@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Enhanced Reveal on Scroll Animation
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px' // Trigger slightly before it's fully in view
+        rootMargin: '0px 0px -100px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -31,12 +31,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, observerOptions);
 
-    // Observe all elements with the 'reveal' class
     document.querySelectorAll('.reveal').forEach(el => {
         observer.observe(el);
     });
 
-    // 3. Navbar background scroll effect
+    // 3. Apple-Style Parallax & Smooth Scale
+    const parallaxItems = document.querySelectorAll('.parallax-item');
+
+    const handleParallax = () => {
+        const scrolled = window.pageYOffset;
+
+        parallaxItems.forEach(item => {
+            const speed = item.dataset.speed || 0.1;
+            const yPos = -(scrolled * speed);
+            item.style.transform = `translateY(${yPos}px)`;
+        });
+
+        // Subtle Hero Scale
+        const hero = document.querySelector('.hero-content');
+        if (hero) {
+            const scale = 1 + scrolled * 0.0002;
+            const opacity = 1 - scrolled * 0.002;
+            if (opacity > 0) {
+                hero.style.transform = `scale(${scale})`;
+                hero.style.opacity = opacity;
+            }
+        }
+    };
+
+    window.addEventListener('scroll', () => {
+        requestAnimationFrame(handleParallax);
+    });
+
+    // 4. Navbar background scroll effect
     const navbar = document.querySelector('.navbar');
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {

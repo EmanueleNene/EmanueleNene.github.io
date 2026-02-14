@@ -626,45 +626,57 @@ footer p {
     }
 }
 
-/* Animation Utilities (Scroll Reveal) */
+/* Animation Utilities (Apple-Style Scroll Reveal) */
 .reveal {
     opacity: 0;
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
+    filter: blur(10px);
+    transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform, opacity, filter;
 }
 
 .reveal-up {
-    transform: translateY(40px);
+    transform: translateY(60px) scale(0.95);
 }
 
 .reveal-left {
-    transform: translateX(-40px);
+    transform: translateX(-60px) scale(0.95);
 }
 
 .reveal-right {
-    transform: translateX(40px);
+    transform: translateX(60px) scale(0.95);
+}
+
+.reveal-scale {
+    transform: scale(0.8);
 }
 
 .reveal.visible {
     opacity: 1;
-    transform: translate(0, 0);
+    filter: blur(0);
+    transform: translate(0, 0) scale(1);
+}
+
+/* Parallax Effect Utility */
+.parallax-item {
+    will-change: transform;
+    transition: transform 0.1s linear;
 }
 
 /* Stagger Delay Utility */
 .stagger-1 {
-    transition-delay: 0.1s;
+    transition-delay: 0.15s;
 }
 
 .stagger-2 {
-    transition-delay: 0.2s;
-}
-
-.stagger-3 {
     transition-delay: 0.3s;
 }
 
+.stagger-3 {
+    transition-delay: 0.45s;
+}
+
 .stagger-4 {
-    transition-delay: 0.4s;
+    transition-delay: 0.6s;
 }
 
 /* Project Detail Pages */
