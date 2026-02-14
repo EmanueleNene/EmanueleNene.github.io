@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Enhanced Reveal on Scroll Animation
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -52,10 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (hero) {
             const scale = 1 + scrolled * 0.0002;
             const opacity = 1 - scrolled * 0.002;
-            if (opacity > 0) {
-                hero.style.transform = `scale(${scale})`;
-                hero.style.opacity = opacity;
-            }
+            hero.style.transform = `scale(${scale})`;
+            hero.style.opacity = Math.max(0, opacity);
         }
     };
 
