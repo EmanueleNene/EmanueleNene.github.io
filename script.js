@@ -16,27 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. Simple Reveal on Scroll Animation
-    // We'll use Intersection Observer for better performance
+    // 2. Enhanced Reveal on Scroll Animation
     const observerOptions = {
-        threshold: 0.1
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px' // Trigger slightly before it's fully in view
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                // Optional: Stop observing once revealed
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Add 'fade-in-section' class to sections we want to animate
-    const sections = document.querySelectorAll('.hero, .section, .timeline-content, .card');
-    sections.forEach(section => {
-        section.classList.add('fade-in-section');
-        observer.observe(section);
+    // Observe all elements with the 'reveal' class
+    document.querySelectorAll('.reveal').forEach(el => {
+        observer.observe(el);
     });
 
     // 3. Navbar background scroll effect

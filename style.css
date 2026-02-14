@@ -626,18 +626,47 @@ footer p {
     }
 }
 
-/* Animation Utilities */
-.fade-in-section {
+/* Animation Utilities (Scroll Reveal) */
+.reveal {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-    will-change: opacity, visibility;
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
 }
 
-.fade-in-section.visible {
-    opacity: 1;
-    transform: none;
+.reveal-up {
+    transform: translateY(40px);
 }
+
+.reveal-left {
+    transform: translateX(-40px);
+}
+
+.reveal-right {
+    transform: translateX(40px);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+/* Stagger Delay Utility */
+.stagger-1 {
+    transition-delay: 0.1s;
+}
+
+.stagger-2 {
+    transition-delay: 0.2s;
+}
+
+.stagger-3 {
+    transition-delay: 0.3s;
+}
+
+.stagger-4 {
+    transition-delay: 0.4s;
+}
+
 /* Project Detail Pages */
 .project-detail-header {
     text-align: center;
