@@ -609,7 +609,20 @@ footer p {
 
     .nav-links {
         display: none;
-        /* In a real app we'd toggle this with JS */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--bg-body);
+        flex-direction: column;
+        padding: 2rem;
+        gap: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-links.active {
+        display: flex;
     }
 
     .hamburger {
