@@ -220,6 +220,17 @@ h3 {
     max-width: 600px;
 }
 
+.hero-small {
+    padding: 8rem 0 4rem 0;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.hero-small .hero-content {
+    margin: 0 auto;
+}
+
 /* Badge */
 .badgewrapper {
     display: inline-block;
