@@ -27,6 +27,7 @@
 
     --border: #e8e6db;
     --border-light: #d9d7cc;
+    --bg-offset: #f0efe5;
 
     /* Spacing & Layout */
     --container-max-width: 1200px;
@@ -85,7 +86,7 @@ img {
 }
 
 .bg-offset {
-    background-color: #f0efe5;
+    background-color: var(--bg-offset);
     /* Soft Pastel Sand */
 }
 
@@ -146,11 +147,16 @@ h3 {
     box-shadow: 0 4px 12px rgba(168, 197, 164, 0.3);
 }
 
+.hero-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .btn-secondary {
     background-color: transparent;
     border: 1px solid var(--border-light);
     color: var(--text-primary);
-    margin-left: 1rem;
 }
 
 .btn-secondary:hover {
@@ -290,7 +296,7 @@ h3 {
 .card:hover {
     transform: translateY(-5px);
     border-color: var(--border-light);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
 .card-icon {
@@ -331,11 +337,13 @@ h3 {
 }
 
 /* Place the items on left/right */
-.left {
+.timeline-item:nth-child(odd),
+.timeline-item.left {
     left: 0;
 }
 
-.right {
+.timeline-item:nth-child(even),
+.timeline-item.right {
     left: 50%;
 }
 
@@ -353,6 +361,7 @@ h3 {
     transition: all 0.3s ease;
 }
 
+.timeline-item:nth-child(even) .timeline-dot,
 .right .timeline-dot {
     left: -8px;
 }
@@ -372,11 +381,13 @@ h3 {
     opacity: 0.5;
 }
 
+.timeline-item:nth-child(odd) .timeline-date,
 .left .timeline-date {
     right: -100px;
     text-align: left;
 }
 
+.timeline-item:nth-child(even) .timeline-date,
 .right .timeline-date {
     left: -100px;
     text-align: right;
@@ -428,24 +439,22 @@ h3 {
         padding-right: 25px;
     }
 
+    .timeline-item:nth-child(even),
     .timeline-item.right {
         left: 0%;
     }
 
-    .left::after,
-    .right::after {
+    .timeline-item::after {
         left: 15px;
     }
 
-    .left .timeline-dot,
-    .right .timeline-dot {
+    .timeline-item .timeline-dot {
         left: 23px;
         /* Align dot with line at 31px (31 - 8) */
         right: auto;
     }
 
-    .left .timeline-date,
-    .right .timeline-date {
+    .timeline-item .timeline-date {
         position: relative;
         left: 0;
         right: auto;
@@ -772,6 +781,103 @@ footer p {
     .project-detail-header {
         padding: 4rem 1rem 0 1rem;
     }
+}
+
+/* -----------------------------------------------
+   Recipe Pages
+   ----------------------------------------------- */
+
+/* Grid utility: 2-column layout, stacks on mobile */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Recipe placeholder image area */
+.recipe-placeholder {
+    background: var(--bg-offset);
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+}
+
+/* Dashed ratio/highlight box */
+.recipe-ratio-box {
+    padding: 1.5rem;
+    background: var(--bg-body);
+    border-style: dashed;
+    margin-bottom: 2rem;
+}
+
+/* Step wrapper spacing */
+.recipe-step {
+    margin-bottom: 2rem;
+}
+
+/* Styled table */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.styled-table thead tr {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.styled-table th {
+    padding: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid var(--border);
+}
+
+.styled-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.styled-table td {
+    padding: 1rem;
+    color: var(--text-secondary);
+}
+
+/* Responsive table wrapper */
+.table-scroll {
+    overflow-x: auto;
+    padding: 0;
+}
+
+/* Placeholder icon inside recipe-placeholder */
+.recipe-icon {
+    font-size: 4rem;
+    color: var(--text-muted);
+}
+
+/* Ratio box centered text */
+.recipe-ratio-text {
+    margin-bottom: 0;
+    text-align: center;
+    font-size: 1.25rem;
+}
+
+/* Pro tip note style */
+.recipe-pro-tip {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 0;
 }
 
 /* -----------------------------------------------

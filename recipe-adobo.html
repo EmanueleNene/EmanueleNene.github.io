@@ -42,9 +42,8 @@
         </div>
 
         <div class="project-detail-image reveal reveal-up stagger-1">
-            <div class="recipe-placeholder"
-                style="background: var(--bg-offset); height: 400px; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
-                <i class="ph ph-fire-simple" style="font-size: 4rem; color: var(--text-muted);"></i>
+            <div class="recipe-placeholder">
+                <i class="ph ph-fire-simple recipe-icon"></i>
             </div>
         </div>
 
@@ -57,9 +56,8 @@
 
             <section>
                 <h2>1. Core Ratio (The Foundation)</h2>
-                <div class="card"
-                    style="padding: 1.5rem; background: var(--bg-body); border-style: dashed; margin-bottom: 2rem;">
-                    <p style="margin-bottom: 0; text-align: center; font-size: 1.25rem;"><strong>Soy : Vinegar : Water =
+                <div class="card recipe-ratio-box">
+                    <p class="recipe-ratio-text"><strong>Soy : Vinegar : Water =
                             1 : 1 : 1.5</strong></p>
                 </div>
 
@@ -82,14 +80,14 @@
             <section>
                 <h2>2. Step-by-Step Logic</h2>
 
-                <div style="margin-bottom: 2rem;">
+                <div class="recipe-step">
                     <h3>Step A — Optional Browning</h3>
                     <p>Sear chicken skin-side down in a lightly oiled pot until golden. This triggers the
                         <strong>Maillard reaction</strong>, adding depth and complexity. Remove excess fat if needed.
                     </p>
                 </div>
 
-                <div style="margin-bottom: 2rem;">
+                <div class="recipe-step">
                     <h3>Step B — Building the Braise</h3>
                     <ul>
                         <li>Add garlic and sauté briefly (do not burn).</li>
@@ -100,7 +98,7 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 2rem;">
+                <div class="recipe-step">
                     <h3>Step C — The Simmer (Tenderization)</h3>
                     <p>Lower heat and cover. The acid helps denature proteins and tenderize tissue.</p>
                     <ul>
@@ -109,7 +107,7 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 2rem;">
+                <div class="recipe-step">
                     <h3>Step D — The Reduction (Concentration)</h3>
                     <p>Remove the lid and simmer uncovered for 10–15 minutes. Liquid reduces by evaporation,
                         concentrating saltiness and acidity. The sauce thickens from chicken-released gelatin. Aim for a
@@ -120,13 +118,13 @@
 
             <section>
                 <h2>3. Texture Control Options</h2>
-                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <div class="card" style="padding: 1.5rem; background: var(--bg-surface);">
+                <div class="grid-2">
+                    <div class="card">
                         <h3>Crisp Skin</h3>
                         <p>Remove chicken after braising. Reduce sauce separately. Broil or air-fry chicken for 5–8
                             mins, then spoon glaze over.</p>
                     </div>
-                    <div class="card" style="padding: 1.5rem; background: var(--bg-surface);">
+                    <div class="card">
                         <h3>Soft & Saucy</h3>
                         <p>Leave chicken in the pot and reduce the sauce around it for a more traditional, tender
                             result.</p>
@@ -136,34 +134,34 @@
 
             <section>
                 <h2>4. Flavor Adjustments</h2>
-                <div class="card" style="overflow-x: auto; padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <div class="card table-scroll">
+                    <table class="styled-table">
                         <thead>
-                            <tr style="background: var(--bg-surface); border-bottom: 1px solid var(--border);">
-                                <th style="padding: 1rem;">Goal</th>
-                                <th style="padding: 1rem;">Adjustment</th>
+                            <tr>
+                                <th>Goal</th>
+                                <th>Adjustment</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--border);">
-                                <td style="padding: 1rem;">More savory depth</td>
-                                <td style="padding: 1rem;">Add 1 tsp fish sauce</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border);">
-                                <td style="padding: 1rem;">Slight sweetness</td>
-                                <td style="padding: 1rem;">1 tbsp brown sugar</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border);">
-                                <td style="padding: 1rem;">Earthy tone</td>
-                                <td style="padding: 1rem;">Add ½ sliced onion</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border);">
-                                <td style="padding: 1rem;">Spicy kick</td>
-                                <td style="padding: 1rem;">1–2 dried chilies</td>
+                            <tr>
+                                <td>More savory depth</td>
+                                <td>Add 1 tsp fish sauce</td>
                             </tr>
                             <tr>
-                                <td style="padding: 1rem;">Richer body</td>
-                                <td style="padding: 1rem;">½ tsp cornstarch slurry at end</td>
+                                <td>Slight sweetness</td>
+                                <td>1 tbsp brown sugar</td>
+                            </tr>
+                            <tr>
+                                <td>Earthy tone</td>
+                                <td>Add ½ sliced onion</td>
+                            </tr>
+                            <tr>
+                                <td>Spicy kick</td>
+                                <td>1–2 dried chilies</td>
+                            </tr>
+                            <tr>
+                                <td>Richer body</td>
+                                <td>½ tsp cornstarch slurry at end</td>
                             </tr>
                         </tbody>
                     </table>
@@ -196,6 +194,18 @@
                 <div class="footer-logo">Emanuele</div>
                 <p>&copy; 2026. All rights reserved.</p>
             </div>
+
+            <div class="footer-contact">
+                <div class="info-item">
+                    <i class="ph ph-envelope-simple"></i>
+                    <span>emadal@kth.se</span>
+                </div>
+                <div class="info-item">
+                    <i class="ph ph-map-pin"></i>
+                    <span>Stockholm, Sweden</span>
+                </div>
+            </div>
+
             <div class="social-links">
                 <a href="https://github.com/EmanueleNene" target="_blank"><i class="ph ph-github-logo"></i></a>
                 <a href="https://www.linkedin.com/in/emanuele-d-allestro-68a9601a7/" target="_blank"><i
