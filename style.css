@@ -87,7 +87,8 @@ img {
 
 .bg-offset {
     background-color: var(--bg-offset);
-    /* Soft Pastel Sand */
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
 /* Typography Headings */
@@ -115,7 +116,7 @@ h3 {
 }
 
 .gradient-text {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    background: linear-gradient(135deg, #7da678 0%, #c49a7e 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -204,6 +205,26 @@ h3 {
 .nav-links a:hover,
 .nav-links a.active {
     color: var(--text-primary);
+}
+
+.nav-links a:not(.btn-primary) {
+    position: relative;
+}
+
+.nav-links a:not(.btn-primary)::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:not(.btn-primary):hover::after,
+.nav-links a:not(.btn-primary).active::after {
+    width: 100%;
 }
 
 /* Hero Section */
@@ -336,61 +357,65 @@ h3 {
     box-sizing: border-box;
 }
 
-/* Place the items on left/right */
-.timeline-item:nth-child(odd),
-.timeline-item.left {
-    left: 0;
-}
-
-.timeline-item:nth-child(even),
-.timeline-item.right {
-    left: 50%;
-}
-
 /* The dots */
 .timeline-dot {
     position: absolute;
     width: 16px;
     height: 16px;
-    right: -8px;
     background-color: var(--bg-body);
     border: 3px solid var(--primary);
     top: 24px;
     border-radius: 50%;
-    z-index: 1;
+    z-index: 5;
     transition: all 0.3s ease;
 }
 
-.timeline-item:nth-child(even) .timeline-dot,
-.right .timeline-dot {
-    left: -8px;
+/* Date Marker Base */
+.timeline-date {
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* Desktop Styles */
+@media screen and (min-width: 769px) {
+    .timeline-item.left {
+        left: 0;
+    }
+
+    .timeline-item.right {
+        left: 50%;
+    }
+
+    .timeline-item.left .timeline-dot {
+        right: -8px;
+    }
+
+    .timeline-item.right .timeline-dot {
+        left: -8px;
+    }
+
+    .timeline-date {
+        position: absolute;
+        top: 20px;
+        font-size: 1.5rem;
+        opacity: 0.5;
+        width: 100px;
+    }
+
+    .timeline-item.left .timeline-date {
+        right: -120px;
+        text-align: left;
+    }
+
+    .timeline-item.right .timeline-date {
+        left: -120px;
+        text-align: right;
+    }
 }
 
 .timeline-item:hover .timeline-dot {
     background-color: var(--primary);
     transform: scale(1.2);
-}
-
-/* Date Marker */
-.timeline-date {
-    position: absolute;
-    top: 20px;
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    opacity: 0.5;
-}
-
-.timeline-item:nth-child(odd) .timeline-date,
-.left .timeline-date {
-    right: -100px;
-    text-align: left;
-}
-
-.timeline-item:nth-child(even) .timeline-date,
-.right .timeline-date {
-    left: -100px;
-    text-align: right;
 }
 
 /* Content Box */
@@ -434,35 +459,27 @@ h3 {
     }
 
     .timeline-item {
-        width: 100%;
-        padding-left: 70px;
-        padding-right: 25px;
+        width: 100% !important;
+        padding-left: 70px !important;
+        padding-right: 25px !important;
+        left: 0 !important;
     }
 
-    .timeline-item:nth-child(even),
-    .timeline-item.right {
-        left: 0%;
+    .timeline-dot {
+        left: 23px !important;
+        right: auto !important;
     }
 
-    .timeline-item::after {
-        left: 15px;
-    }
-
-    .timeline-item .timeline-dot {
-        left: 23px;
-        /* Align dot with line at 31px (31 - 8) */
-        right: auto;
-    }
-
-    .timeline-item .timeline-date {
-        position: relative;
-        left: 0;
-        right: auto;
-        top: 0;
-        margin-bottom: 0.5rem;
-        text-align: left;
-        font-size: 1.1rem;
-        display: block;
+    .timeline-date {
+        display: block !important;
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: auto !important;
+        margin-bottom: 0.5rem !important;
+        text-align: left !important;
+        font-size: 1.1rem !important;
+        opacity: 0.8 !important;
     }
 }
 
@@ -552,6 +569,7 @@ footer {
     padding: 4rem 0;
     border-top: 1px solid var(--border);
     margin-top: 4rem;
+    background-color: var(--bg-offset);
 }
 
 .footer-content {
