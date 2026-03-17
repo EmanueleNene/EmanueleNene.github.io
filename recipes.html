@@ -17,6 +17,9 @@
 
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
 </head>
 
 <body>
@@ -52,30 +55,48 @@
         <div class="container">
             <div class="grid-3">
                 <!-- Recipe Card 1 -->
-                <div class="card reveal reveal-up stagger-1">
-                    <div class="card-icon"><i class="ph ph-fire"></i></div>
-                    <h3>Chicken Adobo-ish</h3>
-                    <p>A savory, tangy Filipino-inspired braised chicken with a perfectly reduced sauce.</p>
-                    <a href="recipe-adobo.html" class="link-arrow stretched-link">View Recipe <i
-                            class="ph ph-arrow-right"></i></a>
+                <div class="card recipe-card reveal reveal-up stagger-1">
+                    <div class="recipe-card-image">
+                        <div class="recipe-placeholder-img">
+                            <i class="ph ph-fire recipe-card-icon"></i>
+                            <span class="recipe-placeholder-text">Chicken Adobo</span>
+                        </div>
+                    </div>
+                    <div class="recipe-card-content">
+                        <h3>Chicken Adobo-ish</h3>
+                        <p>A savory, tangy Filipino-inspired braised chicken with a perfectly reduced sauce.</p>
+                        <a href="recipe-adobo.html" class="link-arrow stretched-link">View Recipe <i
+                                class="ph ph-arrow-right"></i></a>
+                    </div>
                 </div>
 
                 <!-- Recipe Card 2 -->
-                <div class="card reveal reveal-up stagger-2">
-                    <div class="card-icon"><i class="ph ph-bowl-food"></i></div>
-                    <h3>Gochujang Glazed Chicken</h3>
-                    <p>A deeply flavored Korean-inspired chicken glaze, balancing sweet, spicy, and umami.</p>
-                    <a href="recipe-gochujang.html" class="link-arrow stretched-link">View Recipe <i
-                            class="ph ph-arrow-right"></i></a>
+                <div class="card recipe-card reveal reveal-up stagger-2">
+                    <div class="recipe-card-image">
+                        <div class="recipe-placeholder-img">
+                            <i class="ph ph-bowl-food recipe-card-icon"></i>
+                            <span class="recipe-placeholder-text">Gochujang Chicken</span>
+                        </div>
+                    </div>
+                    <div class="recipe-card-content">
+                        <h3>Gochujang Glazed Chicken</h3>
+                        <p>A deeply flavored Korean-inspired chicken glaze, balancing sweet, spicy, and umami.</p>
+                        <a href="recipe-gochujang.html" class="link-arrow stretched-link">View Recipe <i
+                                class="ph ph-arrow-right"></i></a>
+                    </div>
                 </div>
 
                 <!-- Recipe Card 3 -->
-                <div class="card reveal reveal-up stagger-3">
-                    <div class="card-icon"><i class="ph ph-fire"></i></div>
-                    <h3>Pepper Beef Stir-fry</h3>
-                    <p>A classic Chinese-inspired stir-fry featuring tender beef and crisp bell peppers.</p>
-                    <a href="recipe-pepper-beef.html" class="link-arrow stretched-link">View Recipe <i
-                            class="ph ph-arrow-right"></i></a>
+                <div class="card recipe-card reveal reveal-up stagger-3">
+                    <div class="recipe-card-image">
+                        <img src="images/pepper_beef.png" alt="Pepper Beef Stir-fry">
+                    </div>
+                    <div class="recipe-card-content">
+                        <h3>Pepper Beef Stir-fry</h3>
+                        <p>A classic Chinese-inspired stir-fry featuring tender beef and crisp bell peppers.</p>
+                        <a href="recipe-pepper-beef.html" class="link-arrow stretched-link">View Recipe <i
+                                class="ph ph-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
