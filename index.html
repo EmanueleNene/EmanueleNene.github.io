@@ -7,35 +7,45 @@
     <meta name="description" content="Personal Portfolio Website">
     <title>Emanuele D.</title>
 
-    <!-- Google Fonts: Source Serif 4 -->
+    <!-- Google Fonts: Libre Baskerville for organic serif, Cormorant Garamond for display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- Icons (Phosphor Icons - lightweight and clean) -->
+    <!-- Icons (Phosphor Icons) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
 </head>
 
 <body>
+    <!-- Paper Texture Overlay -->
+    <div class="paper-overlay"></div>
+
+    <!-- Floating Paper Sheets (Parallax) -->
+    <div class="paper-sheet paper-sheet-1 parallax-item" data-speed="0.15"></div>
+    <div class="paper-sheet paper-sheet-2 parallax-item" data-speed="-0.1"></div>
+    <div class="paper-sheet paper-sheet-3 parallax-item" data-speed="0.25"></div>
 
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container nav-container">
-            <a href="#" class="logo">Emanuele D.</a>
+            <a href="#" class="logo">
+                <span class="logo-text">Emanuele D.</span>
+                <span class="logo-underline"></span>
+            </a>
             <ul class="nav-links">
                 <li><a href="#home" class="active">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="recipes.html">Recipes</a></li>
                 <li><a href="conferences.html">Conferences</a></li>
-                <li><a href="phd-responsible.html">PhD Responsible</a></li>
-                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
+                <li><a href="phd-responsible.html">PhD</a></li>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Contact</a></li>
             </ul>
             <div class="hamburger">
                 <i class="ph ph-list"></i>
@@ -45,135 +55,205 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
+        <div class="hero-fiber-texture"></div>
         <div class="container hero-content">
-            <span class="badgewrapper"><span class="badge">PhD Student at KTH Royal Institute of
-                    Technology</span></span>
-            <h1 class="reveal reveal-up">Developing <span class="gradient-text">new paper based products</span> that
-                matter.</h1>
-            <p class="hero-subtitle reveal reveal-up stagger-1">I'm a creative researcher who loves to expand his
-                knowledge.</p>
-            <div class="hero-buttons">
-                <a href="#projects" class="btn-primary">View Work</a>
-                <a href="mailto:emadal@kth.se" class="btn-secondary">Email Me</a>
+            <div class="hero-badge">
+                <span class="fiber-line"></span>
+                <span class="badge-text">PhD Student at KTH Royal Institute of Technology</span>
+            </div>
+            <h1 class="hero-title reveal-text">
+                <span class="line">Exploring the</span>
+                <span class="line accent">materiality</span>
+                <span class="line">of paper</span>
+            </h1>
+            <p class="hero-subtitle reveal-up">Researcher developing sustainable cellulose-based solutions for tomorrow's challenges.</p>
+            <div class="hero-buttons reveal-up stagger-2">
+                <a href="#projects" class="btn-primary">
+                    <span>View Research</span>
+                    <i class="ph ph-arrow-down-right"></i>
+                </a>
+                <a href="mailto:emadal@kth.se" class="btn-secondary">
+                    <span>Get in touch</span>
+                </a>
             </div>
         </div>
-        <!-- Abstract Decoration -->
-        <div class="hero-decoration parallax-item" data-speed="0.2"></div>
-    </section>
-
-    <!-- Features / Value  -->
-    <section id="about" class="section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="reveal reveal-up">What I Do</h2>
-                <p class="reveal reveal-up stagger-1">Passionate about creating clean, modern, and high-performance
-                    solutions.</p>
-            </div>
-            <div class="grid-3">
-                <div class="card reveal reveal-up stagger-1">
-                    <div class="card-icon"><i class="ph ph-flask"></i></div>
-                    <h3>Developing new experiment setups</h3>
-                    <p>Focusing on creating new experiment setups for research purposes.</p>
-                </div>
-                <div class="card reveal reveal-up stagger-2">
-                    <div class="card-icon"><i class="ph ph-article"></i></div>
-                    <h3>Paper Research</h3>
-                    <p>Writing clean, maintainable code for concurrent scale model simulations.</p>
-                </div>
-                <div class="card reveal reveal-up stagger-3">
-                    <div class="card-icon"><i class="ph ph-plant"></i></div>
-                    <h3>Vertical Farm</h3>
-                    <p>Designing and building a vertical farm paper-based plugs.</p>
-                </div>
-            </div>
+        <div class="hero-scroll-indicator">
+            <div class="scroll-line"></div>
+            <span>Scroll</span>
         </div>
     </section>
 
-    <!-- Projects Placeholder -->
-    <section id="projects" class="section bg-offset">
+    <!-- About / Research Focus -->
+    <section id="about" class="section section-paper">
+        <div class="paper-tear paper-tear-top"></div>
         <div class="container">
-            <div class="section-header">
-                <h2>Featured Projects</h2>
-                <p>A selection of my recent work.</p>
+            <div class="section-grid">
+                <div class="section-header">
+                    <span class="section-label reveal-left">Research Focus</span>
+                    <h2 class="reveal-left stagger-1">Investigating cellulose structures at the intersection of material science and sustainability.</h2>
+                </div>
+                <div class="section-body">
+                    <p class="reveal-up stagger-2">My work explores how cellulose fibers interact, bond, and transform under various conditions — from nanoscale crystal structures to macroscopic paper behavior like curl and stiffness.</p>
+                    <a href="#projects" class="text-link reveal-up stagger-3">
+                        <span>Explore my work</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <div class="timeline">
+
+            <div class="expertise-grid">
+                <div class="expertise-card reveal-up stagger-1">
+                    <div class="card-fiber"></div>
+                    <div class="card-icon">
+                        <i class="ph ph-flask"></i>
+                    </div>
+                    <h3>Experimental Design</h3>
+                    <p>Building custom setups to investigate paper behavior under controlled conditions.</p>
+                </div>
+                <div class="expertise-card reveal-up stagger-2">
+                    <div class="card-fiber"></div>
+                    <div class="card-icon">
+                        <i class="ph ph-article"></i>
+                    </div>
+                    <h3>Material Characterization</h3>
+                    <p>Advanced analysis of cellulose composites and fiber networks.</p>
+                </div>
+                <div class="expertise-card reveal-up stagger-3">
+                    <div class="card-fiber"></div>
+                    <div class="card-icon">
+                        <i class="ph ph-plant"></i>
+                    </div>
+                    <h3>Sustainable Applications</h3>
+                    <p>Developing bio-based alternatives for packaging and agriculture.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section section-dark">
+        <div class="container">
+            <div class="section-header section-header-center">
+                <span class="section-label reveal-up">Selected Work</span>
+                <h2 class="reveal-up stagger-1">Research Projects</h2>
+            </div>
+
+            <div class="projects-list">
                 <!-- Project 1 -->
-                <div class="timeline-item left">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">2026</div>
-                    <div class="timeline-content reveal">
-                        <img src="images/structural_curl.png" alt="Structural Curl"
-                            class="project-img reveal reveal-scale stagger-1">
-                        <div class="project-text">
-                            <h3>Structural curl and the relative importance of the structural parameters</h3>
-                            <p>Investigating the impact of structural parameters on the curl of paper.</p>
-                            <a href="structural-curl.html" class="link-arrow">View Case Study <i
-                                    class="ph ph-arrow-right"></i></a>
+                <article class="project-item reveal-up">
+                    <div class="project-year">2026</div>
+                    <div class="project-content">
+                        <div class="project-image">
+                            <img src="images/structural_curl.png" alt="Structural Curl Research">
+                            <div class="image-curl"></div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Structural Curl</h3>
+                            <p>Investigating the relative importance of structural parameters on paper curl behavior.</p>
+                            <a href="structural-curl.html" class="project-link">
+                                <span>View case study</span>
+                                <i class="ph ph-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                </div>
+                </article>
+
+                <!-- Divider -->
+                <div class="project-divider reveal-scale"></div>
+
                 <!-- Project 2 -->
-                <div class="timeline-item right">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">2024</div>
-                    <div class="timeline-content reveal">
-                        <img src="images/crystal_plasticity.png" alt="Crystal Plasticity"
-                            class="project-img reveal reveal-scale stagger-1">
-                        <div class="project-text">
+                <article class="project-item reveal-up">
+                    <div class="project-year">2024</div>
+                    <div class="project-content">
+                        <div class="project-image">
+                            <img src="images/crystal_plasticity.png" alt="Crystal Plasticity Analysis">
+                            <div class="image-curl"></div>
+                        </div>
+                        <div class="project-info">
                             <h3>Crystal Plasticity</h3>
-                            <p>Crystal plasticity analysis for bi-crystal Ni-base superalloy by adopting compact
-                                specimens with different crystal orientations.</p>
-                            <a href="crystal-plasticity.html" class="link-arrow">Read Publication <i
-                                    class="ph ph-arrow-right"></i></a>
+                            <p>Analysis of bi-crystal Ni-base superalloy using compact specimens with varied orientations.</p>
+                            <a href="crystal-plasticity.html" class="project-link">
+                                <span>Read publication</span>
+                                <i class="ph ph-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
-                </div>
+                </article>
+
+                <!-- Divider -->
+                <div class="project-divider reveal-scale"></div>
 
                 <!-- Project 3 -->
-                <div class="timeline-item left">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">2023</div>
-                    <div class="timeline-content reveal">
-                        <img src="images/cellulose_nanofibers.png" alt="Cellulose Nanofibers"
-                            class="project-img reveal reveal-scale stagger-1">
-                        <div class="project-text">
+                <article class="project-item reveal-up">
+                    <div class="project-year">2023</div>
+                    <div class="project-content">
+                        <div class="project-image">
+                            <img src="images/cellulose_nanofibers.png" alt="Cellulose Nanofibers">
+                            <div class="image-curl"></div>
+                        </div>
+                        <div class="project-info">
                             <h3>Cellulose Nanofibers</h3>
-                            <p>Investigation of mechanical properties of CNF-reinforced composites for structural
-                                applications.</p>
-                            <a href="cellulose-nanofibers.html" class="link-arrow">Read Publication <i
-                                    class="ph ph-arrow-right"></i></a>
+                            <p>Mechanical property investigation of CNF-reinforced composites for structural applications.</p>
+                            <a href="cellulose-nanofibers.html" class="project-link">
+                                <span>Read publication</span>
+                                <i class="ph ph-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section section-paper-light">
+        <div class="paper-tear paper-tear-bottom"></div>
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-header">
+                    <span class="section-label reveal-left">Contact</span>
+                    <h2 class="reveal-left stagger-1">Let's collaborate</h2>
+                    <p class="reveal-left stagger-2">Interested in discussing research, sustainability, or cellulose applications? I'd love to hear from you.</p>
+                </div>
+                <div class="contact-actions reveal-up stagger-3">
+                    <a href="mailto:emadal@kth.se" class="btn-primary btn-large">
+                        <span>emadal@kth.se</span>
+                        <i class="ph ph-envelope-simple"></i>
+                    </a>
+                    <div class="contact-meta">
+                        <div class="meta-item">
+                            <i class="ph ph-map-pin"></i>
+                            <span>Stockholm, Sweden</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="ph ph-buildings"></i>
+                            <span>KTH Royal Institute</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
-
 
     <!-- Footer -->
     <footer>
-        <div class="container footer-content">
-            <div class="footer-brand">
-                <div class="footer-logo">Emanuele</div>
-                <p>&copy; 2026. All rights reserved.</p>
-            </div>
-
-            <div class="footer-contact">
-                <div class="info-item">
-                    <i class="ph ph-envelope-simple"></i>
-                    <span>emadal@kth.se</span>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-name">Emanuele D.</span>
+                    <span class="footer-title">PhD Researcher</span>
                 </div>
-                <div class="info-item">
-                    <i class="ph ph-map-pin"></i>
-                    <span>Stockholm, Sweden</span>
+                <div class="footer-links">
+                    <a href="https://github.com/EmanueleNene" target="_blank">
+                        <i class="ph ph-github-logo"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/emanuele-d-allestro-68a9601a7/" target="_blank">
+                        <i class="ph ph-linkedin-logo"></i>
+                    </a>
                 </div>
-            </div>
-
-            <div class="social-links">
-                <a href="https://github.com/EmanueleNene" target="_blank"><i class="ph ph-github-logo"></i></a>
-                <a href="https://www.linkedin.com/in/emanuele-d-allestro-68a9601a7/" target="_blank"><i
-                        class="ph ph-linkedin-logo"></i></a>
+                <div class="footer-copy">
+                    <span>&copy; 2026</span>
+                </div>
             </div>
         </div>
     </footer>
