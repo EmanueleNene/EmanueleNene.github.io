@@ -58,9 +58,16 @@
     <!-- Recipes List -->
     <section class="section">
         <div class="container">
+            <!-- Recipe Filter Bar -->
+            <div class="recipe-filter-bar reveal reveal-up">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="chicken">Chicken</button>
+                <button class="filter-btn" data-filter="beef">Beef</button>
+            </div>
+
             <div class="grid-3">
                 <!-- Recipe Card 1 -->
-                <div class="card recipe-card reveal reveal-up stagger-1">
+                <div class="card recipe-card js-tilt reveal reveal-up stagger-1" data-category="chicken">
                     <div class="recipe-card-image">
                         <div class="recipe-placeholder-img">
                             <i class="ph ph-fire recipe-card-icon"></i>
@@ -76,7 +83,7 @@
                 </div>
 
                 <!-- Recipe Card 2 -->
-                <div class="card recipe-card reveal reveal-up stagger-2">
+                <div class="card recipe-card js-tilt reveal reveal-up stagger-2" data-category="chicken">
                     <div class="recipe-card-image">
                         <div class="recipe-placeholder-img">
                             <i class="ph ph-bowl-food recipe-card-icon"></i>
@@ -92,7 +99,7 @@
                 </div>
 
                 <!-- Recipe Card 3 -->
-                <div class="card recipe-card reveal reveal-up stagger-3">
+                <div class="card recipe-card js-tilt reveal reveal-up stagger-3" data-category="beef">
                     <div class="recipe-card-image">
                         <img src="../images/pepper_beef.png" alt="Pepper Beef Stir-fry">
                     </div>
@@ -105,7 +112,7 @@
                 </div>
 
                 <!-- Recipe Card 4 -->
-                <div class="card recipe-card reveal reveal-up stagger-4">
+                <div class="card recipe-card js-tilt reveal reveal-up stagger-4" data-category="beef">
                     <div class="recipe-card-image">
                         <div class="recipe-placeholder-img">
                             <i class="ph ph-meat recipe-card-icon"></i>

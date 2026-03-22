@@ -97,4 +97,71 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // 6. Recipe Filtering Logic
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const recipeCards = document.querySelectorAll('.recipe-card');
+
+    if (filterBtns.length > 0 && recipeCards.length > 0) {
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all
+                filterBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked
+                btn.classList.add('active');
+
+                const filterValue = btn.getAttribute('data-filter');
+
+                recipeCards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                        card.classList.remove('hidden');
+                        card.style.opacity = '1';
+                    } else {
+                        card.classList.add('hidden');
+                        card.style.opacity = '0';
+                    }
+                });
+            });
+        });
+    }
+
+    // 7. 3D Vanilla Tilt Effect for Recipe Cards
+    const tiltElements = document.querySelectorAll('.js-tilt');
+
+    if (tiltElements.length > 0) {
+        tiltElements.forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const tiltX = (y - centerY) / centerY;
+                const tiltY = (centerX - x) / centerX;
+
+                const maxTilt = 8;
+
+                el.style.transform = `perspective(1000px) rotateX(${tiltX * -maxTilt}deg) rotateY(${tiltY * -maxTilt}deg) scale3d(1.02, 1.02, 1.02)`;
+
+                // Adjust shadow dynamically
+                const shadowX = tiltY * 15;
+                const shadowY = tiltX * 15;
+                el.style.boxShadow = `${shadowX}px ${shadowY}px 25px rgba(0,0,0,0.1)`;
+            });
+
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                el.style.boxShadow = '';
+                // Add a smooth transition back
+                el.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+            });
+
+            el.addEventListener('mouseenter', () => {
+                // Remove transition to ensure mousemove is instantly responsive
+                el.style.transition = 'none';
+            });
+        });
+    }
 });
