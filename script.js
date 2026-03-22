@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Enhanced Reveal on Scroll Animation
     const observerOptions = {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px'
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -125,42 +125,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 7. 3D Vanilla Tilt Effect for Recipe Cards
-    const tiltElements = document.querySelectorAll('.js-tilt');
 
-    if (tiltElements.length > 0) {
-        tiltElements.forEach(el => {
-            el.addEventListener('mousemove', (e) => {
-                const rect = el.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+    // 8. Scrollspy Logic
+    const sections = document.querySelectorAll('section[id]');
+    const navItems = document.querySelectorAll('.nav-links a[href^="#"]');
 
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                const tiltX = (y - centerY) / centerY;
-                const tiltY = (centerX - x) / centerX;
-
-                const maxTilt = 8;
-
-                el.style.transform = `perspective(1000px) rotateX(${tiltX * -maxTilt}deg) rotateY(${tiltY * -maxTilt}deg) scale3d(1.02, 1.02, 1.02)`;
-
-                // Adjust shadow dynamically
-                const shadowX = tiltY * 15;
-                const shadowY = tiltX * 15;
-                el.style.boxShadow = `${shadowX}px ${shadowY}px 25px rgba(0,0,0,0.1)`;
+    if (sections.length > 0 && navItems.length > 0) {
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
             });
 
-            el.addEventListener('mouseleave', () => {
-                el.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-                el.style.boxShadow = '';
-                // Add a smooth transition back
-                el.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
-            });
-
-            el.addEventListener('mouseenter', () => {
-                // Remove transition to ensure mousemove is instantly responsive
-                el.style.transition = 'none';
+            navItems.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
             });
         });
     }
