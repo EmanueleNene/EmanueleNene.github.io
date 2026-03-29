@@ -105,6 +105,8 @@ h1 {
     font-size: clamp(2.5rem, 5vw, 4rem);
     margin-bottom: 1.5rem;
     font-weight: 500;
+    line-height: 1.1;
+    /* Tighter for hero titles */
 }
 
 h2 {
@@ -233,9 +235,16 @@ h3 {
 
 /* Hero Section */
 .hero {
-    padding: 10rem 0 6rem 0;
+    height: 100dvh;
+    min-height: 600px;
     position: relative;
     overflow: hidden;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
 }
 
 .hero-content {
@@ -744,6 +753,12 @@ footer p {
 
 .stagger-4 {
     transition-delay: 0.6s;
+}
+
+
+.hero-content {
+    position: relative;
+    z-index: 10;
 }
 
 /* Project Detail Pages */
@@ -1298,4 +1313,125 @@ footer p {
 
 .recipe-card.hidden {
     display: none !important;
+}
+/* --------------------------------------------------------------
+   3D Carousel for Values Section
+   -------------------------------------------------------------- */
+
+.carousel-perspective {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    perspective: 1500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.carousel-container {
+    position: relative;
+    width: 300px;
+    height: 350px;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.carousel-item {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    /* 360 / 3 items = 120deg. translateZ to push them away from center */
+    transform: rotateY(calc(var(--i) * 120deg)) translateZ(350px);
+    transition: all 0.5s ease;
+}
+
+.carousel-card {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: var(--transition-bounce);
+    position: relative;
+}
+
+.carousel-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--primary);
+}
+
+.carousel-card h3 {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+}
+
+.carousel-card p {
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+.carousel-card .card-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Navigation Buttons */
+.carousel-nav {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    z-index: 10;
+}
+
+.nav-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid var(--border-light);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.nav-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: scale(1.1);
+}
+
+/* Mobile Adjustments for Carousel */
+@media screen and (max-width: 768px) {
+    .carousel-perspective {
+        height: 350px;
+        perspective: 1000px;
+    }
+    
+    .carousel-container {
+        width: 250px;
+        height: 300px;
+    }
+    
+    .carousel-item {
+        transform: rotateY(calc(var(--i) * 120deg)) translateZ(200px);
+    }
 }

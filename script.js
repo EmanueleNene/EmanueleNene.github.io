@@ -149,4 +149,58 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+
+    // 10. 3D Carousel Logic
+    const initCarousel = () => {
+        const carousel = document.getElementById('valuesCarousel');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (!carousel || !prevBtn || !nextBtn) return;
+
+        let rotationAngle = 0;
+        const itemsCount = 3;
+        const angleStep = 360 / itemsCount;
+
+        const updateCarousel = () => {
+            carousel.style.transform = `rotateY(${rotationAngle}deg)`;
+            
+            // Adjust opacity/scale for non-active items
+            const items = carousel.querySelectorAll('.carousel-item');
+            items.forEach((item, index) => {
+                // Determine which item is currently front-facing
+                // (rotationAngle % 360) / 120 gives the index, but need to handle negatives and offset
+                const currentPositiveAngle = (Math.abs(rotationAngle) % 360);
+                const normalizedAngle = rotationAngle < 0 ? (360 - currentPositiveAngle) % 360 : currentPositiveAngle;
+                // If item i is at 0, 120, 240... it's front-facing when carousel is at -0, -120, -240
+                const itemAngle = (index * angleStep) % 360;
+                const totalRotation = (rotationAngle + itemAngle) % 360;
+                const absTotal = Math.abs(totalRotation);
+                
+                // If absolute total is near 0 or 360, it's the front item
+                if (absTotal < 30 || absTotal > 330) {
+                    item.style.opacity = '1';
+                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(350px) scale(1.1)`;
+                } else {
+                    item.style.opacity = '0.5';
+                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(350px) scale(0.9)`;
+                }
+            });
+        };
+
+        nextBtn.addEventListener('click', () => {
+            rotationAngle -= angleStep;
+            updateCarousel();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            rotationAngle += angleStep;
+            updateCarousel();
+        });
+
+        // Initialize view
+        updateCarousel();
+    };
+    initCarousel();
 });
