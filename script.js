@@ -159,32 +159,38 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!carousel || !prevBtn || !nextBtn) return;
 
-        let rotationAngle = 0;
-        const itemsCount = 3;
+        const items = carousel.querySelectorAll('.carousel-item');
+        const itemsCount = items.length;
         const angleStep = 360 / itemsCount;
+        let rotationAngle = 0;
 
         const updateCarousel = () => {
             carousel.style.transform = `rotateY(${rotationAngle}deg)`;
             
-            // Adjust opacity/scale for non-active items
-            const items = carousel.querySelectorAll('.carousel-item');
             items.forEach((item, index) => {
-                // Determine which item is currently front-facing
-                // (rotationAngle % 360) / 120 gives the index, but need to handle negatives and offset
-                const currentPositiveAngle = (Math.abs(rotationAngle) % 360);
-                const normalizedAngle = rotationAngle < 0 ? (360 - currentPositiveAngle) % 360 : currentPositiveAngle;
-                // If item i is at 0, 120, 240... it's front-facing when carousel is at -0, -120, -240
                 const itemAngle = (index * angleStep) % 360;
+                // Calculate position relative to front (0 degrees)
+                const currentPositiveAngle = (Math.abs(rotationAngle) % 360);
                 const totalRotation = (rotationAngle + itemAngle) % 360;
-                const absTotal = Math.abs(totalRotation);
+                const normalizedRotation = ((totalRotation % 360) + 360) % 360;
                 
-                // If absolute total is near 0 or 360, it's the front item
-                if (absTotal < 30 || absTotal > 330) {
+                // If the item is near the front (0 or 360 degrees)
+                if (normalizedRotation < 25 || normalizedRotation > 335) {
                     item.style.opacity = '1';
-                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(350px) scale(1.1)`;
+                    item.style.visibility = 'visible';
+                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(450px) scale(1.1)`;
+                    item.style.zIndex = '10';
                 } else {
-                    item.style.opacity = '0.5';
-                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(350px) scale(0.9)`;
+                    item.style.opacity = '0.3';
+                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(450px) scale(0.8)`;
+                    item.style.zIndex = '1';
+                    // Hide items that are too far back to improve performance and look
+                    if (normalizedRotation > 100 && normalizedRotation < 260) {
+                        item.style.opacity = '0';
+                        item.style.visibility = 'hidden';
+                    } else {
+                        item.style.visibility = 'visible';
+                    }
                 }
             });
         };
