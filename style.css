@@ -1332,8 +1332,8 @@ footer p {
 
 .carousel-container {
     position: relative;
-    width: 300px;
-    height: 350px;
+    width: 240px;
+    height: 280px;
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1357,7 +1357,7 @@ footer p {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1375,8 +1375,8 @@ footer p {
 }
 
 .carousel-card h3 {
-    margin-top: 1rem;
-    font-size: 1.5rem;
+    margin-top: 0.75rem;
+    font-size: 1.25rem;
 }
 
 .carousel-card p {
@@ -1385,8 +1385,8 @@ footer p {
 }
 
 .carousel-card .card-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
 }
 
 /* Navigation Buttons */
@@ -1422,16 +1422,28 @@ footer p {
 /* Mobile Adjustments for Carousel */
 @media screen and (max-width: 768px) {
     .carousel-perspective {
-        height: 350px;
+        height: 300px;
         perspective: 1000px;
     }
-    
+
     .carousel-container {
-        width: 250px;
-        height: 300px;
+        width: 200px;
+        height: 240px;
     }
-    
+
     .carousel-item {
-        transform: rotateY(calc(var(--i) * 120deg)) translateZ(200px);
+        transform: rotateY(calc(var(--i) * 120deg)) translateZ(160px);
+    }
+
+    .carousel-card {
+        padding: 1.25rem;
+    }
+
+    .carousel-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .carousel-card .card-icon {
+        font-size: 2rem;
     }
 }
