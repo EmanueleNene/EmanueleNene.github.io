@@ -7,7 +7,7 @@ This is a personal portfolio website for Emanuele D'Allestro, a PhD Researcher a
 
 ## Project Structure
 - `index.html`: Main entry point and landing page. Contains the hero section, about, values, and featured projects.
-- `style.css`: Core styling using a "Soft Pastel Earthy" theme. Uses CSS variables for easy customization.
+- `style.css`: Core styling using a "Soft Pastel Earthy" theme. Uses CSS variables for easy customization. Note: `projects/radiculae.html` is a standalone exception with its own bespoke "Radiculae — Botanical Blueprint" styling (deep forest ink, warm parchment, moss green; Fraunces + IBM Plex Mono), self-contained in that page's own `<style>` block.
 - `script.js`: Interactivity, including scroll reveal animations, a 3D carousel for values, and navigation handling.
 - `images/`: Contains static images for projects and personal branding.
 - `recipes/`: Sub-pages for various recipes (e.g., `recipes.html`, individual recipe pages).
