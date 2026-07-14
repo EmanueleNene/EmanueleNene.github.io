@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Emanuele D'Allestro">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Radiculae — cellulose-based solutions for vertical farm food production.">
+    <title>Radiculae | Emanuele D'Allestro</title>
+
+    <!-- Fonts: Fraunces (display + body via variable axes) and IBM Plex Mono (labels/data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../style.css">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Radiculae | Emanuele D'Allestro">
+    <meta property="og:description" content="Radiculae — cellulose-based solutions for vertical farm food production.">
+    <meta property="og:url" content="https://emanuelenene.github.io/">
+    <meta property="og:locale" content="en_US">
+
+    <style>
+        :root {
+            --rad-ink: #0f1c14;
+            --rad-ink-soft: #1b2c20;
+            --rad-cream: #f4eee0;
+            --rad-cream-2: #ebe2cb;
+            --rad-green: #7fa63c;
+            --rad-green-deep: #4c6b32;
+            --rad-rust: #bd642f;
+            --rad-line: rgba(15, 28, 20, 0.16);
+            --rad-line-on-dark: rgba(244, 238, 224, 0.18);
+        }
+
+        .radiculae-page {
+            font-family: 'Fraunces', Georgia, serif;
+            font-optical-sizing: auto;
+            background-color: var(--rad-cream);
+            color: var(--rad-ink);
+        }
+
+        .radiculae-page * {
+            box-sizing: border-box;
+        }
+
+        /* ---- Grain overlay ---- */
+        .rad-grain {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.05;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* ---- Navbar override ---- */
+        .radiculae-page .navbar {
+            background-color: rgba(15, 28, 20, 0.92) !important;
+            box-shadow: none !important;
+            border-bottom: 1px solid var(--rad-line-on-dark);
+            backdrop-filter: blur(10px);
+        }
+
+        .radiculae-page .logo {
+            color: var(--rad-cream);
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+        }
+
+        .radiculae-page .nav-links a {
+            color: rgba(244, 238, 224, 0.72);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .radiculae-page .nav-links a:hover {
+            color: var(--rad-green);
+        }
+
+        .radiculae-page .nav-links a.btn-primary {
+            background-color: var(--rad-green);
+            color: var(--rad-ink);
+            font-weight: 600;
+        }
+
+        .radiculae-page .nav-links a.btn-primary:hover {
+            background-color: #91bb4a;
+        }
+
+        .radiculae-page .hamburger {
+            color: var(--rad-cream);
+        }
+
+        @media (max-width: 768px) {
+            .radiculae-page .nav-links {
+                background-color: var(--rad-ink) !important;
+                border-bottom: 1px solid var(--rad-line-on-dark);
+            }
+        }
+
+        /* ---- Hero ---- */
+        .rad-hero {
+            position: relative;
+            background-color: var(--rad-ink);
+            color: var(--rad-cream);
+            overflow: hidden;
+            padding: 11rem 0 6rem;
+            min-height: 92vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .rad-hero-bg {
+            position: absolute;
+            top: -5%;
+            right: -6%;
+            width: 60%;
+            height: 110%;
+            z-index: 0;
+            opacity: 0.9;
+        }
+
+        .rad-hero-bg svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .rad-root-path {
+            fill: none;
+            stroke: var(--rad-green);
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-dasharray: 1600;
+            stroke-dashoffset: 1600;
+            animation: rad-draw 2.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+            opacity: 0.55;
+        }
+
+        @keyframes rad-draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .rad-hero-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 840px;
+        }
+
+        .rad-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgba(244, 238, 224, 0.6);
+            margin-bottom: 3rem;
+        }
+
+        .rad-back:hover {
+            color: var(--rad-green);
+        }
+
+        .rad-overline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--rad-green);
+            margin-bottom: 1.75rem;
+            opacity: 0;
+            animation: rad-fade-up 0.9s ease 0.3s forwards;
+        }
+
+        .rad-title {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-style: normal;
+            font-size: clamp(3.75rem, 11vw, 8.5rem);
+            line-height: 0.92;
+            letter-spacing: -0.02em;
+            margin: 0 0 1.25rem;
+            opacity: 0;
+            animation: rad-fade-up 1s ease 0.45s forwards;
+        }
+
+        .rad-gloss {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: rgba(244, 238, 224, 0.72);
+            margin-bottom: 1.75rem;
+            opacity: 0;
+            animation: rad-fade-up 1s ease 0.6s forwards;
+        }
+
+        .rad-tagline {
+            font-family: 'Fraunces', serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-size: clamp(1.15rem, 2vw, 1.4rem);
+            max-width: 32ch;
+            color: rgba(244, 238, 224, 0.9);
+            line-height: 1.5;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: rad-fade-up 1s ease 0.75s forwards;
+        }
+
+        @keyframes rad-fade-up {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .rad-scroll-cue {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(244, 238, 224, 0.45);
+            opacity: 0;
+            animation: rad-fade-up 1s ease 0.95s forwards;
+        }
+
+        .rad-cue-line {
+            width: 40px;
+            height: 1px;
+            background: rgba(244, 238, 224, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rad-cue-line::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--rad-green);
+            transform: translateX(-100%);
+            animation: rad-cue 1.8s ease-in-out 1.4s infinite;
+        }
+
+        @keyframes rad-cue {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            50% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ---- Marquee ---- */
+        .rad-marquee {
+            background-color: var(--rad-green);
+            color: var(--rad-ink);
+            overflow: hidden;
+            border-bottom: 1px solid var(--rad-ink);
+        }
+
+        .rad-marquee-track {
+            display: flex;
+            width: max-content;
+            animation: rad-marquee 26s linear infinite;
+        }
+
+        .rad-marquee-group {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .rad-marquee-track span.word {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            padding: 0 1.5rem;
+        }
+
+        .rad-marquee-track span.dot {
+            font-size: 0.6rem;
+        }
+
+        @keyframes rad-marquee {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ---- Layers ---- */
+        .rad-layers {
+            position: relative;
+            padding: 7rem 0 5rem;
+        }
+
+        .rad-layers-head {
+            max-width: 46ch;
+            margin-bottom: 4.5rem;
+        }
+
+        .rad-layers-head .rad-kicker {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--rad-green-deep);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .rad-layers-head h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+        }
+
+        .rad-layer {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(90px, 160px) 1fr;
+            gap: 2rem;
+            align-items: start;
+            padding: 2.75rem 0;
+            border-top: 1px solid var(--rad-line);
+        }
+
+        .rad-layer:last-of-type {
+            border-bottom: 1px solid var(--rad-line);
+        }
+
+        .rad-layer-num {
+            font-family: 'Fraunces', serif;
+            font-weight: 300;
+            font-style: italic;
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            line-height: 1;
+            color: var(--rad-cream-2);
+            -webkit-text-stroke: 1.5px var(--rad-green-deep);
+            color: transparent;
+        }
+
+        .rad-layer-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--rad-rust);
+            margin-bottom: 0.6rem;
+            display: block;
+        }
+
+        .rad-layer h3 {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+            margin-bottom: 0.85rem;
+            letter-spacing: -0.01em;
+        }
+
+        .rad-layer p {
+            max-width: 58ch;
+            font-size: 1.05rem;
+            line-height: 1.75;
+            color: var(--rad-ink);
+            opacity: 0.85;
+        }
+
+        @media (max-width: 640px) {
+            .rad-layer {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+        }
+
+        /* ---- Specimen / image ---- */
+        .rad-specimen {
+            padding: 2rem 0 7rem;
+        }
+
+        .rad-specimen figure {
+            position: relative;
+            margin: 0;
+            border: 1px solid var(--rad-line);
+            background: var(--rad-ink);
+            padding: 0.6rem;
+        }
+
+        .rad-specimen img {
+            width: 100%;
+            display: block;
+            filter: saturate(0.9) contrast(1.05);
+        }
+
+        .rad-specimen figcaption {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--rad-green-deep);
+            padding: 1rem 0 0;
+        }
+
+        /* ---- CTA ---- */
+        .rad-cta {
+            background-color: var(--rad-ink);
+            color: var(--rad-cream);
+            padding: 7rem 0;
+            text-align: center;
+        }
+
+        .rad-cta h2 {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: clamp(2.2rem, 6vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 2.5rem;
+        }
+
+        .rad-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background-color: var(--rad-green);
+            color: var(--rad-ink);
+            padding: 1.1rem 2rem;
+            border-radius: 2px;
+            font-weight: 600;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+        }
+
+        .rad-cta-btn:hover {
+            background-color: var(--rad-cream);
+            transform: translateY(-3px);
+        }
+
+        /* ---- Footer override ---- */
+        .radiculae-page footer {
+            background-color: var(--rad-ink);
+            color: var(--rad-cream);
+            border-top: 1px solid var(--rad-line-on-dark);
+        }
+
+        .radiculae-page footer p,
+        .radiculae-page .info-item {
+            color: rgba(244, 238, 224, 0.6);
+        }
+
+        .radiculae-page .footer-logo {
+            color: var(--rad-cream);
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+        }
+
+        .radiculae-page .social-links a {
+            color: rgba(244, 238, 224, 0.6);
+        }
+
+        .radiculae-page .social-links a:hover {
+            color: var(--rad-green);
+        }
+    </style>
+</head>
+
+<body class="radiculae-page">
+    <div class="rad-grain"></div>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="../index.html" class="logo">Emanuele D.</a>
+            <ul class="nav-links">
+                <li><a href="../recipes/recipes.html">Recipes</a></li>
+                <li><a href="../conferences/conferences.html">Conferences</a></li>
+                <li><a href="../phd/phd-responsible.html">PhD Responsible</a></li>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
+            </ul>
+            <div class="hamburger">
+                <i class="ph ph-list"></i>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <header class="rad-hero">
+            <div class="rad-hero-bg parallax-item" data-speed="0.12" aria-hidden="true">
+                <svg viewBox="0 0 500 900" preserveAspectRatio="xMidYMid slice">
+                    <path class="rad-root-path" d="M320,0 C300,90 340,140 310,230 C285,300 250,320 210,380" />
+                    <path class="rad-root-path" style="animation-delay:0.15s"
+                        d="M310,230 C345,270 385,290 420,340 C450,385 460,420 470,470" />
+                    <path class="rad-root-path" style="animation-delay:0.3s"
+                        d="M210,380 C220,460 190,510 205,600 C215,660 245,690 270,750" />
+                    <path class="rad-root-path" style="animation-delay:0.45s"
+                        d="M210,380 C170,430 120,450 90,510 C65,560 55,600 40,650" />
+                    <path class="rad-root-path" style="animation-delay:0.6s"
+                        d="M270,750 C280,800 260,830 280,880" />
+                    <path class="rad-root-path" style="animation-delay:0.5s"
+                        d="M205,600 C150,630 120,650 80,690" />
+                </svg>
+            </div>
+            <div class="container rad-hero-inner">
+                <a href="../index.html" class="rad-back"><i class="ph ph-arrow-left"></i> Back to portfolio</a>
+                <p class="rad-overline">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 22V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M12 12C12 12 4 12 4 5C11 5 12 12 12 12Z" stroke="currentColor" stroke-width="2"
+                            stroke-linejoin="round" />
+                        <path d="M12 12C12 12 20 12 20 5C13 5 12 12 12 12Z" stroke="currentColor" stroke-width="2"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Startup &middot; Founded 2026
+                </p>
+                <h1 class="rad-title">Radiculae</h1>
+                <p class="rad-gloss">r&#257;&middot;d&#299;&middot;cu&middot;la, <em>n.</em> — a little root.</p>
+                <p class="rad-tagline">Cellulose-based solutions engineered for vertical-farm food production.</p>
+                <div class="rad-scroll-cue">Scroll <span class="rad-cue-line"></span></div>
+            </div>
+        </header>
+
+        <section class="rad-marquee" aria-hidden="true">
+            <div class="rad-marquee-track">
+                <div class="rad-marquee-group">
+                    <span class="word">Renewable</span><span class="dot">&#9702;</span>
+                    <span class="word">Biodegradable</span><span class="dot">&#9702;</span>
+                    <span class="word">Structural</span><span class="dot">&#9702;</span>
+                    <span class="word">Cellulose</span><span class="dot">&#9702;</span>
+                    <span class="word">Vertical Farming</span><span class="dot">&#9702;</span>
+                    <span class="word">Low-Carbon</span><span class="dot">&#9702;</span>
+                </div>
+                <div class="rad-marquee-group">
+                    <span class="word">Renewable</span><span class="dot">&#9702;</span>
+                    <span class="word">Biodegradable</span><span class="dot">&#9702;</span>
+                    <span class="word">Structural</span><span class="dot">&#9702;</span>
+                    <span class="word">Cellulose</span><span class="dot">&#9702;</span>
+                    <span class="word">Vertical Farming</span><span class="dot">&#9702;</span>
+                    <span class="word">Low-Carbon</span><span class="dot">&#9702;</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="rad-layers container">
+            <div class="rad-layers-head reveal reveal-up">
+                <span class="rad-kicker">What we're building</span>
+                <h2>Three layers of the same idea: roots, reimagined as infrastructure.</h2>
+            </div>
+
+            <article class="rad-layer reveal reveal-up">
+                <span class="rad-layer-num">01</span>
+                <div>
+                    <span class="rad-layer-tag">The Material</span>
+                    <h3>Overview</h3>
+                    <p>Radiculae is a startup I founded to bring cellulose-based materials into vertical farm food
+                        production. The goal is to translate research on cellulose's structural and biodegradable
+                        properties into practical solutions for growers operating in controlled-environment
+                        agriculture.</p>
+                </div>
+            </article>
+
+            <article class="rad-layer reveal reveal-up stagger-1">
+                <span class="rad-layer-num">02</span>
+                <div>
+                    <span class="rad-layer-tag">The Mission</span>
+                    <h3>Objective</h3>
+                    <p>Our objective is to develop cellulose solutions that support more sustainable,
+                        resource-efficient vertical farming — offering renewable alternatives to the plastic-based
+                        components common in today's growing systems.</p>
+                </div>
+            </article>
+
+            <article class="rad-layer reveal reveal-up stagger-2">
+                <span class="rad-layer-num">03</span>
+                <div>
+                    <span class="rad-layer-tag">The Horizon</span>
+                    <h3>Future Prospects</h3>
+                    <p>Radiculae aims to scale its cellulose-based solutions for vertical farms, contributing to more
+                        sustainable urban food production.</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="rad-specimen container reveal reveal-up">
+            <figure>
+                <img src="../images/radiculae.png" alt="Cellulose fiber network under magnification">
+                <figcaption>
+                    <span>Fig. 01</span>
+                    <span>Cellulose fiber network, magnified</span>
+                </figcaption>
+            </figure>
+        </section>
+
+        <section class="rad-cta">
+            <div class="container reveal reveal-up">
+                <h2>Let's grow<br>something together.</h2>
+                <a href="mailto:emadal@kth.se" class="rad-cta-btn">Get in touch <i
+                        class="ph ph-arrow-up-right"></i></a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">Emanuele</div>
+                <p>&copy; 2026. All rights reserved.</p>
+            </div>
+
+            <div class="footer-contact">
+                <div class="info-item">
+                    <i class="ph ph-envelope-simple"></i>
+                    <span>emadal@kth.se</span>
+                </div>
+                <div class="info-item">
+                    <i class="ph ph-map-pin"></i>
+                    <span>Stockholm, Sweden</span>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="https://github.com/EmanueleNene" target="_blank"><i class="ph ph-github-logo"></i></a>
+                <a href="https://www.linkedin.com/in/emanuele-d-allestro-68a9601a7/" target="_blank"><i
+                        class="ph ph-linkedin-logo"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+
+</html>
