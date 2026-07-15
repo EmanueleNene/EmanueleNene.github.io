@@ -128,6 +128,32 @@ h3 {
     background-clip: text;
 }
 
+/* Text Morph (hero headline word cycling) */
+.text-morph {
+    position: relative;
+    display: inline-grid;
+    vertical-align: baseline;
+}
+
+.text-morph-anchor {
+    visibility: hidden;
+    grid-area: 1 / 1;
+}
+
+.text-morph-word {
+    grid-area: 1 / 1;
+    opacity: 0;
+    will-change: opacity, filter, transform;
+    background: linear-gradient(135deg, #7da678 0%, #c49a7e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* @keyframes heroTextMorph is generated at runtime in script.js —
+   its percentage offsets depend on word count, which isn't known at
+   author time (keyframe selectors can't use var() for offsets). */
+
 /* Buttons */
 .btn-primary,
 .btn-secondary {
@@ -250,6 +276,111 @@ h3 {
     max-width: 800px;
     position: relative;
     z-index: 2;
+}
+
+.hero-grid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.hero-grid .hero-content {
+    flex: 1 1 420px;
+    max-width: 560px;
+}
+
+.hero-gallery {
+    flex: 1 1 340px;
+    max-width: 460px;
+    width: 100%;
+    height: 380px;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1600px;
+}
+
+.coverflow-stage {
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.coverflow-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background-color: #1a1a1a;
+    box-shadow: 0 20px 45px rgba(61, 61, 61, 0.25);
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    will-change: transform, opacity;
+}
+
+.coverflow-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    user-select: none;
+}
+
+.coverflow-dim {
+    position: absolute;
+    inset: 0;
+    background-color: #000000;
+    pointer-events: none;
+}
+
+@media (max-width: 900px) {
+    .hero-grid {
+        flex-direction: column-reverse;
+        gap: 2rem;
+    }
+
+    .hero-grid .hero-content {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .hero-grid .hero-content .hero-buttons,
+    .hero-grid .hero-content .hero-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-grid .hero-content .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-gallery {
+        height: 300px;
+        max-width: 100%;
+    }
+
+    .hero {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+        padding: 7rem 0 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-grid .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-gallery {
+        height: 260px;
+    }
 }
 
 .hero-subtitle {

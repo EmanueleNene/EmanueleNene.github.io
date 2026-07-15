@@ -83,16 +83,24 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
 
-        <div class="container hero-content">
-            <span class="badgewrapper"><span class="badge">PhD Student at KTH Royal Institute of
-                    Technology</span></span>
-            <h1>Developing <span class="gradient-text">new paper based products</span> that
-                matter.</h1>
-            <p class="hero-subtitle">I'm a creative researcher who loves to expand his
-                knowledge.</p>
-            <div class="hero-buttons">
-                <a href="#projects" class="btn-primary">View Work</a>
-                <a href="mailto:emadal@kth.se" class="btn-secondary">Email Me</a>
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <span class="badgewrapper"><span class="badge">PhD Student at KTH Royal Institute of
+                        Technology</span></span>
+                <h1>Developing<br>
+                    <span class="text-morph gradient-text" id="hero-morph"
+                        data-words="paper products, substrates, sensors, cardboards, vertical farm plugs"></span><br>
+                    that matter.</h1>
+                <p class="hero-subtitle">I'm a creative researcher who loves to expand his
+                    knowledge.</p>
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn-primary">View Work</a>
+                    <a href="mailto:emadal@kth.se" class="btn-secondary">Email Me</a>
+                </div>
+            </div>
+
+            <div class="hero-gallery" id="hero-coverflow" data-autoplay="true" data-autoplay-dir="rightToLeft">
+                <div class="coverflow-stage" id="coverflow-stage"></div>
             </div>
         </div>
     </section>

@@ -3,6 +3,12 @@
 */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. Hero headline word-morph
+    initTextMorph();
+
+    // 0b. Hero image coverflow
+    initCoverflow();
+
     // 1. Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -210,3 +216,188 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     initCarousel();
 });
+
+/* Hero headline word-morph — cycles the words in [data-words] through a
+   blur/scale/opacity crossfade. Ported from a Framer TextMorph component;
+   keyframe offsets are generated here (not in CSS) because they depend on
+   word count, which isn't known until data-words is read. */
+function initTextMorph() {
+    const el = document.getElementById('hero-morph');
+    if (!el) return;
+
+    const words = (el.dataset.words || '')
+        .split(',')
+        .map(w => w.trim())
+        .filter(Boolean);
+    if (!words.length) return;
+
+    const morph = 1;   // seconds — crossfade duration
+    const hold = 1.5;  // seconds — time a word stays fully visible
+    const slot = morph + hold;
+    const cycle = slot * words.length;
+    const pct = s => Math.min(100, (s / cycle) * 100).toFixed(4);
+    const mIn = pct(morph);
+    const mHold = pct(morph + hold);
+    const mOut = pct(2 * morph + hold);
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes heroTextMorph {
+            0% { opacity: 0; filter: blur(14px); transform: scale(0.85); }
+            ${mIn}% { opacity: 1; filter: blur(0px); transform: scale(1); }
+            ${mHold}% { opacity: 1; filter: blur(0px); transform: scale(1); }
+            ${mOut}%, 100% { opacity: 0; filter: blur(14px); transform: scale(1.1); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    const longest = words.reduce((a, b) => (b.length > a.length ? b : a), '');
+
+    el.innerHTML =
+        `<span class="text-morph-anchor">${longest}</span>` +
+        words.map((word, i) => {
+            const delay = (slot * i).toFixed(3);
+            return `<span class="text-morph-word" style="animation: heroTextMorph ${cycle}s ${delay}s infinite ease-in-out;">${word}</span>`;
+        }).join('');
+}
+
+/* Hero image coverflow — 3D stack of project photos, click to bring a card
+   to centre. Ported from a Framer Smooth3DSlideshow component (titles
+   dropped: this instance was configured showTitle:false). */
+function initCoverflow() {
+    const root = document.getElementById('hero-coverflow');
+    const stage = document.getElementById('coverflow-stage');
+    if (!root || !stage) return;
+
+    const slides = [
+        { src: 'images/cellulose_nanofibers.png', alt: 'Cellulose nanofiber research' },
+        { src: 'images/smart_paper_sensors.png', alt: 'Smart paper sensor prototype' },
+        { src: 'images/crystal_plasticity.png', alt: 'Crystal plasticity simulation' },
+        { src: 'images/structural_curl.png', alt: 'Structural curl study' },
+        { src: 'images/MAXIV/emalab2.JPG', alt: 'MAX IV synchrotron lab work' },
+        { src: 'images/MAXIV/emalab.JPG', alt: 'MAX IV synchrotron lab work'}
+    ];
+    const n = slides.length;
+    if (!n) return;
+
+    const PERSPECTIVE = 1600;
+    const SCALE_STEP = 0.16;
+    const MAX_VISIBLE = 2;
+    const DEPTH = 200;
+    const TILT = 10;
+    const SIDE_TILT = 6;
+    const GAP = 7;
+    const DIM = 1 - 55 / 100;
+    const dur = 0.6;
+    const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+    root.style.perspective = `${PERSPECTIVE}px`;
+
+    let active = 0;
+    let locked = false;
+
+    const cards = slides.map((slide, i) => {
+        const card = document.createElement('div');
+        card.className = 'coverflow-card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', slide.alt || '');
+
+        const img = document.createElement('img');
+        img.src = slide.src;
+        img.alt = slide.alt || '';
+        img.draggable = false;
+        card.appendChild(img);
+
+        const dimEl = document.createElement('div');
+        dimEl.className = 'coverflow-dim';
+        card.appendChild(dimEl);
+
+        card.addEventListener('click', () => handleClick(i));
+        stage.appendChild(card);
+        return { card, dimEl };
+    });
+
+    function lock() {
+        locked = true;
+        window.setTimeout(() => { locked = false; }, Math.max(50, dur * 1000));
+    }
+
+    function handleClick(i) {
+        if (locked) return;
+        lock();
+        active = i === active ? (active + 1) % n : i;
+        render();
+    }
+
+    function sizeFor() {
+        const w = root.clientWidth || 360;
+        const cardWidth = Math.max(200, Math.min(340, w * 0.62));
+        const cardHeight = cardWidth * 1.05;
+        return { cardWidth, cardHeight };
+    }
+
+    function render() {
+        const { cardWidth, cardHeight } = sizeFor();
+        stage.style.width = `${cardWidth}px`;
+        stage.style.height = `${cardHeight}px`;
+
+        cards.forEach(({ card, dimEl }, i) => {
+            let rel = i - active;
+            if (rel > n / 2) rel -= n;
+            if (rel < -n / 2) rel += n;
+
+            const ax = Math.abs(rel);
+            const visible = ax <= MAX_VISIBLE;
+            const isActive = rel === 0;
+            const sc = Math.max(0.4, 1 - ax * SCALE_STEP);
+            const tx = rel * (GAP * 30);
+            const tz = -ax * DEPTH;
+            const ry = -rel * TILT;
+            const rz = rel * SIDE_TILT;
+
+            card.style.width = `${cardWidth}px`;
+            card.style.height = `${cardHeight}px`;
+            card.style.transition = `transform ${dur}s ${ease}, opacity ${dur}s ${ease}`;
+            card.style.transform =
+                `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`;
+            card.style.opacity = visible ? '1' : '0';
+            card.style.pointerEvents = visible ? 'auto' : 'none';
+            card.style.cursor = isActive ? 'default' : 'pointer';
+
+            dimEl.style.transition = `opacity ${dur}s ${ease}`;
+            dimEl.style.opacity = isActive ? '0' : String(DIM);
+        });
+    }
+
+    window.addEventListener('resize', render);
+    render();
+
+    function step(dir) {
+        if (locked) return;
+        lock();
+        active = ((active + dir) % n + n) % n;
+        render();
+    }
+
+    let touchX = null;
+    stage.addEventListener('touchstart', (e) => {
+        touchX = e.touches[0].clientX;
+    }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].clientX - touchX;
+        touchX = null;
+        if (Math.abs(dx) < 30) return;
+        step(dx < 0 ? 1 : -1);
+    }, { passive: true });
+
+    if (root.dataset.autoplay === 'true' && n > 1) {
+        const dir = root.dataset.autoplayDir === 'leftToRight' ? -1 : 1;
+        window.setInterval(() => {
+            if (locked) return;
+            lock();
+            active = ((active + dir) % n + n) % n;
+            render();
+        }, 2600);
+    }
+}
