@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. Recipe Filtering Logic
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const recipeCards = document.querySelectorAll('.recipe-card');
+    const recipeCards = document.querySelectorAll('.recipe-card, .project-card');
 
     if (filterBtns.length > 0 && recipeCards.length > 0) {
         filterBtns.forEach(btn => {
@@ -270,8 +270,8 @@ function initCoverflow() {
     if (!root || !stage) return;
 
     const slides = [
-        { src: 'images/cellulose_nanofibers.png', alt: 'Cellulose nanofiber research' },
-        { src: 'images/smart_paper_sensors.png', alt: 'Smart paper sensor prototype' },
+        { src: 'images/radiculae_logo.jpg', alt: 'Cellulose nanofiber research' },
+        { src: 'images/unleash.png', alt: 'Smart paper sensor prototype' },
         { src: 'images/crystal_plasticity.png', alt: 'Crystal plasticity simulation' },
         { src: 'images/structural_curl.png', alt: 'Structural curl study' },
         { src: 'images/MAXIV/emalab2.JPG', alt: 'MAX IV synchrotron lab work' },

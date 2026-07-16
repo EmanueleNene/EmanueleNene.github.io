@@ -19,7 +19,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+    <link rel="icon" type="image/jpeg" href="../images/radiculae_logo.jpg">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
@@ -75,6 +75,33 @@
             color: var(--rad-cream);
             font-family: 'Fraunces', serif;
             font-style: italic;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .radiculae-page .logo img {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid var(--rad-green);
+        }
+
+        .rad-hero-logo {
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: rad-fade-up 1s ease 0.35s forwards;
+        }
+
+        .rad-hero-logo img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--rad-green);
+            box-shadow: 0 8px 24px rgba(15, 28, 20, 0.4);
         }
 
         .radiculae-page .nav-links a {
@@ -515,13 +542,16 @@
 
     <nav class="navbar">
         <div class="container nav-container">
-            <a href="../index.html" class="logo">Emanuele D.</a>
+            <a href="../index.html" class="logo">
+                <img src="../images/radiculae_logo.jpg" alt="Radiculae Logo">
+                Radiculae
+            </a>
             <ul class="nav-links">
-                <li><a href="../recipes/recipes.html">Recipes</a></li>
+                <li><a href="projects.html">Projects</a></li>
                 <li><a href="../conferences/conferences.html">Conferences</a></li>
                 <li><a href="../phd/phd-responsible.html">PhD Responsible</a></li>
-                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
-            </ul>
+                <li><a href="../recipes/recipes.html">Recipes</a></li>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li></ul>
             <div class="hamburger">
                 <i class="ph ph-list"></i>
             </div>
@@ -547,6 +577,9 @@
             </div>
             <div class="container rad-hero-inner">
                 <a href="../index.html" class="rad-back"><i class="ph ph-arrow-left"></i> Back to portfolio</a>
+                <div class="rad-hero-logo">
+                    <img src="../images/radiculae_logo.jpg" alt="Radiculae Logo">
+                </div>
                 <p class="rad-overline">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M12 22V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -627,7 +660,7 @@
 
         <section class="rad-specimen container reveal reveal-up">
             <figure>
-                <img src="../images/radiculae.png" alt="Cellulose fiber network under magnification">
+                <img src="../images/radiculae.jpg" alt="Cellulose fiber network under magnification">
                 <figcaption>
                     <span>Fig. 01</span>
                     <span>Cellulose fiber network, magnified</span>
