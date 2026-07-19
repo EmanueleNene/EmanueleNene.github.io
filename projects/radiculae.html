@@ -534,6 +534,149 @@
         .radiculae-page .social-links a:hover {
             color: var(--rad-green);
         }
+
+        /* ---- Simulation Section ---- */
+        .rad-simulation {
+            padding: 5rem 0;
+            border-top: 1px solid var(--rad-line);
+        }
+
+        .rad-simulation-head {
+            max-width: 48ch;
+            margin-bottom: 2.5rem;
+        }
+
+        .rad-simulation-head .rad-kicker {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--rad-green-deep);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .rad-simulation-head h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            margin: 0 0 1.25rem;
+        }
+
+        .rad-sim-desc {
+            font-size: 1.05rem;
+            line-height: 1.75;
+            color: var(--rad-ink);
+            opacity: 0.85;
+            margin: 0;
+        }
+
+        .rad-simulation-action {
+            margin-bottom: 1.5rem;
+        }
+
+        .rad-btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background-color: transparent;
+            color: var(--rad-ink);
+            border: 1px solid var(--rad-ink);
+            padding: 1rem 1.75rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .rad-btn-outline:hover {
+            background-color: var(--rad-ink);
+            color: var(--rad-cream);
+        }
+
+        .rad-btn-outline .icon-toggle {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 0.9rem;
+        }
+
+        .rad-btn-outline[aria-expanded="true"] .icon-toggle {
+            transform: rotate(45deg);
+        }
+
+        .rad-sim-results {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .rad-sim-results.open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            margin-top: 2rem;
+        }
+
+        .rad-sim-results-inner {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .rad-sim-figure {
+            position: relative;
+            margin: 0;
+            border: 1px solid var(--rad-line);
+            background: var(--rad-ink);
+            padding: 0.6rem;
+        }
+
+        .rad-sim-figure img {
+            width: 100%;
+            display: block;
+            filter: saturate(0.9) contrast(1.05);
+        }
+
+        .rad-sim-figure figcaption {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--rad-green-deep);
+            padding: 1rem 0 0;
+        }
+
+        .rad-sim-notes {
+            background-color: var(--rad-cream-2);
+            border-left: 2px solid var(--rad-green-deep);
+            padding: 1.5rem 2rem;
+            max-width: 72ch;
+        }
+
+        .rad-sim-notes h4 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+            color: var(--rad-ink);
+        }
+
+        .rad-sim-notes p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--rad-ink-soft);
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -658,6 +801,37 @@
             </article>
         </section>
 
+        <section class="rad-simulation container reveal reveal-up">
+            <div class="rad-simulation-head">
+                <span class="rad-kicker">Research & Modeling</span>
+                <h2>Root System Architecture Simulations</h2>
+                <p class="rad-sim-desc">To validate cellulose-based substrates under real-world irrigation conditions, we simulated root system development for lettuce (<em>Lactuca sativa</em>) under cyclical ebb-and-flow dynamics.</p>
+            </div>
+            
+            <div class="rad-simulation-action">
+                <button id="toggle-sim-btn" class="rad-btn-outline" aria-expanded="false" aria-controls="sim-results-panel">
+                    <span class="btn-text">View Lettuce Simulation Results</span>
+                    <i class="ph ph-plus icon-toggle"></i>
+                </button>
+            </div>
+
+            <div id="sim-results-panel" class="rad-sim-results" aria-hidden="true">
+                <div class="rad-sim-results-inner">
+                    <figure class="rad-sim-figure">
+                        <img src="../images/SIMULATIONS_results/rsa_pathD_comparison_grid.png" alt="Root System Architecture simulation comparison grid for Lactuca sativa across peat, rockwool, and cellulose substrates under ebb-and-flow conditions">
+                        <figcaption>
+                            <span>Fig. 02</span>
+                            <span>Root System Architecture (RSA) comparison across peat, rockwool, and cellulose substrates.</span>
+                        </figcaption>
+                    </figure>
+                    <div class="rad-sim-notes">
+                        <h4>Simulation Key & Methodology</h4>
+                        <p>This comparative grid models root growth pathways for <em>Lactuca sativa</em> over a 14-day growth cycle. The simulation factors in structural tortuosity, moisture retention characteristics, and drying conditions under periodic ebb-and-flow irrigation. The results show that cellulose-based substrates offer a highly versatile structure that can promote balanced root branching and minimize localized anoxia compared to traditional rockwool and peat-based media while being sustainable and easily accessible.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="rad-specimen container reveal reveal-up">
             <figure>
                 <img src="../images/radiculae.jpg" alt="Cellulose fiber network under magnification">
@@ -704,6 +878,26 @@
     </footer>
 
     <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-sim-btn');
+            const resultsPanel = document.getElementById('sim-results-panel');
+
+            if (toggleBtn && resultsPanel) {
+                toggleBtn.addEventListener('click', () => {
+                    const isOpen = resultsPanel.classList.toggle('open');
+                    toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                    resultsPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+                    
+                    // Dispatch a window scroll event to trigger the IntersectionObserver checks
+                    // and scroll reveals for elements below that might have shifted into viewport
+                    if (typeof window.dispatchEvent === 'function') {
+                        window.dispatchEvent(new Event('scroll'));
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
