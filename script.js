@@ -272,10 +272,10 @@ function initCoverflow() {
     const slides = [
         { src: 'images/radiculae_logo.jpg', alt: 'Cellulose nanofiber research' },
         { src: 'images/unleash.png', alt: 'Smart paper sensor prototype' },
-        { src: 'images/crystal_plasticity.png', alt: 'Crystal plasticity simulation' },
         { src: 'images/structural_curl.png', alt: 'Structural curl study' },
         { src: 'images/MAXIV/emalab2.JPG', alt: 'MAX IV synchrotron lab work' },
-        { src: 'images/MAXIV/emalab.JPG', alt: 'MAX IV synchrotron lab work'}
+        { src: 'images/MAXIV/emalab.JPG', alt: 'MAX IV synchrotron lab work' },
+        { src: 'images/ECCOMAS_MUNICH_2026/presentation.jpeg', alt: 'WCCM-ECCOMAS 2026 presentation' }
     ];
     const n = slides.length;
     if (!n) return;
