@@ -39,6 +39,9 @@
     --transition-fast: 0.2s ease;
     --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     --transition-bounce: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Rhomboid Buttons */
+    --btn-skew-angle: -12deg;
 }
 
 /* Reset & Base */
@@ -193,6 +196,60 @@ h3 {
 }
 
 .btn-secondary:hover {
+    background-color: var(--bg-surface);
+    border-color: var(--text-secondary);
+}
+
+/* Rhomboid Email Me Buttons */
+a[href="mailto:emadal@kth.se"].btn-primary,
+a[href="mailto:emadal@kth.se"].btn-secondary {
+    position: relative;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    z-index: 1;
+    padding: 0.875rem 2.25rem !important; /* Slightly increased horizontal padding for skew clearance */
+}
+
+a[href="mailto:emadal@kth.se"].btn-primary:hover,
+a[href="mailto:emadal@kth.se"].btn-secondary:hover {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+a[href="mailto:emadal@kth.se"].btn-primary::before,
+a[href="mailto:emadal@kth.se"].btn-secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    transform: skewX(var(--btn-skew-angle));
+    transition: all var(--transition-fast);
+}
+
+/* Primary Rhomboid Button (Navbar & elsewhere) */
+a[href="mailto:emadal@kth.se"].btn-primary::before {
+    background-color: var(--primary);
+    border-radius: 4px;
+}
+
+a[href="mailto:emadal@kth.se"].btn-primary:hover::before {
+    background-color: var(--primary-hover);
+    box-shadow: 0 4px 12px rgba(168, 197, 164, 0.3);
+}
+
+/* Secondary Rhomboid Button (Hero Section) */
+a[href="mailto:emadal@kth.se"].btn-secondary::before {
+    background-color: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+}
+
+a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
     background-color: var(--bg-surface);
     border-color: var(--text-secondary);
 }
