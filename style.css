@@ -1401,6 +1401,10 @@ footer p {
     overflow: hidden;
 }
 
+.photo-single.size-half {
+    max-width: 400px;
+}
+
 .photo-single img {
     width: 100%;
     height: auto;
