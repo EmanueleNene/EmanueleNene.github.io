@@ -172,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const updateCarousel = () => {
             carousel.style.transform = `rotateY(${rotationAngle}deg)`;
+            const radius = window.innerWidth <= 768 ? 160 : 250;
             
             items.forEach((item, index) => {
                 const itemAngle = (index * angleStep) % 360;
@@ -184,11 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (normalizedRotation < 25 || normalizedRotation > 335) {
                     item.style.opacity = '1';
                     item.style.visibility = 'visible';
-                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(450px) scale(1.1)`;
+                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(${radius}px) scale(1)`;
                     item.style.zIndex = '10';
                 } else {
                     item.style.opacity = '0.3';
-                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(450px) scale(0.8)`;
+                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(${radius}px) scale(0.8)`;
                     item.style.zIndex = '1';
                     // Hide items that are too far back to improve performance and look
                     if (normalizedRotation > 100 && normalizedRotation < 260) {
@@ -270,9 +271,9 @@ function initCoverflow() {
     if (!root || !stage) return;
 
     const slides = [
-        { src: 'images/radiculae_logo.jpg', alt: 'Cellulose nanofiber research' },
+        { src: 'images/radiculae_logo.jpg', alt: 'Startup' },
         { src: 'images/unleash.png', alt: 'Smart paper sensor prototype' },
-        { src: 'images/structural_curl.png', alt: 'Structural curl study' },
+        { src: 'images/UNLEASH/Group_final_day.jpeg', alt: 'Unleash final day' },
         { src: 'images/MAXIV/emalab2.JPG', alt: 'MAX IV synchrotron lab work' },
         { src: 'images/MAXIV/emalab.JPG', alt: 'MAX IV synchrotron lab work' },
         { src: 'images/ECCOMAS_MUNICH_2026/presentation.jpeg', alt: 'WCCM-ECCOMAS 2026 presentation' }
