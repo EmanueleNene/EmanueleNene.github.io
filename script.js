@@ -2,8 +2,19 @@
    Simple functionality for smooth experience 
 */
 
+// Instant theme initialization to prevent flash of wrong theme (FOUC)
+(function () {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 0. Hero headline word-morph
+    // 0. Night Mode Theme Toggle
+    initThemeToggle();
+
+    // 0a. Hero headline word-morph
     initTextMorph();
 
     // 0b. Hero image coverflow
@@ -78,15 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Navbar background scroll effect
     const navbar = document.querySelector('.navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.style.boxShadow = '0 10px 30px -10px rgba(0,0,0,0.05)';
-            navbar.style.backgroundColor = 'rgba(253, 252, 251, 0.98)';
-        } else {
-            navbar.style.boxShadow = 'none';
-            navbar.style.backgroundColor = 'rgba(253, 252, 251, 0.9)';
-        }
-    });
+    if (navbar) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    }
 
     // 5. Mobile Menu Toggle
     const hamburger = document.querySelector('.hamburger');
@@ -475,4 +486,94 @@ function initCardHoverEffect() {
     grid.addEventListener('mouseleave', () => {
         pill.style.opacity = '0';
     });
+}
+
+/* Night Mode / Theme Toggle Logic */
+function initThemeToggle() {
+    const getStoredTheme = () => localStorage.getItem('theme');
+    const getSystemTheme = () => (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    const currentTheme = getStoredTheme() || getSystemTheme();
+    applyTheme(currentTheme);
+
+    const navContainer = document.querySelector('.nav-container');
+    let toggleBtn = document.getElementById('theme-toggle');
+
+    if (!toggleBtn && navContainer) {
+        let navActions = navContainer.querySelector('.nav-actions');
+        if (!navActions) {
+            navActions = document.createElement('div');
+            navActions.className = 'nav-actions';
+
+            const hamburger = navContainer.querySelector('.hamburger');
+            if (hamburger) {
+                hamburger.parentNode.insertBefore(navActions, hamburger);
+                navActions.appendChild(hamburger);
+            } else {
+                navContainer.appendChild(navActions);
+            }
+        }
+
+        toggleBtn = document.createElement('button');
+        toggleBtn.className = 'theme-switch';
+        toggleBtn.id = 'theme-toggle';
+        toggleBtn.setAttribute('type', 'button');
+
+        const hamburger = navActions.querySelector('.hamburger');
+        if (hamburger) {
+            navActions.insertBefore(toggleBtn, hamburger);
+        } else {
+            navActions.appendChild(toggleBtn);
+        }
+    }
+
+    if (toggleBtn) {
+        // Ensure switch track structure exists
+        if (!toggleBtn.querySelector('.theme-switch-track')) {
+            toggleBtn.innerHTML = `
+                <span class="theme-switch-track">
+                    <span class="theme-switch-icon sun"><i class="ph ph-sun"></i></span>
+                    <span class="theme-switch-icon moon"><i class="ph ph-moon"></i></span>
+                    <span class="theme-switch-thumb"></span>
+                </span>
+            `;
+        }
+
+        toggleBtn.setAttribute('role', 'switch');
+        updateToggleState(toggleBtn, currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleState(toggleBtn, newTheme);
+        });
+    }
+
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!getStoredTheme()) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                applyTheme(newTheme);
+                if (toggleBtn) updateToggleState(toggleBtn, newTheme);
+            }
+        });
+    }
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+        document.body?.classList.add('dark-theme');
+    } else {
+        document.body?.classList.remove('dark-theme');
+    }
+}
+
+function updateToggleState(btn, theme) {
+    const isDark = theme === 'dark';
+    btn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+    btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to night mode');
+    btn.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to night mode');
 }
