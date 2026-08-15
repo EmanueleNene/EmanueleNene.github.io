@@ -195,30 +195,46 @@
         </div>
     </section>
 
-    <!-- Events -->
+    <!-- Events Section with Card Hover Effect -->
     <section id="events" class="section">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header reveal reveal-up">
                 <h2>Events</h2>
-                <p>Events I participate in.</p>
+                <p>Events and initiatives I participate in.</p>
             </div>
-            <div class="grid-3">
-                <div class="card reveal reveal-up stagger-1">
-                    <div class="card-icon"><i class="ph ph-calendar-event"></i></div>
-                    <h3>UNLEASH</h3>
-                    <p>Global Innovation Lab for the UN Sustainable Development Goals.</p>
-                    <a href="events/unleash.html" class="link-arrow"
-                        style="margin-top: 1rem; display: inline-block;">Event Details <i
-                            class="ph ph-arrow-right"></i></a>
-                </div>
-                <div class="card reveal reveal-up stagger-2">
-                    <div class="card-icon"><i class="ph ph-coins"></i></div>
-                    <h3>Economics Competing</h3>
-                    <p>Economics competition event details and analysis.</p>
-                    <a href="events/economics-competing.html" class="link-arrow"
-                        style="margin-top: 1rem; display: inline-block;">Event Details <i
-                            class="ph ph-arrow-right"></i></a>
-                </div>
+            
+            <div class="hover-effect-grid" id="hoverEffectEvents">
+                <div class="hover-effect-pill" id="hoverEffectPill"></div>
+
+                <!-- Event 1 -->
+                <a href="events/unleash.html" class="hover-effect-card reveal reveal-up stagger-1">
+                    <div class="hover-card-content">
+                        <div class="card-icon"><i class="ph ph-globe-hemisphere-west"></i></div>
+                        <h3>UNLEASH</h3>
+                        <p>Global Innovation Lab for the UN Sustainable Development Goals bringing together young talents worldwide.</p>
+                        <span class="link-arrow">Event Details <i class="ph ph-arrow-right"></i></span>
+                    </div>
+                </a>
+
+                <!-- Event 2 -->
+                <a href="events/economics-competing.html" class="hover-effect-card reveal reveal-up stagger-2">
+                    <div class="hover-card-content">
+                        <div class="card-icon"><i class="ph ph-trophy"></i></div>
+                        <h3>Economics Competing</h3>
+                        <p>Economics competition event details, strategy, and analytical modeling insights.</p>
+                        <span class="link-arrow">Event Details <i class="ph ph-arrow-right"></i></span>
+                    </div>
+                </a>
+
+                <!-- Event 3 -->
+                <a href="conferences/conference-wccm-eccomas-2026.html" class="hover-effect-card reveal reveal-up stagger-3">
+                    <div class="hover-card-content">
+                        <div class="card-icon"><i class="ph ph-presentation-chart"></i></div>
+                        <h3>WCCM-ECCOMAS 2026</h3>
+                        <p>World Congress on Computational Mechanics & ECCOMAS conference presentation log.</p>
+                        <span class="link-arrow">Conference Log <i class="ph ph-arrow-right"></i></span>
+                    </div>
+                </a>
             </div>
         </div>
     </section>

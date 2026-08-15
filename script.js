@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0c. Sticky Scroll Reveal for Featured Projects
     initStickyScroll();
 
+    // 0d. Card Hover Effect for Events
+    initCardHoverEffect();
+
     // 1. Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -458,4 +461,36 @@ function initStickyScroll() {
 
     // Initial check
     handleScroll();
+}
+
+/* Card Hover Effect for Events (Aceternity UI style) */
+function initCardHoverEffect() {
+    const grid = document.getElementById('hoverEffectEvents');
+    const pill = document.getElementById('hoverEffectPill');
+
+    if (!grid || !pill) return;
+
+    const cards = grid.querySelectorAll('.hover-effect-card');
+
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            const gridRect = grid.getBoundingClientRect();
+            const cardRect = card.getBoundingClientRect();
+
+            const offset = 6; // Padding offset matching pill design
+            const left = cardRect.left - gridRect.left - offset;
+            const top = cardRect.top - gridRect.top - offset;
+            const width = cardRect.width + offset * 2;
+            const height = cardRect.height + offset * 2;
+
+            pill.style.transform = `translate(${left}px, ${top}px)`;
+            pill.style.width = `${width}px`;
+            pill.style.height = `${height}px`;
+            pill.style.opacity = '1';
+        });
+    });
+
+    grid.addEventListener('mouseleave', () => {
+        pill.style.opacity = '0';
+    });
 }
