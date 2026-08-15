@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0d. Card Hover Effect for Events
     initCardHoverEffect();
 
+    // 0e. Hero Parallax for Values Section
+    initHeroParallax();
+
     // 1. Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -163,65 +166,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // 10. 3D Carousel Logic
-    const initCarousel = () => {
-        const carousel = document.getElementById('valuesCarousel');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        
-        if (!carousel || !prevBtn || !nextBtn) return;
+    // 10. Hero Parallax for Values Section (Aceternity UI style)
+    function initHeroParallax() {
+        const container = document.getElementById('heroParallax');
+        if (!container) return;
 
-        const items = carousel.querySelectorAll('.carousel-item');
-        const itemsCount = items.length;
-        const angleStep = 360 / itemsCount;
-        let rotationAngle = 0;
+        const rowsLeft = container.querySelectorAll('.row-left');
+        const rowsRight = container.querySelectorAll('.row-right');
 
-        const updateCarousel = () => {
-            carousel.style.transform = `rotateY(${rotationAngle}deg)`;
-            const radius = window.innerWidth <= 768 ? 160 : 250;
-            
-            items.forEach((item, index) => {
-                const itemAngle = (index * angleStep) % 360;
-                // Calculate position relative to front (0 degrees)
-                const currentPositiveAngle = (Math.abs(rotationAngle) % 360);
-                const totalRotation = (rotationAngle + itemAngle) % 360;
-                const normalizedRotation = ((totalRotation % 360) + 360) % 360;
-                
-                // If the item is near the front (0 or 360 degrees)
-                if (normalizedRotation < 25 || normalizedRotation > 335) {
-                    item.style.opacity = '1';
-                    item.style.visibility = 'visible';
-                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(${radius}px) scale(1)`;
-                    item.style.zIndex = '10';
-                } else {
-                    item.style.opacity = '0.3';
-                    item.style.transform = `rotateY(${itemAngle}deg) translateZ(${radius}px) scale(0.8)`;
-                    item.style.zIndex = '1';
-                    // Hide items that are too far back to improve performance and look
-                    if (normalizedRotation > 100 && normalizedRotation < 260) {
-                        item.style.opacity = '0';
-                        item.style.visibility = 'hidden';
-                    } else {
-                        item.style.visibility = 'visible';
-                    }
-                }
-            });
+        const handleScroll = () => {
+            const rect = container.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            if (rect.top < viewportHeight && rect.bottom > 0) {
+                const scrollProgress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
+                const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
+
+                const shiftLeft = (clampedProgress - 0.5) * 350;
+                const shiftRight = (0.5 - clampedProgress) * 350;
+                const rotateX = 15 - clampedProgress * 25;
+
+                container.style.transform = `rotateX(${rotateX}deg) rotateY(0deg) rotateZ(0deg)`;
+
+                rowsLeft.forEach(row => {
+                    row.style.transform = `translateX(${shiftLeft}px)`;
+                });
+
+                rowsRight.forEach(row => {
+                    row.style.transform = `translateX(${shiftRight}px)`;
+                });
+            }
         };
 
-        nextBtn.addEventListener('click', () => {
-            rotationAngle -= angleStep;
-            updateCarousel();
-        });
+        window.addEventListener('scroll', () => {
+            requestAnimationFrame(handleScroll);
+        }, { passive: true });
 
-        prevBtn.addEventListener('click', () => {
-            rotationAngle += angleStep;
-            updateCarousel();
-        });
-
-        // Initialize view
-        updateCarousel();
-    };
-    initCarousel();
+        handleScroll();
+    }
 });
 
 /* Hero headline word-morph — cycles the words in [data-words] through a

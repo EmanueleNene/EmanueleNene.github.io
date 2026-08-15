@@ -1584,140 +1584,82 @@ footer p {
     display: none !important;
 }
 /* --------------------------------------------------------------
-   3D Carousel for Values Section
+   Hero Parallax for Values Section (Aceternity UI style)
    -------------------------------------------------------------- */
 
-.carousel-perspective {
+.hero-parallax-section {
+    overflow: hidden;
     position: relative;
-    width: 100%;
-    height: 260px;
+    padding-bottom: 5rem;
+}
+
+.hero-parallax-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
     perspective: 1000px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 1rem;
-}
-
-.carousel-container {
-    position: relative;
-    width: 170px;
-    height: 190px;
     transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 2rem 0;
+    will-change: transform;
 }
 
-.carousel-item {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    /* translateZ to push them away from center */
-    transform: rotateY(calc(var(--i) * 51.4deg)) translateZ(250px);
-    transition: all 0.5s ease;
+.parallax-row {
+    display: flex;
+    gap: 1.75rem;
+    width: max-content;
+    will-change: transform;
+    transition: transform 0.1s ease-out;
 }
 
-.carousel-card {
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+.parallax-card {
+    position: relative;
+    width: 280px;
+    height: 170px;
     border-radius: var(--radius-lg);
-    padding: 1rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    transition: var(--transition-bounce);
-    position: relative;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
 }
 
-.carousel-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.9);
+.parallax-card:hover {
+    transform: translateY(-6px) scale(1.02);
     border-color: var(--primary);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
 }
 
-.carousel-card h3 {
-    margin-top: 0.4rem;
-    font-size: 1rem;
+.parallax-card-icon {
+    font-size: 2rem;
+    color: var(--primary);
 }
 
-.carousel-card p {
-    color: var(--text-secondary);
-    margin-top: 0.25rem;
-    font-size: 0.85rem;
-}
-
-.carousel-card .card-icon {
-    font-size: 1.6rem;
+.parallax-card-info h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
     margin-bottom: 0.25rem;
 }
 
-/* Navigation Buttons */
-.carousel-nav {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.25rem;
-    z-index: 10;
+.parallax-card-info p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
 }
 
-.nav-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 1px solid var(--border-light);
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    cursor: pointer;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-fast);
-}
-
-.nav-btn:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-    transform: scale(1.1);
-}
-
-/* Mobile Adjustments for Carousel */
 @media screen and (max-width: 768px) {
-    .carousel-perspective {
-        height: 220px;
-        perspective: 800px;
+    .hero-parallax-container {
+        perspective: none;
     }
 
-    .carousel-container {
-        width: 140px;
-        height: 160px;
-    }
-
-    .carousel-item {
-        transform: rotateY(calc(var(--i) * 51.4deg)) translateZ(160px);
-    }
-
-    .carousel-card {
-        padding: 0.75rem;
-    }
-
-    .carousel-card h3 {
-        font-size: 0.9rem;
-    }
-
-    .carousel-card p {
-        font-size: 0.8rem;
-    }
-
-    .carousel-card .card-icon {
-        font-size: 1.35rem;
+    .parallax-card {
+        width: 240px;
+        height: 150px;
+        padding: 1.25rem;
     }
 }
