@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0b. Hero image coverflow
     initCoverflow();
 
+    // 0c. Sticky Scroll Reveal for Featured Projects
+    initStickyScroll();
+
     // 1. Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -401,4 +404,58 @@ function initCoverflow() {
             render();
         }, 2600);
     }
+}
+
+/* Sticky Scroll Reveal for Featured Projects */
+function initStickyScroll() {
+    const items = document.querySelectorAll('.sticky-scroll-item');
+    const images = document.querySelectorAll('.sticky-scroll-img-wrapper');
+    const container = document.getElementById('stickyScrollProjects');
+
+    if (!items.length || !images.length || !container) return;
+
+    const handleScroll = () => {
+        if (window.innerWidth < 850) return;
+
+        const viewportHeight = window.innerHeight;
+        let activeIndex = 0;
+        let minDistance = Infinity;
+
+        items.forEach((item, index) => {
+            const rect = item.getBoundingClientRect();
+            const itemCenter = rect.top + rect.height / 2;
+            const viewportCenter = viewportHeight / 2;
+            const distance = Math.abs(itemCenter - viewportCenter);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                activeIndex = index;
+            }
+        });
+
+        items.forEach((item, index) => {
+            if (index === activeIndex) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        images.forEach((img, index) => {
+            if (index === activeIndex) {
+                img.classList.add('active');
+            } else {
+                img.classList.remove('active');
+            }
+        });
+    };
+
+    window.addEventListener('scroll', () => {
+        requestAnimationFrame(handleScroll);
+    }, { passive: true });
+
+    window.addEventListener('resize', handleScroll, { passive: true });
+
+    // Initial check
+    handleScroll();
 }

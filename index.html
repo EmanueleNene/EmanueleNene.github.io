@@ -134,62 +134,63 @@
         </div>
     </section>
 
-    <!-- Projects Placeholder -->
+    <!-- Featured Projects Section with Sticky Scroll Reveal -->
     <section id="projects" class="section bg-offset">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header reveal reveal-up">
                 <h2>Featured Projects</h2>
                 <p>A selection of my recent work.</p>
             </div>
-            <div class="timeline">
-                <!-- Project 1 -->
-                <article class="timeline-item left">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">2026</div>
-                    <div class="timeline-content reveal">
-                        <img src="images/radiculae.jpg" alt="Radiculae"
-                            class="project-img reveal reveal-scale stagger-1">
-                        <div class="project-text">
-                            <h3>Radiculae</h3>
-                            <p>Founded Radiculae, a startup developing cellulose-based solutions for vertical farm
-                                food production.</p>
-                            <a href="/projects/radiculae.html" class="link-arrow">Learn More <i
-                                    class="ph ph-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </article>
-                <!-- Project 2 -->
-                <article class="timeline-item right">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">2026</div>
-                    <div class="timeline-content reveal">
-                        <img src="images/structural_curl.jpg" alt="Structural Curl"
-                            class="project-img reveal reveal-scale stagger-1">
-                        <div class="project-text">
-                            <h3>Structural curl and the relative importance of the structural parameters</h3>
-                            <p>Investigating the impact of structural parameters on the curl of paper.</p>
-                            <a href="projects/structural-curl.html" class="link-arrow">View Case Study <i
-                                    class="ph ph-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </article>
 
-                <!-- Project 3 -->
-                <article class="timeline-item left">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">2024</div>
-                    <div class="timeline-content reveal">
-                        <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity"
-                            class="project-img reveal reveal-scale stagger-1">
-                        <div class="project-text">
-                            <h3>Crystal Plasticity</h3>
-                            <p>Crystal plasticity analysis for bi-crystal Ni-base superalloy by adopting compact
-                                specimens with different crystal orientations.</p>
-                            <a href="projects/crystal-plasticity.html" class="link-arrow">Read Publication <i
-                                    class="ph ph-arrow-right"></i></a>
+            <div class="sticky-scroll-wrapper" id="stickyScrollProjects">
+                <div class="sticky-scroll-text-col">
+                    <!-- Project 1 -->
+                    <article class="sticky-scroll-item active" data-index="0">
+                        <div class="mobile-project-img">
+                            <img src="images/radiculae.jpg" alt="Radiculae">
+                        </div>
+                        <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Startup</span>
+                        <h3>Radiculae</h3>
+                        <p>Founded Radiculae, a startup developing cellulose-based solutions for vertical farm food production.</p>
+                        <a href="/projects/radiculae.html" class="link-arrow">Learn More <i class="ph ph-arrow-right"></i></a>
+                    </article>
+
+                    <!-- Project 2 -->
+                    <article class="sticky-scroll-item" data-index="1">
+                        <div class="mobile-project-img">
+                            <img src="images/structural_curl.jpg" alt="Structural Curl">
+                        </div>
+                        <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Paper Mechanics</span>
+                        <h3>Structural curl and the relative importance of the structural parameters</h3>
+                        <p>Investigating the impact of structural parameters on the curl of paper.</p>
+                        <a href="projects/structural-curl.html" class="link-arrow">View Case Study <i class="ph ph-arrow-right"></i></a>
+                    </article>
+
+                    <!-- Project 3 -->
+                    <article class="sticky-scroll-item" data-index="2">
+                        <div class="mobile-project-img">
+                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity">
+                        </div>
+                        <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2024 • Publication</span>
+                        <h3>Crystal Plasticity</h3>
+                        <p>Crystal plasticity analysis for bi-crystal Ni-base superalloy by adopting compact specimens with different crystal orientations.</p>
+                        <a href="projects/crystal-plasticity.html" class="link-arrow">Read Publication <i class="ph ph-arrow-right"></i></a>
+                    </article>
+                </div>
+
+                <div class="sticky-scroll-sticky-col">
+                    <div class="sticky-scroll-card">
+                        <div class="sticky-scroll-img-wrapper active" data-index="0">
+                            <img src="images/radiculae.jpg" alt="Radiculae">
+                        </div>
+                        <div class="sticky-scroll-img-wrapper" data-index="1">
+                            <img src="images/structural_curl.jpg" alt="Structural Curl">
+                        </div>
+                        <div class="sticky-scroll-img-wrapper" data-index="2">
+                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity">
                         </div>
                     </div>
-                </article>
+                </div>
             </div>
         </div>
     </section>
