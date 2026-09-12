@@ -67,7 +67,11 @@ const check = (name, cond, extra='') => {
   d.querySelector('#fname').value = 'Nene'; tap(d, '#fgo');
   tap(d, '#startHere');
   tap(d, '#fromLib');
+  const addsel = d.querySelector('#addsel');
+  const lib = d.querySelector('#lib');
   check('library rendered', !!d.querySelector('#lib .libitem'), log.join(' | '));
+  check('#addsel present in library view', !!addsel);
+  check('#addsel positioned before #lib in DOM tree', !!(addsel && lib && (addsel.compareDocumentPosition(lib) & w.Node.DOCUMENT_POSITION_FOLLOWING)));
   if (d.querySelector('#lib .libitem')) {
     tap(d, d.querySelector('#lib .libitem'));
     tap(d, '#addsel');
