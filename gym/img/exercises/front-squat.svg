@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- Ground line -->
+  <line x1="20" y1="125" x2="130" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+  <line x1="170" y1="125" x2="280" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- START -->
+  <g>
+    <!-- Barbell (Front Rack) -->
+    <line x1="55" y1="42" x2="105" y2="42" stroke="#52525B" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="54" y="32" width="4" height="20" rx="1" fill="#71717A"/>
+    <rect x="102" y="32" width="4" height="20" rx="1" fill="#71717A"/>
+    <!-- Head -->
+    <circle cx="73" cy="28" r="6" fill="#18181B"/>
+    <!-- Body -->
+    <path d="M 75 34 L 75 75 L 75 98 L 75 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Feet -->
+    <path d="M 75 125 L 83 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- High Elbow Rack Arms -->
+    <path d="M 75 44 L 86 44 L 78 42" fill="none" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- MID -->
+  <g>
+    <!-- Barbell (Front Rack stays high & vertical path) -->
+    <line x1="205" y1="62" x2="255" y2="62" stroke="#52525B" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="204" y="52" width="4" height="20" rx="1" fill="#71717A"/>
+    <rect x="252" y="52" width="4" height="20" rx="1" fill="#71717A"/>
+    <!-- Head upright -->
+    <circle cx="223" cy="48" r="6" fill="#18181B"/>
+    <!-- Torso very upright in front squat -->
+    <path d="M 225 54 L 216 88" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Deep knees forward squat -->
+    <path d="M 216 88 L 246 96 L 225 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Feet -->
+    <path d="M 225 125 L 233 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- High Elbows maintained -->
+    <path d="M 225 64 L 236 64 L 228 62" fill="none" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Quad Accent & Upward Drive -->
+    <path d="M 220 90 Q 233 86 243 95" fill="none" stroke="#C25E3E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 252 82 L 252 68 M 248 73 L 252 67 L 256 73" fill="none" stroke="#C25E3E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

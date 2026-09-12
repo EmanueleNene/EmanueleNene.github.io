@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- Ground line -->
+  <line x1="20" y1="125" x2="130" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+  <line x1="170" y1="125" x2="280" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- START -->
+  <g>
+    <!-- Calf Block -->
+    <rect x="65" y="115" width="35" height="10" rx="1" fill="#71717A"/>
+    <!-- Head -->
+    <circle cx="70" cy="28" r="6" fill="#18181B"/>
+    <!-- Body -->
+    <path d="M 70 34 L 70 70 L 70 98" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Ankle dorsiflexed, heel dropped below block -->
+    <path d="M 70 98 L 62 122 L 75 115" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- MID -->
+  <g>
+    <!-- Calf Block -->
+    <rect x="215" y="115" width="35" height="10" rx="1" fill="#71717A"/>
+    <!-- Head elevated high -->
+    <circle cx="225" cy="14" r="6" fill="#18181B"/>
+    <!-- Body extended tall -->
+    <path d="M 225 20 L 225 56 L 225 84" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- High Plantarflexion (tiptoes on block) -->
+    <path d="M 225 84 L 225 102 L 220 106 M 225 102 L 228 115" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Calf Muscle Highlight & Up Arrow -->
+    <path d="M 225 68 Q 219 74 225 80" fill="none" stroke="#C25E3E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 245 60 L 245 42 M 241 47 L 245 41 L 249 47" fill="none" stroke="#C25E3E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

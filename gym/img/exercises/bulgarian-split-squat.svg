@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- Ground line -->
+  <line x1="20" y1="125" x2="130" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+  <line x1="170" y1="125" x2="280" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- START -->
+  <g>
+    <!-- Bench -->
+    <rect x="25" y="90" width="30" height="35" rx="2" fill="none" stroke="#71717A" stroke-width="2"/>
+    <!-- Head -->
+    <circle cx="75" cy="28" r="6" fill="#18181B"/>
+    <!-- Torso -->
+    <path d="M 75 34 L 75 75" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Front Leg -->
+    <path d="M 75 75 L 85 98 L 85 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 85 125 L 92 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Rear Leg on Bench -->
+    <path d="M 75 75 L 52 90 L 40 90" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Arms holding DBs -->
+    <path d="M 75 44 L 75 72" fill="none" stroke="#18181B" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="71" y1="72" x2="79" y2="72" stroke="#52525B" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- MID -->
+  <g>
+    <!-- Bench -->
+    <rect x="175" y="90" width="30" height="35" rx="2" fill="none" stroke="#71717A" stroke-width="2"/>
+    <!-- Head -->
+    <circle cx="225" cy="46" r="6" fill="#18181B"/>
+    <!-- Torso upright -->
+    <path d="M 225 52 L 225 90" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Front Leg (90 deg knee bend) -->
+    <path d="M 225 90 L 242 98 L 242 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 242 125 L 250 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Rear Leg dropping down -->
+    <path d="M 225 90 L 202 112 L 190 90" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Arms holding DBs -->
+    <path d="M 225 60 L 225 88" fill="none" stroke="#18181B" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="221" y1="88" x2="229" y2="88" stroke="#52525B" stroke-width="3" stroke-linecap="round"/>
+    <!-- Front Quad Accent & Up Arrow -->
+    <path d="M 227 92 Q 236 90 241 97" fill="none" stroke="#C25E3E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 252 82 L 252 68 M 248 73 L 252 67 L 256 73" fill="none" stroke="#C25E3E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

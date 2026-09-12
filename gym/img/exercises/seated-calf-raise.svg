@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- START -->
+  <g>
+    <!-- Machine Frame: Seat & Footrest Block -->
+    <line x1="40" y1="50" x2="48" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="48" y1="85" x2="65" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round"/>
+    <rect x="75" y="115" width="25" height="10" rx="1" fill="#71717A"/>
+    <!-- Thigh Pad -->
+    <rect x="70" y="77" width="16" height="6" rx="1" fill="#52525B"/>
+    <!-- Head -->
+    <circle cx="38" cy="38" r="6" fill="#18181B"/>
+    <!-- Body -->
+    <path d="M 43 44 L 50 82" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Leg (knee 90 deg, heel dropped below block) -->
+    <path d="M 50 82 L 78 82 L 78 112 L 70 122 L 80 115" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- MID -->
+  <g>
+    <!-- Machine Frame: Seat & Footrest Block -->
+    <line x1="190" y1="50" x2="198" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="198" y1="85" x2="215" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round"/>
+    <rect x="225" y="115" width="25" height="10" rx="1" fill="#71717A"/>
+    <!-- Elevated Thigh Pad -->
+    <rect x="220" y="69" width="16" height="6" rx="1" fill="#52525B"/>
+    <!-- Head -->
+    <circle cx="188" cy="38" r="6" fill="#18181B"/>
+    <!-- Body -->
+    <path d="M 193 44 L 200 82" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Leg elevated on tiptoes -->
+    <path d="M 200 82 L 228 74 L 228 98 L 223 103 M 228 98 L 230 115" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Calf Muscle Accent & Upward Push Arrow -->
+    <path d="M 228 82 Q 222 88 228 94" fill="none" stroke="#C25E3E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 248 85 L 248 68 M 244 73 L 248 67 L 252 73" fill="none" stroke="#C25E3E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
