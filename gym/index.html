@@ -271,7 +271,8 @@ const EXERCISES = [
 const exMeta = name => EXERCISES.find(e=>e.n===name) || (db.customEx||[]).find(e=>e.n===name) || null;
 const isTimed = name => !!exMeta(name)?.t;
 const allExercises = () => [...EXERCISES, ...(db.customEx||[])];
-function exSlug(name) { return name.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+function exSlug(name) { return name.toLowerCase().replace(/['']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+function hesc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 window.exSlug = exSlug;
 window.exMeta = exMeta;
 window.isTimed = isTimed;
@@ -976,15 +977,15 @@ function sLibrary(){
     row.innerHTML=`
       <div style="display:flex;align-items:center;gap:8px;width:100%;">
         <button class="libitem" aria-pressed="${on}" style="border-bottom:none;flex:1;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 2px;">
-          <img src="img/exercises/${slug}.svg" alt="${e.n} diagram" onerror="this.style.display='none'" class="ex-thumb">
-          <span style="flex:1;min-width:0">${e.n}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${e.g} · ${e.s}×${e.r}${e.t?' sec':''}</small></span>
+          <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" onerror="this.style.display='none'" class="ex-thumb">
+          <span style="flex:1;min-width:0">${hesc(e.n)}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${hesc(e.g)} · ${hesc(e.s)}×${hesc(e.r)}${e.t?' sec':''}</small></span>
           <span style="font-size:15px">${on?'✓':'+'}</span>
         </button>
-        <button class="quiet diag-toggle" aria-label="Toggle diagram for ${e.n}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
+        <button class="quiet diag-toggle" aria-label="Toggle diagram for ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
       </div>
       ${isExpanded ? `
         <div class="ex-diagram">
-          <img src="img/exercises/${slug}.svg" alt="${e.n} diagram" onerror="this.style.display='none'">
+          <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" onerror="this.style.display='none'">
         </div>` : ''}
     `;
     row.querySelector('.libitem').onclick=()=>{ on ? st.picked.splice(st.picked.indexOf(e.n),1) : st.picked.push(e.n); sLibrary(); };
