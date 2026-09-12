@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <!-- START -->
+  <g>
+    <!-- Preacher Stand -->
+    <path d="M60,85 L80,65" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <line x1="70" y1="75" x2="70" y2="125" stroke="#71717A" stroke-width="2.5" />
+    <line x1="55" y1="85" x2="55" y2="125" stroke="#71717A" stroke-width="2" />
+    <!-- Seat & Person -->
+    <line x1="40" y1="95" x2="55" y2="95" stroke="#71717A" stroke-width="3" />
+    <circle cx="48" cy="45" r="6" fill="#18181B" />
+    <line x1="50" y1="51" x2="52" y2="85" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M52,85 L48,105 L48,125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Arm on pad extended -->
+    <path d="M54,58 L68,73 L83,82" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- EZ Bar -->
+    <path d="M80,82 L86,82 L88,80 L90,84 L92,82" stroke="#52525B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <rect x="91" y="74" width="4" height="16" rx="1" fill="#52525B" />
+  </g>
+  <!-- MID -->
+  <g>
+    <!-- Preacher Stand -->
+    <path d="M210,85 L230,65" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <line x1="220" y1="75" x2="220" y2="125" stroke="#71717A" stroke-width="2.5" />
+    <line x1="205" y1="85" x2="205" y2="125" stroke="#71717A" stroke-width="2" />
+    <!-- Seat & Person -->
+    <line x1="190" y1="95" x2="205" y2="95" stroke="#71717A" stroke-width="3" />
+    <circle cx="198" cy="45" r="6" fill="#18181B" />
+    <line x1="200" y1="51" x2="202" y2="85" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M202,85 L198,105 L198,125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Arm curled -->
+    <path d="M204,58 L218,73 L208,50" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- EZ Bar -->
+    <path d="M202,50 L208,50 L210,48 L212,52 L214,50" stroke="#52525B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <rect x="213" y="42" width="4" height="16" rx="1" fill="#52525B" />
+    <path d="M225,75 A12,12 0 0,0 215,48" stroke="#C25E3E" stroke-width="1.5" stroke-dasharray="2 2" fill="none" />
+    <polygon points="217,46 211,48 214,53" fill="#C25E3E" />
+  </g>
+</svg>

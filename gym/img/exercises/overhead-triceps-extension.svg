@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <!-- START -->
+  <g>
+    <circle cx="75" cy="45" r="6" fill="#18181B" />
+    <line x1="75" y1="51" x2="75" y2="88" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M75,88 L68,106 L68,125 M75,88 L82,106 L82,125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Arms overhead bent back -->
+    <path d="M75,56 L72,25 L64,42" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Dumbbell behind head -->
+    <line x1="58" y1="42" x2="70" y2="42" stroke="#52525B" stroke-width="2" />
+    <rect x="56" y="38" width="3" height="8" rx="1" fill="#52525B" />
+    <rect x="69" y="38" width="3" height="8" rx="1" fill="#52525B" />
+  </g>
+  <!-- MID -->
+  <g>
+    <circle cx="225" cy="45" r="6" fill="#18181B" />
+    <line x1="225" y1="51" x2="225" y2="88" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M225,88 L218,106 L218,125 M225,88 L232,106 L232,125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Arms locked overhead -->
+    <path d="M225,56 L225,30 L225,16" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Dumbbell overhead -->
+    <line x1="219" y1="16" x2="231" y2="16" stroke="#52525B" stroke-width="2" />
+    <rect x="217" y="12" width="3" height="8" rx="1" fill="#52525B" />
+    <rect x="230" y="12" width="3" height="8" rx="1" fill="#52525B" />
+    <path d="M214,40 L214,20" stroke="#C25E3E" stroke-width="1.5" stroke-dasharray="2 2" fill="none" />
+    <polygon points="211,22 214,16 217,22" fill="#C25E3E" />
+  </g>
+</svg>
