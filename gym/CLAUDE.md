@@ -42,7 +42,7 @@ the calendar day panel). Build the full HTML string, assign once, then wire.
 ```
 fds.profiles      [{id, name}]
 fds.active        profile id
-fds.data.<id>     {unit, programId, custom:{}, sessions:[], draft}
+fds.data.<id>     {unit, programId, custom:{}, customEx:[], sessions:[], draft}
 ```
 
 A one-time migration from the old `ironlog.*` keys runs at startup. Leave it in place.
@@ -57,7 +57,7 @@ node gym/test.js
 # or: cd gym && npm install jsdom && node test.js
 ```
 
-79 checks across 10 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
+117 checks across 12 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
 visual inspection missed a dead button twice.
 
 ## After any change to index.html
