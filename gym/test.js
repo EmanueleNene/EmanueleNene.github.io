@@ -295,7 +295,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
 // ---------- scenario 9: exercise diagram SVG verification ----------
 {
-  console.log('\n9. Exercise diagram SVG verification (Chest & Shoulders)');
+  console.log('\n9. Exercise diagram SVG verification (Chest, Shoulders & Legs)');
   const chest = [
     'bench-press.svg', 'incline-barbell-press.svg', 'incline-dumbbell-press.svg',
     'dumbbell-bench-press.svg', 'dumbbell-fly.svg', 'cable-crossover.svg',
@@ -306,12 +306,20 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     'lateral-raise.svg', 'cable-lateral-raise.svg', 'rear-delt-fly.svg',
     'face-pull.svg', 'upright-row.svg'
   ];
-  const all = [...chest, ...shoulders];
+  const legs = [
+    'back-squat.svg', 'front-squat.svg', 'hack-squat.svg', 'leg-press.svg',
+    'romanian-deadlift.svg', 'stiff-leg-deadlift.svg', 'bulgarian-split-squat.svg',
+    'walking-lunge.svg', 'step-up.svg', 'leg-extension.svg', 'leg-curl.svg',
+    'hip-thrust.svg', 'glute-bridge.svg', 'good-morning.svg',
+    'standing-calf-raise.svg', 'seated-calf-raise.svg'
+  ];
+  const all = [...chest, ...shoulders, ...legs];
   const exDir = path.join(__dirname, 'img', 'exercises');
 
   check('exercise image directory exists', fs.existsSync(exDir));
   check('all 9 chest exercise SVGs exist', chest.every(f => fs.existsSync(path.join(exDir, f))));
   check('all 8 shoulder exercise SVGs exist', shoulders.every(f => fs.existsSync(path.join(exDir, f))));
+  check('all 16 leg exercise SVGs exist', legs.every(f => fs.existsSync(path.join(exDir, f))));
 
   let allValidXml = true;
   let allConformant = true;
@@ -347,10 +355,10 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     }
   }
 
-  check('all 17 SVGs parse as valid XML without syntax errors', allValidXml);
-  check('all 17 SVGs have viewBox="0 0 300 150", width="100%", height="100%"', allConformant);
-  check('all 17 SVGs have START at (75, 142) and MID at (225, 142)', allLabels);
-  check('all 17 SVGs have vertical dashed divider at x=150', allDividers);
+  check('all 33 SVGs parse as valid XML without syntax errors', allValidXml);
+  check('all 33 SVGs have viewBox="0 0 300 150", width="100%", height="100%"', allConformant);
+  check('all 33 SVGs have START at (75, 142) and MID at (225, 142)', allLabels);
+  check('all 33 SVGs have vertical dashed divider at x=150', allDividers);
 }
 
 // ---------- scenario 10: 2-frame vector SVG exercise diagrams (Back & Core) ----------
