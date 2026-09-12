@@ -198,7 +198,7 @@ const PKEY='fds.profiles', AKEY='fds.active', dkey=id=>'fds.data.'+id;
 const readJSON=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
 const writeJSON=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){alert('Storage is full or blocked. Data was not saved.')}};
 
-const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, sessions:[], draft:null});
+const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], sessions:[], draft:null});
 
 const BUILTIN = {
   ul:{name:'Upper / Lower', note:'4 days · balanced strength', days:[
@@ -268,10 +268,13 @@ const EXERCISES = [
   {n:'Jump rope',g:'Conditioning',s:4,r:60,t:1},{n:'Kettlebell swing',g:'Conditioning',s:4,r:20},
   {n:"Farmer's walk",g:'Conditioning',s:3,r:40,t:1},{n:'Sled push',g:'Conditioning',s:5,r:30,t:1}
 ];
-const exMeta = name => EXERCISES.find(e=>e.n===name);
+const exMeta = name => EXERCISES.find(e=>e.n===name) || (db.customEx||[]).find(e=>e.n===name) || null;
 const isTimed = name => !!exMeta(name)?.t;
+const allExercises = () => [...EXERCISES, ...(db.customEx||[])];
 function exSlug(name) { return name.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
 window.exSlug = exSlug;
+window.exMeta = exMeta;
+window.isTimed = isTimed;
 
 const dayKey = d => { const x=new Date(d);
   return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
@@ -864,10 +867,82 @@ function openLibrary(onAdd, extra){
 
 function sLibrary(){
   const st=screen;
+  // If creating mode, show creation form inline
+  if(st.creating){
+    view().innerHTML=`
+      <h2>New exercise</h2>
+      <div class="card" style="margin-top:10px">
+        <div style="margin-bottom:12px">
+          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Exercise name</label>
+          <input id="cxname" placeholder="e.g. Kettlebell press" maxlength="60" autocomplete="off"
+            value="${(st.cxname||'').replace(/"/g,'&quot;')}">
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px">Muscle group</label>
+          <div class="chips" id="cxchips" style="flex-wrap:wrap"></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px">Measurement</label>
+          <div style="display:flex;gap:8px">
+            <button id="cxreps" class="${(st.cxt||0)?'ghost':'rust'}" style="flex:1">Reps</button>
+            <button id="cxsecs" class="${(st.cxt||0)?'rust':'ghost'}" style="flex:1">Seconds</button>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px">
+          <div style="flex:1">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Default sets</label>
+            <input id="cxsets" type="number" inputmode="numeric" min="1" max="12" value="${st.cxsets||3}">
+          </div>
+          <div style="flex:1">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">${(st.cxt||0)?'Seconds':'Reps'}</label>
+            <input id="cxrepsv" type="number" inputmode="numeric" min="1" max="600" value="${st.cxrepsv||10}">
+          </div>
+        </div>
+        <div class="row">
+          <button class="rust grow" id="cxsave">Create exercise</button>
+          <button class="ghost" id="cxcancel">Cancel</button>
+        </div>
+      </div>`;
+
+    const cxChips=document.getElementById('cxchips');
+    GROUPS.forEach(g=>{
+      const c=document.createElement('button'); c.className='chip'; c.textContent=g;
+      c.setAttribute('aria-pressed',String(g===(st.cxgroup||GROUPS[0])));
+      c.onclick=()=>{ st.cxgroup=g; sLibrary(); };
+      cxChips.appendChild(c);
+    });
+
+    document.getElementById('cxname').oninput=e=>{ st.cxname=e.target.value; };
+    document.getElementById('cxsets').oninput=e=>{ st.cxsets=Math.min(12,Math.max(1,+e.target.value||1)); };
+    document.getElementById('cxrepsv').oninput=e=>{ st.cxrepsv=Math.min(600,Math.max(1,+e.target.value||1)); };
+    document.getElementById('cxreps').onclick=()=>{ st.cxt=0; sLibrary(); };
+    document.getElementById('cxsecs').onclick=()=>{ st.cxt=1; sLibrary(); };
+    document.getElementById('cxcancel').onclick=()=>{ st.creating=false; sLibrary(); };
+    document.getElementById('cxsave').onclick=()=>{
+      const name=(st.cxname||'').trim();
+      if(!name){ alert('Please enter an exercise name.'); document.getElementById('cxname').focus(); return; }
+      if(allExercises().some(e=>e.n.toLowerCase()===name.toLowerCase())){
+        alert('An exercise with that name already exists.'); document.getElementById('cxname').focus(); return; }
+      const ex={n:name, g:st.cxgroup||GROUPS[0], s:+(st.cxsets||3), r:+(st.cxrepsv||10)};
+      if(st.cxt) ex.t=1;
+      db.customEx = db.customEx||[];
+      db.customEx.push(ex);
+      save();
+      st.creating=false; st.cxname=''; st.q=name.toLowerCase(); sLibrary();
+    };
+    // Focus name input
+    const ni=document.getElementById('cxname'); if(ni && !ni.value) ni.focus();
+    return;
+  }
+
+  const allEx=allExercises();
   view().innerHTML=`
     <h2>Exercise library</h2>
-    <input id="q" placeholder="Search ${EXERCISES.length} exercises" autocomplete="off"
-      value="${st.q.replace(/"/g,'&quot;')}" style="margin-top:6px">
+    <div class="row" style="margin-top:6px;gap:8px">
+      <input id="q" placeholder="Search ${allEx.length} exercises" autocomplete="off"
+        value="${st.q.replace(/"/g,'&quot;')}" style="margin-top:0;flex:1">
+      <button class="ghost" id="newex" style="white-space:nowrap;padding:9px 12px">+ New</button>
+    </div>
     <div class="chips" id="chips" style="margin-top:10px"></div>
     <div id="lib"></div>
     <div class="row" style="margin:12px 0 4px">
@@ -885,13 +960,16 @@ function sLibrary(){
   });
 
   const lib=document.getElementById('lib');
-  const list=EXERCISES.filter(e=>(st.group==='All'||e.g===st.group) && e.n.toLowerCase().includes(st.q));
-  if(!list.length) lib.innerHTML=`<div class="empty">Nothing matches that search.</div>`;
+  const list=allEx.filter(e=>(st.group==='All'||e.g===st.group) && e.n.toLowerCase().includes(st.q));
+  if(!list.length){
+    lib.innerHTML=`<div class="empty">Nothing matches that search.</div>`;
+  }
   st.showDiag = st.showDiag || {};
   list.forEach(e=>{
     const on=st.picked.includes(e.n);
     const slug=exSlug(e.n);
     const isExpanded=!!st.showDiag[e.n];
+    const isCustom=!!(db.customEx||[]).find(c=>c.n===e.n);
     const row=document.createElement('div');
     row.className='libitem-row';
     row.style.borderBottom='1px solid var(--line)';
@@ -899,7 +977,7 @@ function sLibrary(){
       <div style="display:flex;align-items:center;gap:8px;width:100%;">
         <button class="libitem" aria-pressed="${on}" style="border-bottom:none;flex:1;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 2px;">
           <img src="img/exercises/${slug}.svg" alt="${e.n} diagram" onerror="this.style.display='none'" class="ex-thumb">
-          <span style="flex:1;min-width:0">${e.n}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${e.g} · ${e.s}×${e.r}${e.t?' sec':''}</small></span>
+          <span style="flex:1;min-width:0">${e.n}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${e.g} · ${e.s}×${e.r}${e.t?' sec':''}</small></span>
           <span style="font-size:15px">${on?'✓':'+'}</span>
         </button>
         <button class="quiet diag-toggle" aria-label="Toggle diagram for ${e.n}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
@@ -917,9 +995,10 @@ function sLibrary(){
   const q=document.getElementById('q');
   q.oninput=ev=>{ st.q=ev.target.value.toLowerCase().trim(); const pos=ev.target.selectionStart;
     sLibrary(); const nq=document.getElementById('q'); nq.focus(); nq.setSelectionRange(pos,pos); };
+  document.getElementById('newex').onclick=()=>{ st.creating=true; st.cxname=st.q?st.q:''; st.cxgroup=GROUPS[0]; st.cxt=0; st.cxsets=3; st.cxrepsv=10; sLibrary(); };
   document.getElementById('cancel').onclick=closeScreen;
   document.getElementById('addsel').onclick=()=>{
-    const chosen=st.picked.map(n=>EXERCISES.find(e=>e.n===n)).filter(Boolean);
+    const chosen=st.picked.map(n=>allExercises().find(e=>e.n===n)).filter(Boolean);
     const cb=st.onAdd; screen=null; cb(chosen);
   };
 }

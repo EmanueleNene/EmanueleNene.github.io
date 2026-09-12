@@ -500,6 +500,148 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
+
+// ---------- scenario 12: custom exercise creation, search, select into workout ----------
+{
+  console.log('\n12. Custom exercise creation, search, select into workout, log it');
+  const { w, d, log } = boot();
+
+  // Setup profile, navigate to library
+  d.querySelector('#fname').value = 'Tester'; tap(d, '#fgo');
+  tap(d, '#startHere'); tap(d, '#fromLib');
+
+  check('library view has + New button', !!d.querySelector('#newex'));
+
+  // Tap New exercise button
+  tap(d, '#newex');
+  check('creation form shown: name input', !!d.querySelector('#cxname'));
+  check('creation form shown: group chips', !!d.querySelector('#cxchips'));
+  check('creation form shown: reps button', !!d.querySelector('#cxreps'));
+  check('creation form shown: secs button', !!d.querySelector('#cxsecs'));
+  check('creation form shown: sets input', !!d.querySelector('#cxsets'));
+  check('creation form shown: reps value input', !!d.querySelector('#cxrepsv'));
+  check('creation form shown: create button', !!d.querySelector('#cxsave'));
+  check('creation form shown: cancel button', !!d.querySelector('#cxcancel'));
+
+  // Try saving with empty name — should alert
+  log.length = 0;
+  tap(d, '#cxsave');
+  check('saving without a name triggers alert', log.some(m => m.startsWith('ALERT:')));
+
+  // Fill in name and pick Shoulders group
+  d.querySelector('#cxname').value = 'Cable face pull';
+  d.querySelector('#cxname').dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
+  const groupBtns = d.querySelectorAll('#cxchips button');
+  const shouldersBtn = [...groupBtns].find(b => b.textContent === 'Shoulders');
+  if (shouldersBtn) tap(d, shouldersBtn);
+
+  // Switch to Seconds measurement
+  tap(d, '#cxsecs');
+  check('seconds button now active after tap', d.querySelector('#cxsecs').className.includes('rust'));
+  check('reps button is now ghost after tap', d.querySelector('#cxreps').className.includes('ghost'));
+
+  // Set custom sets/reps
+  d.querySelector('#cxsets').value = '4';
+  d.querySelector('#cxsets').dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
+  d.querySelector('#cxrepsv').value = '30';
+  d.querySelector('#cxrepsv').dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
+
+  // Save it
+  log.length = 0;
+  tap(d, '#cxsave');
+  check('no alert when saving valid exercise', !log.some(m => m.startsWith('ALERT:')));
+  check('library view restored after save', !!d.querySelector('#newex'), 'expected library view with #newex');
+
+  // Check the custom exercise persisted in db
+  // Read db from localStorage (fds.data.<profileId>)
+  const profiles = JSON.parse(w.localStorage.getItem('fds.profiles') || '[]');
+  const activeId = w.localStorage.getItem('fds.active');
+  const dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('custom exercise stored in db.customEx', Array.isArray(dbData.customEx) && dbData.customEx.some(e => e.n === 'Cable face pull'));
+  const stored = (dbData.customEx || []).find(e => e.n === 'Cable face pull');
+  if (stored) {
+    check('stored exercise has correct group', stored.g === 'Shoulders');
+    check('stored exercise is timed (t:1)', stored.t === 1);
+    check('stored exercise has 4 sets', stored.s === 4);
+    check('stored exercise has 30 reps/secs', stored.r === 30);
+  }
+
+  // The library should now show it in the list (search was set to the name by save logic)
+  check('custom exercise visible in library list', !!d.querySelector('#lib .libitem-row'));
+  const libItems = [...d.querySelectorAll('#lib .libitem')];
+  check('custom exercise appears in lib items', libItems.some(b => b.textContent.includes('Cable face pull')));
+
+  // Check allExercises includes it (via exMeta)
+  check('exMeta finds custom exercise', !!w.exMeta('Cable face pull'));
+  check('isTimed returns true for timed custom exercise', w.isTimed('Cable face pull'));
+
+  // Clear search and filter to Shoulders to find it
+  const qInput = d.querySelector('#q');
+  qInput.value = '';
+  qInput.dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
+  // Filter by Shoulders
+  const chips = [...d.querySelectorAll('.chips button')];
+  const shouldersChip = chips.find(b => b.textContent === 'Shoulders');
+  if (shouldersChip) tap(d, shouldersChip);
+
+  const filteredItems = [...d.querySelectorAll('#lib .libitem')];
+  check('custom exercise visible when filtered by Shoulders', filteredItems.some(b => b.textContent.includes('Cable face pull')));
+
+  // Select it into the workout
+  const customLibBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Cable face pull'));
+  if (customLibBtn) tap(d, customLibBtn);
+  check('custom exercise selected (Add button enabled)', !d.querySelector('#addsel').disabled);
+
+  // Confirm add
+  tap(d, '#addsel');
+  check('draft active workout opened with custom exercise', !!d.querySelector('#finish'));
+
+  // Check the custom exercise is in the draft
+  const exList = d.querySelector('#exlist');
+  check('custom exercise name appears in draft exlist', !!exList && exList.textContent.includes('Cable face pull'));
+
+  // Log a set for the custom exercise
+  const inputs = d.querySelectorAll('.setrow input');
+  if (inputs.length >= 2) {
+    inputs[0].value = '0'; // no weight (bodyweight / time)
+    inputs[0].dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
+    inputs[1].value = '30';
+    inputs[1].dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
+    const tick = d.querySelector('.setrow .tick');
+    if (tick) tap(d, tick);
+  }
+
+  // Finish the session
+  tap(d, '#finish');
+  check('session logged with custom exercise — returned to calendar', !!d.querySelector('.cell.sel'));
+
+  // Verify session exists in db with the custom exercise
+  const dbData2 = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('session stored in db.sessions', (dbData2.sessions||[]).length > 0);
+  if ((dbData2.sessions||[]).length) {
+    const last = dbData2.sessions[0];
+    check('custom exercise logged in session', last.ex.some(e => e.name === 'Cable face pull'));
+  }
+
+  // Verify the custom exercise badge is shown in the library
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const allLibItems = [...d.querySelectorAll('#lib .libitem')];
+  const customBadgeItem = allLibItems.find(b => b.textContent.includes('Cable face pull'));
+  check('custom exercise shows "custom" badge in library', !!customBadgeItem && customBadgeItem.innerHTML.includes('custom'));
+
+  // Duplicate name rejected
+  tap(d, '#newex');
+  d.querySelector('#cxname').value = 'Cable face pull';
+  d.querySelector('#cxname').dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
+  log.length = 0;
+  tap(d, '#cxsave');
+  check('duplicate exercise name is rejected with alert', log.some(m => m.startsWith('ALERT:')));
+
+  // Cancel returns to library
+  tap(d, '#cxcancel');
+  check('cancel returns to library view', !!d.querySelector('#newex'));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
