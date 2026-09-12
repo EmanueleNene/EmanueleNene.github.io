@@ -57,12 +57,20 @@ node gym/test.js
 # or: cd gym && npm install jsdom && node test.js
 ```
 
-50 checks across 8 scenarios driving the real UI. Add a scenario for any bug you fix — this suite exists because
+57 checks across 9 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
 visual inspection missed a dead button twice.
 
 ## After any change to index.html
 
 Bump `CACHE` in `sw.js`. Installed phones serve the cached copy until the version string changes.
+
+## Exercise diagrams (`img/exercises/`)
+
+Two-frame vector SVGs (`viewBox="0 0 300 150"`), transparent background:
+- **Left (0–150):** Starting position with `<text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>`.
+- **Right (150–300):** Mid/peak contraction position with `<text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>`.
+- **Divider:** dashed vertical line `<line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />`.
+- **Colors:** limbs/torso `#18181B`, equipment `#52525B` / `#71717A`, active accents `#C25E3E`.
 
 ## Deliberate design decisions — don't "fix" these
 

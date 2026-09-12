@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#C25E3E" />
+    </marker>
+  </defs>
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+
+  <!-- Left Frame: START -->
+  <g id="start-frame">
+    <circle cx="38" cy="60" r="6.5" fill="#18181B" />
+    <line x1="90" y1="85" x2="90" y2="128" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="90" y1="85" x2="45" y2="65" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="52" y1="68" x2="52" y2="105" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="46" y="103" width="12" height="7" rx="2" fill="#52525B" />
+    <path d="M 52 98 Q 45 75 45 50" stroke="#C25E3E" stroke-width="1.5" stroke-dasharray="2 2" stroke-linecap="round" fill="none" />
+    <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  </g>
+
+  <!-- Right Frame: MID -->
+  <g id="mid-frame">
+    <circle cx="188" cy="60" r="6.5" fill="#18181B" />
+    <line x1="240" y1="85" x2="240" y2="128" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="240" y1="85" x2="195" y2="65" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 202 68 L 202 48 L 202 40" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <rect x="196" y="36" width="12" height="7" rx="2" fill="#52525B" />
+<circle cx="202" cy="65" r="4" fill="#C25E3E" opacity="0.6" />
+    <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  </g>
+</svg>

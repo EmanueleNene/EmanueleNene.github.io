@@ -293,5 +293,65 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
+// ---------- scenario 9: exercise diagram SVG verification ----------
+{
+  console.log('\n9. Exercise diagram SVG verification (Chest & Shoulders)');
+  const chest = [
+    'bench-press.svg', 'incline-barbell-press.svg', 'incline-dumbbell-press.svg',
+    'dumbbell-bench-press.svg', 'dumbbell-fly.svg', 'cable-crossover.svg',
+    'machine-chest-press.svg', 'push-up.svg', 'dip.svg'
+  ];
+  const shoulders = [
+    'overhead-press.svg', 'seated-dumbbell-press.svg', 'arnold-press.svg',
+    'lateral-raise.svg', 'cable-lateral-raise.svg', 'rear-delt-fly.svg',
+    'face-pull.svg', 'upright-row.svg'
+  ];
+  const all = [...chest, ...shoulders];
+  const exDir = path.join(__dirname, 'img', 'exercises');
+
+  check('exercise image directory exists', fs.existsSync(exDir));
+  check('all 9 chest exercise SVGs exist', chest.every(f => fs.existsSync(path.join(exDir, f))));
+  check('all 8 shoulder exercise SVGs exist', shoulders.every(f => fs.existsSync(path.join(exDir, f))));
+
+  let allValidXml = true;
+  let allConformant = true;
+  let allDividers = true;
+  let allLabels = true;
+
+  for (const file of all) {
+    const raw = fs.readFileSync(path.join(exDir, file), 'utf8');
+    const dom = new JSDOM(raw, { contentType: 'image/svg+xml' });
+    const doc = dom.window.document;
+    if (doc.querySelector('parsererror')) allValidXml = false;
+
+    const svg = doc.documentElement;
+    if (svg.getAttribute('viewBox') !== '0 0 300 150' ||
+        svg.getAttribute('width') !== '100%' ||
+        svg.getAttribute('height') !== '100%') {
+      allConformant = false;
+    }
+
+    const texts = [...doc.querySelectorAll('text')];
+    const start = texts.find(t => t.textContent.trim() === 'START');
+    const mid = texts.find(t => t.textContent.trim() === 'MID');
+    if (!start || start.getAttribute('x') !== '75' || start.getAttribute('y') !== '142' ||
+        !mid || mid.getAttribute('x') !== '225' || mid.getAttribute('y') !== '142') {
+      allLabels = false;
+    }
+
+    const lines = [...doc.querySelectorAll('line')];
+    const divider = lines.find(l => l.getAttribute('x1') === '150' && l.getAttribute('x2') === '150');
+    if (!divider || divider.getAttribute('y1') !== '15' || divider.getAttribute('y2') !== '135' ||
+        divider.getAttribute('stroke') !== '#E4E4E7' || divider.getAttribute('stroke-dasharray') !== '3 3') {
+      allDividers = false;
+    }
+  }
+
+  check('all 17 SVGs parse as valid XML without syntax errors', allValidXml);
+  check('all 17 SVGs have viewBox="0 0 300 150", width="100%", height="100%"', allConformant);
+  check('all 17 SVGs have START at (75, 142) and MID at (225, 142)', allLabels);
+  check('all 17 SVGs have vertical dashed divider at x=150', allDividers);
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;

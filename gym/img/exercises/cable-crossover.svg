@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#C25E3E" />
+    </marker>
+  </defs>
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+
+  <!-- Left Frame: START -->
+  <g id="start-frame">
+    <line x1="15" y1="20" x2="15" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <line x1="135" y1="20" x2="135" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+<circle cx="20" cy="30" r="3" fill="#71717A" />
+<circle cx="130" cy="30" r="3" fill="#71717A" />
+    <circle cx="75" cy="40" r="6.5" fill="#18181B" />
+    <line x1="75" y1="47" x2="75" y2="85" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 75 85 L 65 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 75 85 L 85 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="75" y1="52" x2="38" y2="42" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="75" y1="52" x2="112" y2="42" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="20" y1="30" x2="38" y2="42" stroke="#71717A" stroke-width="2" stroke-dasharray="2 2" stroke-linecap="round" />
+    <line x1="130" y1="30" x2="112" y2="42" stroke="#71717A" stroke-width="2" stroke-dasharray="2 2" stroke-linecap="round" />
+    <rect x="33" y="38" width="8" height="8" rx="2" fill="#52525B" />
+    <rect x="109" y="38" width="8" height="8" rx="2" fill="#52525B" />
+    <path d="M 38 46 Q 50 70 70 82" stroke="#C25E3E" stroke-width="1.5" stroke-dasharray="2 2" stroke-linecap="round" fill="none" />
+    <path d="M 112 46 Q 100 70 80 82" stroke="#C25E3E" stroke-width="1.5" stroke-dasharray="2 2" stroke-linecap="round" fill="none" />
+    <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  </g>
+
+  <!-- Right Frame: MID -->
+  <g id="mid-frame">
+    <line x1="165" y1="20" x2="165" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <line x1="285" y1="20" x2="285" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+<circle cx="170" cy="30" r="3" fill="#71717A" />
+<circle cx="280" cy="30" r="3" fill="#71717A" />
+    <circle cx="225" cy="40" r="6.5" fill="#18181B" />
+    <line x1="225" y1="47" x2="225" y2="85" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 225 85 L 215 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 225 85 L 235 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 225 52 L 210 75 L 220 85" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 225 52 L 240 75 L 230 85" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="170" y1="30" x2="220" y2="85" stroke="#71717A" stroke-width="2" stroke-dasharray="2 2" stroke-linecap="round" />
+    <line x1="280" y1="30" x2="230" y2="85" stroke="#71717A" stroke-width="2" stroke-dasharray="2 2" stroke-linecap="round" />
+<circle cx="225" cy="60" r="4" fill="#C25E3E" opacity="0.6" />
+    <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  </g>
+</svg>
