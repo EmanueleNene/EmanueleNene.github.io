@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <!-- START -->
+  <g>
+    <circle cx="75" cy="28" r="6" fill="#18181B" />
+    <line x1="75" y1="34" x2="75" y2="75" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M75,75 L71,100 L71,125 M75,75 L79,100 L79,125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M75,42 L77,63 L77,80" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Vertical DB neutral grip -->
+    <line x1="77" y1="73" x2="77" y2="87" stroke="#52525B" stroke-width="2" />
+    <rect x="73" y="70" width="8" height="4" rx="1" fill="#52525B" />
+    <rect x="73" y="86" width="8" height="4" rx="1" fill="#52525B" />
+  </g>
+  <!-- MID -->
+  <g>
+    <circle cx="225" cy="28" r="6" fill="#18181B" />
+    <line x1="225" y1="34" x2="225" y2="75" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M225,75 L221,100 L221,125 M225,75 L229,100 L229,125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M225,42 L227,65 L215,48" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Vertical DB at hand -->
+    <line x1="215" y1="41" x2="215" y2="55" stroke="#52525B" stroke-width="2" />
+    <rect x="211" y="38" width="8" height="4" rx="1" fill="#52525B" />
+    <rect x="211" y="54" width="8" height="4" rx="1" fill="#52525B" />
+    <path d="M232,70 A15,15 0 0,0 220,45" stroke="#C25E3E" stroke-width="1.5" stroke-dasharray="2 2" fill="none" />
+    <polygon points="223,43 216,45 220,49" fill="#C25E3E" />
+  </g>
+</svg>

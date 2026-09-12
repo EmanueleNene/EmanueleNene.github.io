@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <!-- START -->
+  <g>
+    <!-- Bike Frame -->
+    <circle cx="42" cy="95" r="15" fill="none" stroke="#52525B" stroke-width="2" />
+    <path d="M42,95 L62,95 L80,68" stroke="#71717A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="42" y1="95" x2="42" y2="60" stroke="#71717A" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="36" y1="60" x2="48" y2="60" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <line x1="74" y1="68" x2="86" y2="68" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <!-- Rider -->
+    <circle cx="65" cy="34" r="6" fill="#18181B" />
+    <line x1="65" y1="40" x2="80" y2="68" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M80,68 L76,92 L75,114 M80,68 L64,78 L65,90" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M65,46 L45,60" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+  <!-- MID -->
+  <g>
+    <!-- Bike Frame -->
+    <circle cx="192" cy="95" r="15" fill="none" stroke="#52525B" stroke-width="2" />
+    <path d="M192,95 L212,95 L230,68" stroke="#71717A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="192" y1="95" x2="192" y2="60" stroke="#71717A" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="186" y1="60" x2="198" y2="60" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <line x1="224" y1="68" x2="236" y2="68" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <!-- Rider opposite legs -->
+    <circle cx="215" cy="34" r="6" fill="#18181B" />
+    <line x1="215" y1="40" x2="230" y2="68" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M230,68 L214,78 L215,90 M230,68 L226,92 L225,114" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M215,46 L195,60" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M177,95 A15,15 0 0,1 192,80" stroke="#C25E3E" stroke-width="1.5" fill="none" stroke-dasharray="2 2" />
+    <polygon points="193,78 197,83 191,84" fill="#C25E3E" />
+  </g>
+</svg>
