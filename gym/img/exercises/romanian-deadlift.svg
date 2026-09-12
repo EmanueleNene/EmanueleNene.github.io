@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- Ground line -->
+  <line x1="20" y1="125" x2="130" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+  <line x1="170" y1="125" x2="280" y2="125" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="2 2"/>
+
+  <!-- START -->
+  <g>
+    <!-- Barbell -->
+    <line x1="55" y1="78" x2="105" y2="78" stroke="#52525B" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="55" cy="78" r="8" fill="none" stroke="#71717A" stroke-width="2"/>
+    <circle cx="105" cy="78" r="8" fill="none" stroke="#71717A" stroke-width="2"/>
+    <!-- Head -->
+    <circle cx="75" cy="28" r="6" fill="#18181B"/>
+    <!-- Body upright -->
+    <path d="M 75 34 L 75 75 L 75 98 L 75 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Feet -->
+    <path d="M 75 125 L 83 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Arms holding bar at thigh -->
+    <path d="M 75 44 L 80 78" fill="none" stroke="#18181B" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- MID -->
+  <g>
+    <!-- Barbell hanging just below knees -->
+    <line x1="215" y1="95" x2="265" y2="95" stroke="#52525B" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="215" cy="95" r="8" fill="none" stroke="#71717A" stroke-width="2"/>
+    <circle cx="265" cy="95" r="8" fill="none" stroke="#71717A" stroke-width="2"/>
+    <!-- Head -->
+    <circle cx="254" cy="50" r="6" fill="#18181B"/>
+    <!-- Torso hinged forward ~60 deg -->
+    <path d="M 249 55 L 202 75" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Hips pushed back, slight knee bend -->
+    <path d="M 202 75 L 210 98 L 215 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Feet -->
+    <path d="M 215 125 L 223 125" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Arms hanging vertically to bar -->
+    <path d="M 240 60 L 240 95" fill="none" stroke="#18181B" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Hamstring / Glute Stretch Accent & Hip Drive Arrow -->
+    <path d="M 200 77 Q 206 90 211 96" fill="none" stroke="#C25E3E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 195 72 L 183 66 M 186 73 L 182 65 L 191 66" fill="none" stroke="#C25E3E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

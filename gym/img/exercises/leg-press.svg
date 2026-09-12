@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- START -->
+  <g>
+    <!-- Machine Frame: Seat & Footplate -->
+    <path d="M 32" fill="none"/>
+    <line x1="35" y1="75" x2="58" y2="105" stroke="#71717A" stroke-width="4" stroke-linecap="round"/> <!-- Backrest -->
+    <line x1="58" y1="105" x2="72" y2="105" stroke="#71717A" stroke-width="4" stroke-linecap="round"/> <!-- Seat -->
+    <line x1="95" y1="35" x2="115" y2="60" stroke="#52525B" stroke-width="5" stroke-linecap="round"/> <!-- Footplate -->
+    <!-- Head -->
+    <circle cx="36" cy="62" r="6" fill="#18181B"/>
+    <!-- Body in seat -->
+    <path d="M 42 70 L 60 102" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Legs extended -->
+    <path d="M 60 102 L 82 72 L 103 48" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Hands holding handles -->
+    <path d="M 48 80 L 58 92" fill="none" stroke="#18181B" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- MID -->
+  <g>
+    <!-- Machine Frame: Seat & Footplate -->
+    <line x1="185" y1="75" x2="208" y2="105" stroke="#71717A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="208" y1="105" x2="222" y2="105" stroke="#71717A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="245" y1="35" x2="265" y2="60" stroke="#52525B" stroke-width="5" stroke-linecap="round"/>
+    <!-- Head -->
+    <circle cx="186" cy="62" r="6" fill="#18181B"/>
+    <!-- Body -->
+    <path d="M 192 70 L 210 102" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round"/>
+    <!-- Legs deeply flexed -->
+    <path d="M 210 102 L 220 74 L 253 48" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Hands -->
+    <path d="M 198 80 L 208 92" fill="none" stroke="#18181B" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- Quad Accent & Push Arrow -->
+    <path d="M 212 95 Q 212 80 220 73" fill="none" stroke="#C25E3E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 226 70 L 244 48 M 237 49 L 245 47 L 244 55" fill="none" stroke="#C25E3E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
