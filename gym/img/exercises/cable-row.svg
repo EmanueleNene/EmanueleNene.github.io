@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="#C25E3E" />
+    </marker>
+  </defs>
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- START -->
+  <line x1="25" y1="122" x2="125" y2="122" stroke="#E4E4E7" stroke-width="1.5" />
+  <!-- Seat & Pulley -->
+  <rect x="30" y="100" width="40" height="5" rx="2" fill="#52525B" />
+  <line x1="90" y1="75" x2="90" y2="105" stroke="#71717A" stroke-width="2" />
+  <rect x="115" y="78" width="10" height="15" fill="#52525B" />
+  <line x1="92" y1="78" x2="115" y2="85" stroke="#71717A" stroke-width="1.5" />
+  <!-- Lifter Extended -->
+  <path d="M 45 100 L 70 92 L 90 85" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 45 100 L 55 65" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+  <line x1="55" y1="65" x2="92" y2="78" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+  <circle cx="57" cy="53" r="6" fill="#18181B" />
+  <path d="M 85 70 L 68 70" fill="none" stroke="#C25E3E" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- MID -->
+  <line x1="175" y1="122" x2="275" y2="122" stroke="#E4E4E7" stroke-width="1.5" />
+  <rect x="180" y="100" width="40" height="5" rx="2" fill="#52525B" />
+  <line x1="240" y1="75" x2="240" y2="105" stroke="#71717A" stroke-width="2" />
+  <rect x="265" y="78" width="10" height="15" fill="#52525B" />
+  <line x1="190" y1="76" x2="265" y2="85" stroke="#71717A" stroke-width="1.5" />
+  <path d="M 195 100 L 220 92 L 240 85" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 195 100 L 192 65" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+  <!-- Elbow Back -->
+  <path d="M 192 65 L 176 70 L 190 76" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="192" cy="53" r="6" fill="#18181B" />
+  <path d="M 180 60 Q 185 68 180 76" fill="none" stroke="#C25E3E" stroke-width="2" stroke-linecap="round" />
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="#C25E3E" />
+    </marker>
+  </defs>
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- START (Setup on knees) -->
+  <line x1="20" y1="115" x2="130" y2="115" stroke="#E4E4E7" stroke-width="2" />
+  <path d="M 30 115 L 45 115 L 58 95 L 85 82" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 85 82 L 85 115 L 102 115" fill="none" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="96" cy="76" r="6" fill="#18181B" />
+  <path d="M 58 92 L 68 82" fill="none" stroke="#C25E3E" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- MID (Full Plank) -->
+  <line x1="170" y1="115" x2="280" y2="115" stroke="#E4E4E7" stroke-width="2" />
+  <path d="M 185 115 L 210 100 L 235 85 L 260 85" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 260 85 L 260 115 L 275 115" fill="none" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="270" cy="85" r="6" fill="#18181B" />
+  <line x1="230" y1="88" x2="258" y2="88" stroke="#C25E3E" stroke-width="2" stroke-linecap="round" />
+</svg>

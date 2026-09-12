@@ -57,7 +57,7 @@ node gym/test.js
 # or: cd gym && npm install jsdom && node test.js
 ```
 
-57 checks across 9 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
+63 checks across 10 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
 visual inspection missed a dead button twice.
 
 ## After any change to index.html

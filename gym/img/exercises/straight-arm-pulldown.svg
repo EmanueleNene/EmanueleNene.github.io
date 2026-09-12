@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="#C25E3E" />
+    </marker>
+  </defs>
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <!-- Labels -->
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+
+  <!-- START -->
+  <line x1="25" y1="122" x2="125" y2="122" stroke="#E4E4E7" stroke-width="1.5" />
+  <circle cx="125" cy="20" r="4" fill="#52525B" />
+  <line x1="105" y1="36" x2="125" y2="20" stroke="#71717A" stroke-width="1.5" />
+  <!-- Lifter angled -->
+  <path d="M 50 122 L 52 98 L 50 75 L 62 52" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="64" cy="42" r="6" fill="#18181B" />
+  <line x1="62" y1="52" x2="105" y2="36" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+  <line x1="100" y1="31" x2="110" y2="41" stroke="#71717A" stroke-width="2.5" />
+  <path d="M 98 46 Q 98 65 78 80" fill="none" stroke="#C25E3E" stroke-width="1.5" stroke-dasharray="2 2" marker-end="url(#arrow)" />
+
+  <!-- MID -->
+  <line x1="175" y1="122" x2="275" y2="122" stroke="#E4E4E7" stroke-width="1.5" />
+  <circle cx="275" cy="20" r="4" fill="#52525B" />
+  <line x1="218" y1="82" x2="275" y2="20" stroke="#71717A" stroke-width="1.5" />
+  <path d="M 200 122 L 202 98 L 200 75 L 212 52" fill="none" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="214" cy="42" r="6" fill="#18181B" />
+  <!-- Arms pulled to thigh -->
+  <line x1="212" y1="52" x2="218" y2="82" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+  <line x1="213" y1="82" x2="223" y2="82" stroke="#71717A" stroke-width="2.5" />
+  <path d="M 200 56 Q 194 66 200 76" fill="none" stroke="#C25E3E" stroke-width="2" stroke-linecap="round" />
+</svg>

@@ -353,5 +353,80 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check('all 17 SVGs have vertical dashed divider at x=150', allDividers);
 }
 
+// ---------- scenario 10: 2-frame vector SVG exercise diagrams (Back & Core) ----------
+{
+  console.log('\n10. Exercise diagram vector SVGs (Back & Core)');
+  const backExercises = [
+    'deadlift.svg', 'rack-pull.svg', 'barbell-row.svg', 'pendlay-row.svg',
+    'dumbbell-row.svg', 't-bar-row.svg', 'cable-row.svg', 'lat-pulldown.svg',
+    'pull-up.svg', 'chin-up.svg', 'straight-arm-pulldown.svg', 'shrug.svg'
+  ];
+  const coreExercises = [
+    'plank.svg', 'side-plank.svg', 'hanging-leg-raise.svg', 'cable-crunch.svg',
+    'ab-wheel-rollout.svg', 'russian-twist.svg', 'dead-bug.svg', 'back-extension.svg'
+  ];
+  const allExercises = [...backExercises, ...coreExercises];
+
+  check('exactly 12 back exercise diagrams specified', backExercises.length === 12);
+  check('exactly 8 core exercise diagrams specified', coreExercises.length === 8);
+
+  const exDir = path.join(__dirname, 'img', 'exercises');
+  check('img/exercises directory exists', fs.existsSync(exDir));
+
+  let missingFiles = 0;
+  let parseErrors = 0;
+  let specErrors = 0;
+
+  for (const filename of allExercises) {
+    const filePath = path.join(exDir, filename);
+    if (!fs.existsSync(filePath)) {
+      missingFiles++;
+      continue;
+    }
+
+    const raw = fs.readFileSync(filePath, 'utf8');
+    let dom;
+    try {
+      dom = new JSDOM(raw, { contentType: 'image/svg+xml' });
+    } catch (e) {
+      parseErrors++;
+      continue;
+    }
+
+    const svg = dom.window.document.documentElement;
+    const viewBox = svg.getAttribute('viewBox');
+    const width = svg.getAttribute('width');
+    const height = svg.getAttribute('height');
+
+    if (viewBox !== '0 0 300 150' || width !== '100%' || height !== '100%') {
+      specErrors++;
+    }
+
+    // Divider line at x=150
+    const lines = Array.from(svg.querySelectorAll('line'));
+    const divider = lines.find(l => l.getAttribute('x1') === '150' && l.getAttribute('x2') === '150');
+    if (!divider || divider.getAttribute('y1') !== '15' || divider.getAttribute('y2') !== '135') {
+      specErrors++;
+    }
+
+    // START label
+    const texts = Array.from(svg.querySelectorAll('text'));
+    const startText = texts.find(t => t.textContent.trim() === 'START');
+    if (!startText || startText.getAttribute('x') !== '75' || startText.getAttribute('y') !== '142') {
+      specErrors++;
+    }
+
+    // MID label
+    const midText = texts.find(t => t.textContent.trim() === 'MID');
+    if (!midText || midText.getAttribute('x') !== '225' || midText.getAttribute('y') !== '142') {
+      specErrors++;
+    }
+  }
+
+  check('all 20 exercise SVG files exist', missingFiles === 0, `${missingFiles} missing`);
+  check('all 20 exercise SVGs parse as valid XML', parseErrors === 0, `${parseErrors} parse errors`);
+  check('all 20 exercise SVGs meet design standards (viewBox, divider, START/MID labels)', specErrors === 0, `${specErrors} spec errors`);
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;
