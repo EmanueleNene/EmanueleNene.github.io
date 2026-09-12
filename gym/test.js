@@ -644,5 +644,63 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
+// ---------- scenario 13: finish session with no sets ticked — must still save ----------
+{
+  console.log('\n13. Finish session with filled-in sets but no ✓ ticks — session must still save');
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'Nene'; tap(d, '#fgo');
+
+  // Start a workout via the library route
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const item = d.querySelector('#lib .libitem');
+  check('library has at least one item', !!item);
+  if (item) {
+    tap(d, item);
+    tap(d, '#addsel');
+    check('draft opened', !!d.querySelector('#finish'), log.join(' | '));
+
+    // Fill in weight and reps for the first set WITHOUT ticking ✓
+    const rows = d.querySelectorAll('.setrow');
+    check('at least one set row rendered', rows.length > 0);
+    if (rows.length > 0) {
+      const inputs = rows[0].querySelectorAll('input');
+      if (inputs[0]) {
+        inputs[0].value = '80';
+        inputs[0].dispatchEvent(new w.Event('input', { bubbles: true }));
+      }
+      if (inputs[1]) {
+        inputs[1].value = '10';
+        inputs[1].dispatchEvent(new w.Event('input', { bubbles: true }));
+      }
+      // Do NOT tap the tick button — this is the regression scenario
+    }
+
+    // Tap Finish session — the session must be saved
+    tap(d, '#finish');
+    check('returned to calendar after finish', d.querySelector('nav button[aria-current=true]').dataset.tab === 'calendar');
+    check('calendar shows a trained day', !!d.querySelector('.cell.has'));
+
+    // Verify the session is in db.sessions with the exercise and set data
+    const activeId = w.localStorage.getItem('fds.active');
+    const dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+    check('session saved in db.sessions', (dbData.sessions || []).length > 0, 'db.sessions was empty');
+    if ((dbData.sessions || []).length > 0) {
+      const saved = dbData.sessions[0];
+      check('saved session has at least one exercise', saved.ex.length > 0, 'ex array was empty');
+      if (saved.ex.length > 0) {
+        const ex = saved.ex[0];
+        check('saved exercise has sets', ex.sets.length > 0, 'sets array was empty');
+        if (ex.sets.length > 0) {
+          const set = ex.sets[0];
+          check('saved set has entered weight (80)', String(set.w) === '80', 'got w=' + set.w);
+          check('saved set has entered reps (10)', String(set.r) === '10', 'got r=' + set.r);
+        }
+      }
+    }
+  }
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;

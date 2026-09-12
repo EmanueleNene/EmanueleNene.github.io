@@ -628,7 +628,7 @@ function drawDraft(){
   });
   document.getElementById('finish').onclick=()=>{
     const s=JSON.parse(JSON.stringify(dr));
-    s.ex=s.ex.map(e=>({name:e.name,sets:e.sets.filter(x=>x.done)})).filter(e=>e.sets.length);
+    s.ex=s.ex.filter(e=>e.sets.length);
     if(!s.ex.length){db.draft=null;save();render();return;}
     if(!s.id) s.id='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
     db.sessions.unshift(s);
