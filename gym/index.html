@@ -945,12 +945,12 @@ function sLibrary(){
       <button class="ghost" id="newex" style="white-space:nowrap;padding:9px 12px">+ New</button>
     </div>
     <div class="chips" id="chips" style="margin-top:10px"></div>
-    <div id="lib"></div>
-    <div class="row" style="margin:12px 0 4px">
+    <div class="row" style="margin:10px 0 6px;position:sticky;top:0;z-index:5;background:var(--concrete);padding:6px 0">
       <button class="rust grow" id="addsel" ${st.picked.length?'':'disabled'}>${
         st.picked.length?'Add '+st.picked.length:'Add'}</button>
       <button class="ghost" id="cancel">Cancel</button>
-    </div>`;
+    </div>
+    <div id="lib"></div>`;
 
   const chips=document.getElementById('chips');
   ['All',...GROUPS].forEach(g=>{
