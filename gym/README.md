@@ -23,7 +23,7 @@ Each family member does this on their own phone and creates their own profile on
 |---|---|
 | `fds.profiles` | `[{id, name}]` — the people on this device |
 | `fds.active` | which profile is currently selected |
-| `fds.data.<id>` | that person's programs, sessions and in-progress draft |
+| `fds.data.<id>` | that person's programs, sessions, custom exercises, and in-progress draft |
 
 Consequences worth knowing:
 
@@ -79,7 +79,7 @@ program does not remove sessions already logged under it.
 ## Editing the code
 
 `index.html` is the whole application — markup, styles and logic in one file. After changing it,
-bump `CACHE` in `sw.js` (currently `ferrodastiro-v4`) or installed phones will keep serving the old version.
+bump `CACHE` in `sw.js` (currently `ferrodastiro-v6`) or installed phones will keep serving the old version.
 
 ### Running the tests
 
