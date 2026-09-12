@@ -3,18 +3,9 @@
 A workout log that runs entirely in the browser. No account, no server, no analytics.
 Every session is written to `localStorage` on the device that logged it.
 
-## Deploy on emanuelenene.github.io
+## Deployment
 
-```bash
-cd ~/path/to/emanuelenene.github.io
-mkdir -p gym
-cp -r /path/to/ironlog/* gym/
-git add gym
-git commit -m "Add FerroDaStiro workout tracker"
-git push
-```
-
-Live a minute later at `https://emanuelenene.github.io/gym/`.
+FerroDaStiro is hosted at `https://emanuelenene.github.io/gym/`. Pushing changes on `main` deploys automatically via GitHub Pages.
 
 GitHub Pages serves over HTTPS, which the service worker and the install prompt both require.
 
@@ -94,6 +85,12 @@ bump `CACHE` in `sw.js` (currently `ferrodastiro-v4`) or installed phones will k
 
 `test.js` drives the real UI in a headless browser — creating profiles, starting workouts by all
 three routes, logging sets, finishing, repeating past sessions, editing programs.
+
+```bash
+node gym/test.js
+```
+
+Or from within the `gym/` directory:
 
 ```bash
 npm install jsdom

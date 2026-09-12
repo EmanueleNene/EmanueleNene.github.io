@@ -47,16 +47,17 @@ fds.data.<id>     {unit, programId, custom:{}, sessions:[], draft}
 
 A one-time migration from the old `ironlog.*` keys runs at startup. Leave it in place.
 
-Session shape: `{date, day, program, ex:[{name, sets:[{w, r, done}]}]}`. Dates are stamped at
+Session shape: `{id, date, day, program, ex:[{name, sets:[{w, r, done}]}]}`. Dates are stamped at
 **midday** so daylight-saving shifts can't move a session onto the neighbouring day.
 
 ## Testing
 
 ```bash
-npm install jsdom && node test.js
+node gym/test.js
+# or: cd gym && npm install jsdom && node test.js
 ```
 
-40 checks driving the real UI. Add a scenario for any bug you fix — this suite exists because
+50 checks across 8 scenarios driving the real UI. Add a scenario for any bug you fix — this suite exists because
 visual inspection missed a dead button twice.
 
 ## After any change to index.html
