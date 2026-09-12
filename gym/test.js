@@ -1,6 +1,18 @@
 const fs = require('fs');
 const path = require('path');
-const { JSDOM } = require('jsdom');
+let JSDOM;
+try {
+  ({ JSDOM } = require('jsdom'));
+} catch (err) {
+  const fallbacks = [
+    '/home/emanuele/.npm/_npx/32b3ceb8ef573b04/node_modules/jsdom',
+    '/home/emanuele/n8n-local/node_modules/jsdom'
+  ];
+  for (const p of fallbacks) {
+    try { ({ JSDOM } = require(p)); if (JSDOM) break; } catch {}
+  }
+  if (!JSDOM) throw err;
+}
 
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
@@ -219,4 +231,67 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     check('library route produces a draft', !!d.querySelector('#finish'), log.slice(-1).join('')); }
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
+
+// ---------- scenario 8: multi-session deletion, month navigation selection, zero-weight chart ----------
+{
+  console.log('\n8. Multi-session deletion, month navigation, zero-weight progress');
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'Nene'; tap(d, '#fgo');
+
+  // Month navigation: calSel is preserved as null when navigating
+  tap(d, '#prev');
+  check('no cell selected after month navigation', !d.querySelector('.cell.sel'));
+  check('no start button when no day selected in navigated month', !d.querySelector('#startHere'));
+  const monthCells = [...d.querySelectorAll('.cell:not(.blank)')];
+  tap(d, monthCells[5]);
+  check('selecting a day in navigated month selects cell', !!d.querySelector('.cell.sel'));
+  const startNav = d.querySelector('#startHere');
+  check('start button appears on selected day in navigated month', !!startNav);
+  if (startNav) {
+    tap(d, startNav);
+    check('start workout route opens for selected day in navigated month', !!d.querySelector('#fromProg'));
+    tap(d, '#cancelStart');
+  }
+
+  // Go back to today on calendar
+  tap(d, '#next');
+  tap(d, d.querySelector('.cell.today'));
+
+  // Log session 1 on today
+  tap(d, '#startHere'); tap(d, '#fromProg'); tap(d, '#rows .libitem');
+  tap(d, d.querySelector('.tick')); tap(d, '#finish');
+
+  // Log session 2 on today
+  tap(d, '#startHere'); tap(d, '#fromProg'); tap(d, '#rows .libitem');
+  tap(d, d.querySelector('.tick')); tap(d, '#finish');
+
+  // Verify two sessions are rendered with delete buttons
+  const delButtons = d.querySelectorAll('[data-del]');
+  check('two sessions logged on same day', delButtons.length === 2);
+  if (delButtons.length === 2) {
+    tap(d, delButtons[0]);
+    check('deleting one session leaves the second intact', d.querySelectorAll('[data-del]').length === 1);
+  }
+
+  // Zero-weight / bodyweight exercise in progress chart
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems = d.querySelectorAll('#lib .libitem');
+  tap(d, libItems[0]);
+  tap(d, '#addsel');
+  tap(d, d.querySelector('.tick')); tap(d, '#finish');
+
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems2 = d.querySelectorAll('#lib .libitem');
+  tap(d, libItems2[0]);
+  tap(d, '#addsel');
+  tap(d, d.querySelector('.tick')); tap(d, '#finish');
+
+  tap(d, 'nav button[data-tab=progress]');
+  const cardText = d.querySelector('#chart .card')?.textContent || '';
+  check('progress chart does not display NaN%', !cardText.includes('NaN%'));
+  check('progress chart does not display Infinity%', !cardText.includes('Infinity%'));
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
+if (fails > 0) process.exitCode = 1;

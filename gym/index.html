@@ -267,16 +267,22 @@ const EXERCISES = [
 const exMeta = name => EXERCISES.find(e=>e.n===name);
 const isTimed = name => !!exMeta(name)?.t;
 
+const dayKey = d => { const x=new Date(d);
+  return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
+
 let profiles=[], me=null, db=BLANK(), tab='calendar';
 let calMonth=(()=>{const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return d;})();
-let calSel=null, editing=null;
+let calSel=dayKey(new Date()), editing=null;
 
 function loadProfiles(){
   profiles = readJSON(PKEY, []);
   me = localStorage.getItem(AKEY);
   if(!profiles.find(p=>p.id===me)) me = profiles[0]?.id || null;
 }
-function loadData(){ db = Object.assign(BLANK(), readJSON(dkey(me), {})); }
+function loadData(){
+  db = Object.assign(BLANK(), readJSON(dkey(me), {}));
+  db.sessions.forEach(s=>{ if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9); });
+}
 function save(){ if(me) writeJSON(dkey(me), db); }
 function switchTo(id){ localStorage.setItem(AKEY,id); me=id; loadData(); tab='calendar'; render(); }
 function addProfile(name){
@@ -484,13 +490,15 @@ function prefill(name,count,reps){
 }
 
 function beginDay(day,dateMs,pname){
-  db.draft={date:dateMs||noon(new Date()), day:day.name, program:pname||prog().name,
+  db.draft={id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    date:dateMs||noon(new Date()), day:day.name, program:pname||prog().name,
     ex:day.ex.map(([name,sets,reps])=>({name,target:reps,sets:prefill(name,sets,reps)}))};
   save(); tab='train'; render();
 }
 
 function beginCustom(picked,dateMs){
-  db.draft={date:dateMs||noon(new Date()),
+  db.draft={id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    date:dateMs||noon(new Date()),
     day:new Date(dateMs).toLocaleDateString(undefined,{weekday:'long'})+' session',
     program:'Built on the day',
     ex:picked.map(x=>({name:x.n,target:x.r,sets:prefill(x.n,x.s,x.r)}))};
@@ -498,7 +506,8 @@ function beginCustom(picked,dateMs){
 }
 
 function beginRepeat(src,dateMs){
-  db.draft={date:dateMs||noon(new Date()), day:src.day, program:src.program||'Repeat',
+  db.draft={id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    date:dateMs||noon(new Date()), day:src.day, program:src.program||'Repeat',
     ex:src.ex.map(e=>({name:e.name, target:+e.sets[0]?.r||10,
       sets:e.sets.map(s=>({w:s.w, r:s.r, done:false}))}))};
   save(); tab='train'; render();
@@ -601,6 +610,7 @@ function drawDraft(){
     const s=JSON.parse(JSON.stringify(dr));
     s.ex=s.ex.map(e=>({name:e.name,sets:e.sets.filter(x=>x.done)})).filter(e=>e.sets.length);
     if(!s.ex.length){db.draft=null;save();render();return;}
+    if(!s.id) s.id='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
     db.sessions.unshift(s);
     db.sessions.sort((a,b)=>b.date-a.date);     // backdated sessions slot into place
     db.draft=null; stopTimer(); save();
@@ -640,7 +650,7 @@ function chartFor(name){
   const x=i=>P.l+i*(W-P.l-P.r)/(pts.length-1);
   const y=v=>P.t+(hi-v)/((hi-lo)||1)*(H-P.t-P.b);
   const line=pts.map((p,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
-  const gain=(pts.at(-1).v/pts[0].v-1)*100;
+  const gain=pts[0].v>0 ? (pts.at(-1).v/pts[0].v-1)*100 : 0;
   box.innerHTML=`<div class="card">
       <div class="exhead"><h3>Estimated 1-rep max</h3>
         <em style="color:${gain>=0?'var(--rust)':'var(--steel)'}">${gain>=0?'+':''}${gain.toFixed(1)}% overall</em></div>
@@ -728,7 +738,9 @@ function vPrograms(){
       const incoming=parsed.data||parsed;
       if(!Array.isArray(incoming.sessions)) throw new Error('shape');
       if(confirm(`Replace this profile's log with ${incoming.sessions.length} imported sessions?`)){
-        db=Object.assign(BLANK(),incoming); save(); render();
+        db=Object.assign(BLANK(),incoming);
+        db.sessions.forEach(s=>{ if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9); });
+        save(); render();
       }
     }catch(err){ alert("That file isn't a FerroDaStiro export."); }
   };
@@ -814,7 +826,9 @@ function vEditor(){
     if(ed.days.every(d=>!d.ex.length)){ alert('Add at least one exercise before saving.'); return; }
     const clean={name:ed.name.trim(), note:ed.note?.trim()||ed.days.length+' days',
       days:ed.days.filter(d=>d.ex.length).map(d=>({name:d.name.trim()||'Day',ex:d.ex}))};
-    db.custom[ed.id]=clean; db.programId=ed.id; editing=null; save(); tab='calendar'; render();
+    db.custom[ed.id]=clean; db.programId=ed.id; editing=null; save();
+    calMonth=(()=>{const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return d;})();
+    calSel=dayKey(new Date()); tab='calendar'; render();
   };
   document.getElementById('cancelp').onclick=()=>{ editing=null; render(); };
   const dp=document.getElementById('delp');
@@ -878,11 +892,7 @@ function sLibrary(){
 }
 
 /* --- Calendar --- */
-const dayKey = d => { const x=new Date(d);
-  return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
-
 function vCalendar(){
-  if(calSel===null) calSel=dayKey(new Date());   // land on today
   const byDay={};
   db.sessions.forEach(s=>{ const k=dayKey(s.date); (byDay[k]=byDay[k]||[]).push(s); });
 
@@ -955,14 +965,15 @@ function vCalendar(){
   };
   box.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick=()=>{
-      const ts=+b.dataset.del;
+      const id=b.dataset.del;
       if(!confirm('Delete this logged session? This cannot be undone.')) return;
-      db.sessions=db.sessions.filter(s=>s.date!==ts); save(); vCalendar();
+      db.sessions=db.sessions.filter(s=>s.id!==id); save(); vCalendar();
     };
   });
 }
 
 function sessionCard(s){
+  if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9);
   const vol=s.ex.reduce((a,e)=>a+e.sets.reduce((b,x)=>b+(+x.w||0)*(+x.r||0),0),0);
   return `<div class="card">
     <div class="exhead"><h3>${s.day}</h3>
@@ -971,7 +982,7 @@ function sessionCard(s){
       <small>${e.sets.map(x=>`${x.w}×${x.r}`).join('  ')}</small></div>`).join('')}
     <div class="row" style="margin-top:10px">
       <p class="note grow" style="margin:0">${s.program||''}${s.program?' · ':''}${Math.round(vol).toLocaleString()} ${db.unit} volume</p>
-      <button class="mini" data-del="${s.date}">Delete</button>
+      <button class="mini" data-del="${s.id}">Delete</button>
     </div>
   </div>`;
 }
