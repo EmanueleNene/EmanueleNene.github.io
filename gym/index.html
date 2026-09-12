@@ -139,6 +139,10 @@
   .exline .x{font-size:12px;color:var(--steel)}
   .mini{background:transparent;border:1px solid var(--line);color:var(--steel);
     padding:5px 9px;font-size:13px;font-weight:700;border-radius:var(--r)}
+  .ex-thumb{width:36px;height:36px;object-fit:contain;border-radius:2px;background:var(--paper);flex-shrink:0}
+  .ex-diagram{margin:8px 0;padding:8px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);text-align:center}
+  .ex-diagram img{max-width:100%;height:auto;border-radius:2px;display:block;margin:0 auto}
+  .diag-toggle{font-size:14px;cursor:pointer}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -266,6 +270,8 @@ const EXERCISES = [
 ];
 const exMeta = name => EXERCISES.find(e=>e.n===name);
 const isTimed = name => !!exMeta(name)?.t;
+function exSlug(name) { return name.toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+window.exSlug = exSlug;
 
 const dayKey = d => { const x=new Date(d);
   return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
@@ -538,12 +544,20 @@ function drawDraft(){
     const complete = finished===ex.sets.length;
     const nowIdx = ex.sets.findIndex(s=>!s.done);   // the set you're on
     const prev = lastPerformance(ex.name);
+    const slug = exSlug(ex.name);
+    const isExpanded = !!ex.showDiag;
 
     const card=document.createElement('div');
     card.className='card'+(complete?' done':'');
     card.innerHTML=`
-      <div class="exhead"><h3>${ex.name}</h3>
-        <em style="${complete?'color:var(--rust)':''}">${complete?'complete':`set ${finished+1} of ${ex.sets.length}`}</em></div>
+      <div class="exhead" style="cursor:pointer" title="Tap to toggle diagram">
+        <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">🖼️</button></h3>
+        <em style="${complete?'color:var(--rust)':''}">${complete?'complete':`set ${finished+1} of ${ex.sets.length}`}</em>
+      </div>
+      ${isExpanded ? `
+        <div class="ex-diagram">
+          <img src="img/exercises/${slug}.svg" alt="${ex.name} diagram" onerror="this.style.display='none'">
+        </div>` : ''}
       ${prev?`<p class="note" style="margin:-2px 0 10px">Last time ${fmtDate(prev.date)}: ${prev.sets.map(s=>`${s.w}×${s.r}`).join(', ')}</p>`:''}
       <div class="controls">
         <div class="step" data-k="sets">
@@ -561,7 +575,9 @@ function drawDraft(){
       <div class="units"><div></div><div>${db.unit}</div><div>${isTimed(ex.name)?'sec':'reps'}</div><div></div></div>
       <div class="sets"></div>`;
 
-    // steppers
+    card.querySelector('.exhead').onclick=()=>{
+      ex.showDiag = !ex.showDiag; save(); drawDraft();
+    };
     card.querySelectorAll('.step button').forEach(b=>{
       b.onclick=()=>{
         const d=+b.dataset.d, kind=b.parentElement.dataset.k;
@@ -871,14 +887,31 @@ function sLibrary(){
   const lib=document.getElementById('lib');
   const list=EXERCISES.filter(e=>(st.group==='All'||e.g===st.group) && e.n.toLowerCase().includes(st.q));
   if(!list.length) lib.innerHTML=`<div class="empty">Nothing matches that search.</div>`;
+  st.showDiag = st.showDiag || {};
   list.forEach(e=>{
     const on=st.picked.includes(e.n);
-    const b=document.createElement('button');
-    b.className='libitem'; b.setAttribute('aria-pressed',String(on));
-    b.innerHTML=`<span>${e.n}<small>${e.g} · ${e.s}×${e.r}${e.t?' sec':''}</small></span>
-      <span style="font-size:15px">${on?'✓':'+'}</span>`;
-    b.onclick=()=>{ on ? st.picked.splice(st.picked.indexOf(e.n),1) : st.picked.push(e.n); sLibrary(); };
-    lib.appendChild(b);
+    const slug=exSlug(e.n);
+    const isExpanded=!!st.showDiag[e.n];
+    const row=document.createElement('div');
+    row.className='libitem-row';
+    row.style.borderBottom='1px solid var(--line)';
+    row.innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px;width:100%;">
+        <button class="libitem" aria-pressed="${on}" style="border-bottom:none;flex:1;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 2px;">
+          <img src="img/exercises/${slug}.svg" alt="${e.n} diagram" onerror="this.style.display='none'" class="ex-thumb">
+          <span style="flex:1;min-width:0">${e.n}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${e.g} · ${e.s}×${e.r}${e.t?' sec':''}</small></span>
+          <span style="font-size:15px">${on?'✓':'+'}</span>
+        </button>
+        <button class="quiet diag-toggle" aria-label="Toggle diagram for ${e.n}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
+      </div>
+      ${isExpanded ? `
+        <div class="ex-diagram">
+          <img src="img/exercises/${slug}.svg" alt="${e.n} diagram" onerror="this.style.display='none'">
+        </div>` : ''}
+    `;
+    row.querySelector('.libitem').onclick=()=>{ on ? st.picked.splice(st.picked.indexOf(e.n),1) : st.picked.push(e.n); sLibrary(); };
+    row.querySelector('.diag-toggle').onclick=()=>{ st.showDiag[e.n] = !st.showDiag[e.n]; sLibrary(); };
+    lib.appendChild(row);
   });
 
   const q=document.getElementById('q');

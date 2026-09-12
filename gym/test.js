@@ -436,5 +436,71 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check('all 20 exercise SVGs meet design standards (viewBox, divider, START/MID labels)', specErrors === 0, `${specErrors} spec errors`);
 }
 
+// ---------- scenario 11: exSlug mapping and exercise diagram toggling ----------
+{
+  console.log('\n11. exSlug mapping and exercise diagram toggling in library & active workout');
+  const { w, d, log } = boot();
+
+  // 1. exSlug mapping checks
+  check('exSlug mapping: Bench press', w.exSlug('Bench press') === 'bench-press');
+  check('exSlug mapping: Incline dumbbell press', w.exSlug('Incline dumbbell press') === 'incline-dumbbell-press');
+  check('exSlug mapping: Farmer\'s walk', w.exSlug("Farmer's walk") === 'farmers-walk');
+
+  // Setup profile & navigate to library
+  d.querySelector('#fname').value = 'Nene'; tap(d, '#fgo');
+  tap(d, '#startHere'); tap(d, '#fromLib');
+
+  // 2. Library diagram toggling check
+  const libDiagBtn = d.querySelector('#lib .diag-toggle');
+  check('library renders diagram toggle button', !!libDiagBtn);
+  check('library thumbnail img exists with onerror fallback', !!d.querySelector('#lib .ex-thumb[onerror*="display"]'));
+
+  if (libDiagBtn) {
+    check('library diagram initially closed', !d.querySelector('#lib .ex-diagram'));
+    tap(d, libDiagBtn);
+    const libDiagImg = d.querySelector('#lib .ex-diagram img');
+    check('library diagram opens on toggle tap', !!libDiagImg);
+    if (libDiagImg) {
+      check('library diagram img src uses exSlug', libDiagImg.getAttribute('src').startsWith('img/exercises/') && libDiagImg.getAttribute('src').endsWith('.svg'));
+      check('library diagram img includes onerror fallback', libDiagImg.getAttribute('onerror') === "this.style.display='none'");
+    }
+    tap(d, d.querySelector('#lib .diag-toggle'));
+    check('library diagram closes on second toggle tap', !d.querySelector('#lib .ex-diagram'));
+  }
+
+  // 3. Active workout diagram toggling check
+  const libItem = d.querySelector('#lib .libitem');
+  if (libItem) {
+    tap(d, libItem);
+    tap(d, '#addsel');
+    check('draft active workout opened', !!d.querySelector('#finish'));
+
+    const exHead = d.querySelector('#exlist .exhead');
+    const activeDiagBtn = d.querySelector('#exlist .diag-toggle');
+    check('active workout renders exercise header', !!exHead);
+    check('active workout renders illustration toggle button', !!activeDiagBtn);
+
+    if (exHead) {
+      check('active workout diagram initially closed', !d.querySelector('#exlist .ex-diagram'));
+
+      // Tap header to expand
+      tap(d, exHead);
+      const activeDiagImg = d.querySelector('#exlist .ex-diagram img');
+      check('active workout diagram opens on header tap', !!activeDiagImg);
+      if (activeDiagImg) {
+        check('active workout diagram img src uses exSlug', activeDiagImg.getAttribute('src').startsWith('img/exercises/') && activeDiagImg.getAttribute('src').endsWith('.svg'));
+        check('active workout diagram img includes onerror fallback', activeDiagImg.getAttribute('onerror') === "this.style.display='none'");
+      }
+
+      // Tap header again to collapse
+      tap(d, exHead);
+      check('active workout diagram closes on second header tap', !d.querySelector('#exlist .ex-diagram'));
+    }
+  }
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;
