@@ -79,7 +79,7 @@ program does not remove sessions already logged under it.
 ## Editing the code
 
 `index.html` is the whole application — markup, styles and logic in one file. After changing it,
-bump `CACHE` in `sw.js` (currently `ferrodastiro-v8`) or installed phones will keep serving the old version.
+bump `CACHE` in `sw.js` (currently `ferrodastiro-v9`) or installed phones will keep serving the old version.
 
 ### Running the tests
 
@@ -108,10 +108,10 @@ key: { name:'Display name', note:'subtitle', days:[
 ]}
 ```
 
-## Progress maths
+## Progress & analytics
 
-The chart plots an estimated one-rep max using the **Epley formula**: `weight × (1 + reps / 30)`.
-It lets a heavy triple and a light set of ten be compared on one axis. It is reasonably accurate
-up to about 10 reps and increasingly optimistic beyond that.
+The Progress tab provides timeframe analytics and per-exercise tracking:
 
-Session volume is `sets × reps × weight` — a crude but stable proxy for workload over time.
+- **Volume trends & timeframe views:** Interactive SVG bar charts showing Weekly (past 8 weeks) or Monthly (past 6 months) volume, with toggles between weight volume (`weight × reps`) and total reps volume.
+- **Muscle group breakdown:** Visual breakdown showing total sets, reps, and percentage distribution across muscle groups (Chest, Back, Legs, Shoulders, Arms, Core, Conditioning).
+- **Per-exercise 1RM & history:** Exercise selector for tracking estimated one-rep max using the **Epley formula** (`weight × (1 + reps / 30)`), which allows different weight/rep combinations to be compared on one axis. Renders 1RM stat card and session volume immediately after 1 logged session, with a trend line drawn once 2 or more sessions are logged.

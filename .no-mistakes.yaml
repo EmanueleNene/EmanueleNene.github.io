@@ -1,0 +1,2 @@
+test:
+  command: "NODE_PATH=/home/emanuele/n8n-local/node_modules node gym/test.js"
