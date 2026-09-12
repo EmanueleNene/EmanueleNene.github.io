@@ -706,5 +706,85 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
+// ---------- scenario 14: progress analytics overhaul ----------
+{
+  console.log('\n14. Progress analytics overhaul (dual volume metrics, timeframe toggle, muscle group breakdown)');
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'Analytics Tester'; tap(d, '#fgo');
+
+  // Verify empty progress tab when 0 sessions logged
+  tap(d, 'nav button[data-tab=progress]');
+  check('progress tab shows empty message before any workout', (d.querySelector('.empty')?.textContent || '').includes('first session'));
+
+  // Switch back to calendar to start a workout
+  tap(d, 'nav button[data-tab=calendar]');
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems = d.querySelectorAll('#lib .libitem');
+  tap(d, libItems[0]);
+  if (libItems[1]) tap(d, libItems[1]);
+  tap(d, '#addsel');
+
+  // Fill set details: set 1 weight 80, reps 10; set 2 weight 100, reps 5
+  const rows = d.querySelectorAll('.setrow');
+  if (rows.length > 0) {
+    const inputs = rows[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '80'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '10'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  if (rows.length > 1) {
+    const inputs = rows[1].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '100'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '5'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+
+  tap(d, '#finish');
+
+  // Switch to Progress tab after 1 session logged
+  tap(d, 'nav button[data-tab=progress]');
+
+  // Check 1: Progress tab is NOT empty after 1 session
+  check('after 1 session, progress tab volume chart is rendered', !!d.querySelector('#volume-chart'));
+  check('weekly button present and active', !!d.querySelector('#tf-weekly'));
+  check('monthly button present', !!d.querySelector('#tf-monthly'));
+
+  // Check 2: Volume calculations
+  const viewText = d.querySelector('#view').textContent;
+  check('volume stats rendered (weight vol and reps)', viewText.includes('Weight volume') && viewText.includes('Total reps'));
+  check('volume chart SVG rendered', !!d.querySelector('#volume-chart svg'));
+
+  // Check 3: Muscle group breakdown rendered with categories and non-zero counts
+  const mbElem = d.querySelector('#muscle-breakdown');
+  check('muscle group breakdown section present', !!mbElem);
+  const mbText = mbElem ? mbElem.textContent : '';
+  check('muscle group breakdown contains categories', mbText.includes('Chest') || mbText.includes('Legs') || mbText.includes('Back'));
+  check('muscle group breakdown contains non-zero set counts', /\d+\s*sets/.test(mbText));
+
+  // Check 4: Single session 1RM note
+  const pickSelect = d.querySelector('#pick');
+  check('exercise picker dropdown present', !!pickSelect);
+  const chartText = d.querySelector('#chart')?.textContent || '';
+  check('single session exercise note displayed', chartText.includes('Trend line will appear once you log a second session'));
+
+  // Check 5: Toggle between weekly and monthly views
+  tap(d, '#tf-monthly');
+  check('monthly view toggle activates monthly button', !d.querySelector('#tf-monthly').classList.contains('ghost'));
+  const monthlyText = d.querySelector('#view').textContent;
+  check('monthly view updates header text', monthlyText.includes('This Month'));
+
+  tap(d, '#tf-weekly');
+  check('weekly view toggle activates weekly button', !d.querySelector('#tf-weekly').classList.contains('ghost'));
+  const weeklyText = d.querySelector('#view').textContent;
+  check('weekly view updates header text', weeklyText.includes('This Week'));
+
+  // Check 6: Toggle volume metric
+  const repsBtn = d.querySelector('#m-reps');
+  if (repsBtn) {
+    tap(d, repsBtn);
+    check('reps metric button activated', !d.querySelector('#m-reps').classList.contains('ghost'));
+  }
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;

@@ -139,6 +139,8 @@
   .exline .x{font-size:12px;color:var(--steel)}
   .mini{background:transparent;border:1px solid var(--line);color:var(--steel);
     padding:5px 9px;font-size:13px;font-weight:700;border-radius:var(--r)}
+  .mg-bar-bg{background:var(--concrete);height:7px;border-radius:3px;overflow:hidden;margin-top:4px}
+  .mg-bar-fill{background:var(--rust);height:100%;border-radius:3px}
   .ex-thumb{width:36px;height:36px;object-fit:contain;border-radius:2px;background:var(--paper);flex-shrink:0}
   .ex-diagram{margin:8px 0;padding:8px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);text-align:center}
   .ex-diagram img{max-width:100%;height:auto;border-radius:2px;display:block;margin:0 auto}
@@ -283,6 +285,178 @@ const dayKey = d => { const x=new Date(d);
 let profiles=[], me=null, db=BLANK(), tab='calendar';
 let calMonth=(()=>{const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return d;})();
 let calSel=dayKey(new Date()), editing=null;
+let progressTimeframe='weekly', progressMetric='weight', progressEx=null;
+
+function getWeekStart(d){
+  const dt=new Date(d); dt.setHours(0,0,0,0);
+  const day=dt.getDay();
+  const diff=dt.getDate()-day+(day===0?-6:1);
+  return new Date(dt.setDate(diff));
+}
+
+function getWeeklyBuckets(sessions,numWeeks=8){
+  let maxDate=new Date();
+  for(const s of sessions){
+    const d=new Date(s.date);
+    if(!isNaN(d)&&d>maxDate) maxDate=d;
+  }
+  const endMon=getWeekStart(maxDate);
+  const weeks=[];
+  for(let i=numWeeks-1;i>=0;i--){
+    const mon=new Date(endMon);
+    mon.setDate(mon.getDate()-i*7);
+    const sun=new Date(mon);
+    sun.setDate(sun.getDate()+6);
+    sun.setHours(23,59,59,999);
+    weeks.push({
+      start:mon, end:sun, key:mon.toISOString().slice(0,10),
+      label:mon.toLocaleDateString(undefined,{month:'short',day:'numeric'}),
+      weightVol:0, repsVol:0, workouts:0, sessions:[]
+    });
+  }
+  for(const s of sessions){
+    const sDate=new Date(s.date);
+    if(isNaN(sDate)) continue;
+    for(const w of weeks){
+      if(sDate>=w.start && sDate<=w.end){
+        w.workouts++;
+        w.sessions.push(s);
+        for(const ex of (s.ex||[])){
+          for(const set of (ex.sets||[])){
+            const r=+set.r||0, weight=+set.w||0;
+            w.repsVol+=r;
+            w.weightVol+=weight*r;
+          }
+        }
+        break;
+      }
+    }
+  }
+  return weeks;
+}
+
+function getMonthlyBuckets(sessions,numMonths=6){
+  let maxDate=new Date();
+  for(const s of sessions){
+    const d=new Date(s.date);
+    if(!isNaN(d)&&d>maxDate) maxDate=d;
+  }
+  const endMonth=new Date(maxDate.getFullYear(),maxDate.getMonth(),1);
+  const months=[];
+  for(let i=numMonths-1;i>=0;i--){
+    const m=new Date(endMonth.getFullYear(),endMonth.getMonth()-i,1);
+    const mEnd=new Date(m.getFullYear(),m.getMonth()+1,0,23,59,59,999);
+    months.push({
+      start:m, end:mEnd, key:m.getFullYear()+'-'+String(m.getMonth()+1).padStart(2,'0'),
+      label:m.toLocaleDateString(undefined,{month:'short'}),
+      weightVol:0, repsVol:0, workouts:0, sessions:[]
+    });
+  }
+  for(const s of sessions){
+    const sDate=new Date(s.date);
+    if(isNaN(sDate)) continue;
+    for(const m of months){
+      if(sDate>=m.start && sDate<=m.end){
+        m.workouts++;
+        m.sessions.push(s);
+        for(const ex of (s.ex||[])){
+          for(const set of (ex.sets||[])){
+            const r=+set.r||0, weight=+set.w||0;
+            m.repsVol+=r;
+            m.weightVol+=weight*r;
+          }
+        }
+        break;
+      }
+    }
+  }
+  return months;
+}
+
+function renderVolumeChart(buckets,metric){
+  const vals=buckets.map(b=>metric==='weight'?b.weightVol:b.repsVol);
+  const maxVal=Math.max(...vals,1);
+  const W=560, H=180, P={l:45,r:15,t:22,b:30};
+  const n=buckets.length;
+  const slotW=(W-P.l-P.r)/n;
+  const barW=Math.min(Math.max(slotW*0.52,10),34);
+
+  const yTicks=[0,Math.round(maxVal/2),Math.round(maxVal)];
+  const formatY=v=>{
+    if(v>=1000000) return (v/1000000).toFixed(1)+'M';
+    if(v>=1000) return (v/1000).toFixed(1)+'k';
+    return String(v);
+  };
+  const yPos=v=>P.t+(1-(v/maxVal))*(H-P.t-P.b);
+
+  let svgHtml=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Volume history chart">`;
+  yTicks.forEach(t=>{
+    const y=yPos(t);
+    svgHtml+=`<line class="grid" x1="${P.l}" x2="${W-P.r}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+    svgHtml+=`<text x="${P.l-6}" y="${(y+4).toFixed(1)}" text-anchor="end">${formatY(t)}</text>`;
+  });
+
+  buckets.forEach((b,i)=>{
+    const val=vals[i];
+    const x=P.l+i*slotW+(slotW-barW)/2;
+    const barH=val>0 ? Math.max((val/maxVal)*(H-P.t-P.b),4) : 0;
+    const y=H-P.b-barH;
+
+    if(val>0){
+      svgHtml+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="3" fill="var(--rust)"/>`;
+      const txtY=Math.max(y-5,P.t+10);
+      svgHtml+=`<text x="${(x+barW/2).toFixed(1)}" y="${txtY.toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--steel)">${val>=1000 ? (val/1000).toFixed(1)+'k' : Math.round(val)}</text>`;
+    } else {
+      svgHtml+=`<rect x="${x.toFixed(1)}" y="${(H-P.b-2).toFixed(1)}" width="${barW.toFixed(1)}" height="2" rx="1" fill="var(--line)"/>`;
+    }
+    svgHtml+=`<text x="${(P.l+i*slotW+slotW/2).toFixed(1)}" y="${H-8}" text-anchor="middle">${hesc(b.label)}</text>`;
+  });
+  svgHtml+=`</svg>`;
+  return svgHtml;
+}
+
+function renderMuscleBreakdown(buckets){
+  const STANDARD_GROUPS=['Chest','Back','Legs','Shoulders','Arms','Core','Conditioning'];
+  const groupStats={};
+  STANDARD_GROUPS.forEach(g=>{ groupStats[g]={sets:0,reps:0,weightVol:0}; });
+
+  const tfSessions=buckets.flatMap(b=>b.sessions||[]);
+  tfSessions.forEach(s=>{
+    (s.ex||[]).forEach(ex=>{
+      const meta=exMeta(ex.name);
+      const g=meta?.g||'Other';
+      if(!groupStats[g]) groupStats[g]={sets:0,reps:0,weightVol:0};
+      (ex.sets||[]).forEach(set=>{
+        const r=+set.r||0, w=+set.w||0;
+        groupStats[g].sets+=1;
+        groupStats[g].reps+=r;
+        groupStats[g].weightVol+=w*r;
+      });
+    });
+  });
+
+  const totalSets=Object.values(groupStats).reduce((a,b)=>a+b.sets,0);
+  const groupsToDisplay=[...new Set([...STANDARD_GROUPS,...Object.keys(groupStats)])];
+
+  if(totalSets===0){
+    return `<div class="empty" style="padding:12px;font-size:13px">No volume recorded in this timeframe.</div>`;
+  }
+
+  return groupsToDisplay.map(g=>{
+    const st=groupStats[g]||{sets:0,reps:0,weightVol:0};
+    if(st.sets===0 && !STANDARD_GROUPS.includes(g)) return '';
+    const pct=totalSets>0 ? Math.round((st.sets/totalSets)*100) : 0;
+    return `<div class="mg-row" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;font-size:13px">
+        <span style="font-weight:600">${hesc(g)}</span>
+        <span style="color:var(--steel);font-size:12px">${st.sets} set${st.sets===1?'':'s'} · ${st.reps} reps (${pct}%)</span>
+      </div>
+      <div class="mg-bar-bg">
+        <div class="mg-bar-fill" style="width:${pct}%;background:${pct>0?'var(--rust)':'var(--line)'}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 function loadProfiles(){
   profiles = readJSON(PKEY, []);
@@ -643,28 +817,101 @@ function drawDraft(){
 
 /* --- Progress --- */
 function vProgress(){
-  const names=[...new Set(db.sessions.flatMap(s=>s.ex.map(e=>e.name)))];
-  if(!names.length){
+  const names=[...new Set(db.sessions.flatMap(s=>(s.ex||[]).map(e=>e.name)))];
+  if(!db.sessions.length){
     view().innerHTML=`<h2>Progress</h2>
-      <div class="empty" style="margin-top:10px">Charts appear once you finish your first session.</div>`;
+      <div class="empty" style="margin-top:10px">No workouts logged yet. Charts appear once you finish your first session.</div>`;
     return;
   }
+
+  const isWeekly = progressTimeframe === 'weekly';
+  const buckets = isWeekly ? getWeeklyBuckets(db.sessions, 8) : getMonthlyBuckets(db.sessions, 6);
+  const curr = buckets[buckets.length - 1] || { weightVol: 0, repsVol: 0, workouts: 0, sessions: [] };
+
+  if(!progressEx || !names.includes(progressEx)){
+    progressEx = names[0] || '';
+  }
+
   view().innerHTML=`<h2>Progress</h2>
-    <select id="pick" style="margin:4px 0 14px">${names.map(n=>`<option>${n}</option>`).join('')}</select>
+    <div class="controls" style="margin-bottom:14px">
+      <button class="${isWeekly ? '' : 'ghost'}" id="tf-weekly" aria-pressed="${isWeekly}">Weekly</button>
+      <button class="${!isWeekly ? '' : 'ghost'}" id="tf-monthly" aria-pressed="${!isWeekly}">Monthly</button>
+    </div>
+
+    <div class="card">
+      <div class="exhead">
+        <h3>${isWeekly ? 'This Week' : 'This Month'}</h3>
+        <div style="display:flex;gap:4px">
+          <button class="${progressMetric === 'weight' ? '' : 'ghost'} mini" id="m-weight" title="Weight volume">${hesc(db.unit)}</button>
+          <button class="${progressMetric === 'reps' ? '' : 'ghost'} mini" id="m-reps" title="Reps volume">Reps</button>
+        </div>
+      </div>
+      <div class="stat" style="gap:16px;flex-wrap:wrap;margin:10px 0 14px">
+        <div><b>${Math.round(curr.weightVol).toLocaleString()} ${hesc(db.unit)}</b><span>Weight volume</span></div>
+        <div><b>${curr.repsVol.toLocaleString()}</b><span>Total reps</span></div>
+        <div><b>${curr.workouts}</b><span>Workouts</span></div>
+      </div>
+      <div id="volume-chart">
+        ${renderVolumeChart(buckets, progressMetric)}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Muscle Group Breakdown</h3>
+      <p class="note" style="margin-bottom:12px">Distribution for ${isWeekly ? 'past 8 weeks' : 'past 6 months'}</p>
+      <div id="muscle-breakdown">
+        ${renderMuscleBreakdown(buckets)}
+      </div>
+    </div>
+
+    <h2 style="margin-top:22px">Exercise History & 1RM</h2>
+    <select id="pick" style="margin:4px 0 14px">${names.map(n=>`<option ${n===progressEx?'selected':''}>${hesc(n)}</option>`).join('')}</select>
     <div id="chart"></div>`;
-  const draw=()=>chartFor(document.getElementById('pick').value);
-  document.getElementById('pick').onchange=draw; draw();
+
+  document.getElementById('tf-weekly').onclick = () => { progressTimeframe = 'weekly'; vProgress(); };
+  document.getElementById('tf-monthly').onclick = () => { progressTimeframe = 'monthly'; vProgress(); };
+  document.getElementById('m-weight').onclick = () => { progressMetric = 'weight'; vProgress(); };
+  document.getElementById('m-reps').onclick = () => { progressMetric = 'reps'; vProgress(); };
+
+  const pickEl = document.getElementById('pick');
+  if (pickEl) {
+    pickEl.onchange = () => { progressEx = pickEl.value; chartFor(progressEx); };
+    chartFor(pickEl.value);
+  }
 }
 
 function chartFor(name){
   const pts=db.sessions.slice().reverse().flatMap(s=>{
-    const ex=s.ex.find(e=>e.name===name); if(!ex) return [];
+    const ex=(s.ex||[]).find(e=>e.name===name); if(!ex || !ex.sets || !ex.sets.length) return [];
     const best=Math.max(...ex.sets.map(x=>e1rm(+x.w||0,+x.r||0)));
     const vol=ex.sets.reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0);
     return [{d:s.date,v:best,vol}];
   });
   const box=document.getElementById('chart');
-  if(pts.length<2){ box.innerHTML=`<div class="empty">One data point so far. Log ${name} again to see the trend.</div>`; return; }
+  if(!box) return;
+
+  if(!pts.length){
+    box.innerHTML=`<div class="empty">No logged sessions found for ${hesc(name)}.</div>`;
+    return;
+  }
+
+  if(pts.length===1){
+    const p=pts[0];
+    box.innerHTML=`<div class="card">
+      <div class="exhead"><h3>Estimated 1-rep max</h3><em>1 session logged</em></div>
+      <div class="stat" style="margin:8px 0 10px">
+        <div><b>${Math.round(p.v)} ${hesc(db.unit)}</b><span>Best Epley 1RM</span></div>
+      </div>
+      <p class="note">Trend line will appear once you log a second session with this exercise.</p>
+    </div>
+    <div class="card"><h3 style="margin-bottom:8px">Session volume</h3>
+      <div class="histline">
+        <span>${fmtDate(p.d)}</span><small>${Math.round(p.vol).toLocaleString()} ${hesc(db.unit)}</small>
+      </div>
+    </div>`;
+    return;
+  }
+
   const W=560,H=210,P={l:38,r:12,t:14,b:26};
   const vs=pts.map(p=>p.v), lo=Math.min(...vs)*0.94, hi=Math.max(...vs)*1.04||1;
   const x=i=>P.l+i*(W-P.l-P.r)/(pts.length-1);
@@ -682,11 +929,11 @@ function chartFor(name){
         <text x="${P.l}" y="${H-6}">${fmtDate(pts[0].d)}</text>
         <text x="${W-P.r}" y="${H-6}" text-anchor="end">${fmtDate(pts.at(-1).d)}</text>
       </svg>
-      <p class="note">Epley estimate: weight × (1 + reps ÷ 30), best set of each session, in ${db.unit}.</p>
+      <p class="note">Epley estimate: weight × (1 + reps ÷ 30), best set of each session, in ${hesc(db.unit)}.</p>
     </div>
     <div class="card"><h3 style="margin-bottom:8px">Session volume</h3>
       ${pts.slice().reverse().slice(0,6).map(p=>`<div class="histline">
-        <span>${fmtDate(p.d)}</span><small>${Math.round(p.vol).toLocaleString()} ${db.unit}</small></div>`).join('')}
+        <span>${fmtDate(p.d)}</span><small>${Math.round(p.vol).toLocaleString()} ${hesc(db.unit)}</small></div>`).join('')}
     </div>`;
 }
 
