@@ -9,7 +9,6 @@
   <!-- START -->
   <g>
     <!-- Machine Frame: Seat & Footplate -->
-    <path d="M 32" fill="none"/>
     <line x1="35" y1="75" x2="58" y2="105" stroke="#71717A" stroke-width="4" stroke-linecap="round"/> <!-- Backrest -->
     <line x1="58" y1="105" x2="72" y2="105" stroke="#71717A" stroke-width="4" stroke-linecap="round"/> <!-- Seat -->
     <line x1="95" y1="35" x2="115" y2="60" stroke="#52525B" stroke-width="5" stroke-linecap="round"/> <!-- Footplate -->
