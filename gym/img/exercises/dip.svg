@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#C25E3E" />
+    </marker>
+  </defs>
+  <!-- Divider -->
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+
+  <!-- Left Frame: START -->
+  <g id="start-frame">
+    <line x1="25" y1="75" x2="125" y2="75" stroke="#52525B" stroke-width="3.5" stroke-linecap="round" />
+    <line x1="35" y1="75" x2="35" y2="125" stroke="#71717A" stroke-width="2" stroke-linecap="round" />
+    <line x1="115" y1="75" x2="115" y2="125" stroke="#71717A" stroke-width="2" stroke-linecap="round" />
+    <circle cx="65" cy="42" r="6.5" fill="#18181B" />
+    <line x1="68" y1="48" x2="58" y2="85" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 58 85 L 52 105 L 65 115" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 68 52 L 50 70 L 68 75" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 68 38 L 68 20" stroke="#C25E3E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" marker-end="url(#arrow)" />
+    <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  </g>
+
+  <!-- Right Frame: MID -->
+  <g id="mid-frame">
+    <line x1="175" y1="75" x2="275" y2="75" stroke="#52525B" stroke-width="3.5" stroke-linecap="round" />
+    <line x1="185" y1="75" x2="185" y2="125" stroke="#71717A" stroke-width="2" stroke-linecap="round" />
+    <line x1="265" y1="75" x2="265" y2="125" stroke="#71717A" stroke-width="2" stroke-linecap="round" />
+    <circle cx="215" cy="25" r="6.5" fill="#18181B" />
+    <line x1="218" y1="31" x2="215" y2="72" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 215 72 L 210 95 L 220 108" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="218" y1="35" x2="218" y2="75" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="218" cy="45" r="4" fill="#C25E3E" opacity="0.6" />
+    <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  </g>
+</svg>
