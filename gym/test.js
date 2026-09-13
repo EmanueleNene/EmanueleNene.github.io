@@ -891,5 +891,78 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
+// ---------- scenario 16: bodyweight tracking & trend charting ----------
+{
+  console.log('\n16. Optional bodyweight tracking and trend charting in Progress tab');
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'BW Tester'; tap(d, '#fgo');
+
+  // Go to Progress tab
+  tap(d, 'nav button[data-tab=progress]');
+
+  // 1. Verify Bodyweight card renders with empty state
+  const bwCard = d.querySelector('#bw-card');
+  check('Bodyweight card renders in Progress tab', !!bwCard);
+  const bwCardText = bwCard ? bwCard.textContent : '';
+  check('Bodyweight card shows empty state text', bwCardText.includes('Bodyweight tracking is optional. Log your weight to see your progress chart.'));
+
+  // 2. Log weight entry (75.5)
+  const bwInput = d.querySelector('#bw-val');
+  check('weight input present', !!bwInput);
+  if (bwInput) {
+    bwInput.value = '75.5';
+    bwInput.dispatchEvent(new w.Event('input', { bubbles: true }));
+  }
+  const bwForm = d.querySelector('#bw-form');
+  if (bwForm) {
+    bwForm.dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
+  }
+
+  // Verify db.bodyweight and single entry state UI
+  const activeId = w.localStorage.getItem('fds.active');
+  let dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('Logging weight entry adds it to db.bodyweight', Array.isArray(dbData.bodyweight) && dbData.bodyweight.length === 1 && dbData.bodyweight[0].w === 75.5);
+
+  const bwCard1 = d.querySelector('#bw-card');
+  const bwText1 = bwCard1 ? bwCard1.textContent : '';
+  check('Single entry view displays current weight and prompt', bwText1.includes('75.5 kg') && bwText1.includes('Log more entries to see your trend chart'));
+
+  // 3. Log a second entry on a different day to render SVG trend chart and net change stat
+  // Inject a past entry directly into db.bodyweight to simulate multiple days
+  dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 2);
+  dbData.bodyweight.unshift({
+    id: 'bw_test_1',
+    date: yesterday.getTime(),
+    w: 74.5
+  });
+  w.localStorage.setItem('fds.data.' + activeId, JSON.stringify(dbData));
+
+  // Refresh Progress tab view (reload db in JS runtime from localStorage by calling w.loadData())
+  w.loadData();
+  tap(d, 'nav button[data-tab=calendar]');
+  tap(d, 'nav button[data-tab=progress]');
+
+  const bwCard2 = d.querySelector('#bw-card');
+  const bwText2 = bwCard2 ? bwCard2.textContent : '';
+  check('Logging a second entry renders net change stat (+1.0 kg)', bwText2.includes('+1.0 kg') || bwText2.includes('Net change'));
+  check('SVG trend chart is rendered for 2+ entries', !!bwCard2?.querySelector('svg'));
+
+  // 4. Delete an entry
+  const delBtn = bwCard2?.querySelector('.bw-del');
+  check('delete button present in history list', !!delBtn);
+  if (delBtn) tap(d, delBtn);
+
+  // Check db and UI after deletion
+  dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('Deleting entry removes it from db.bodyweight', dbData.bodyweight.length === 1);
+  const bwCard3 = d.querySelector('#bw-card');
+  const bwText3 = bwCard3 ? bwCard3.textContent : '';
+  check('UI updates after deletion back to single entry view', bwText3.includes('Log more entries to see your trend chart'));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;

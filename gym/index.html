@@ -200,7 +200,7 @@ const PKEY='fds.profiles', AKEY='fds.active', dkey=id=>'fds.data.'+id;
 const readJSON=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
 const writeJSON=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){alert('Storage is full or blocked. Data was not saved.')}};
 
-const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], sessions:[], draft:null});
+const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], sessions:[], bodyweight:[], draft:null});
 
 const BUILTIN = {
   ul:{name:'Upper / Lower', note:'4 days · balanced strength', days:[
@@ -540,6 +540,7 @@ function loadProfiles(){
 }
 function loadData(){
   db = Object.assign(BLANK(), readJSON(dkey(me), {}));
+  db.bodyweight = db.bodyweight || [];
   db.sessions.forEach(s=>{ if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9); });
 }
 function save(){ if(me) writeJSON(dkey(me), db); }
@@ -907,11 +908,125 @@ function drawDraft(){
 }
 
 /* --- Progress --- */
+function renderBodyweightCard(){
+  const bw = db.bodyweight || [];
+  let displayHTML = '';
+  if(!bw.length){
+    displayHTML = `<p class="note">Bodyweight tracking is optional. Log your weight to see your progress chart.</p>`;
+  } else if(bw.length === 1){
+    const entry = bw[0];
+    displayHTML = `
+      <div class="stat" style="margin:8px 0 10px">
+        <div><b>${entry.w} ${hesc(db.unit)}</b><span>Current weight (${fmtDate(entry.date)})</span></div>
+      </div>
+      <p class="note">Log more entries to see your trend chart.</p>`;
+  } else {
+    const latest = bw[bw.length - 1];
+    const prev = bw[bw.length - 2];
+    const diff = latest.w - prev.w;
+    const diffStr = (diff >= 0 ? '+' : '') + diff.toFixed(1) + ' ' + hesc(db.unit);
+    
+    const W=560, H=210, P={l:38, r:12, t:14, b:26};
+    const weights = bw.map(b=>b.w);
+    let minW = Math.min(...weights), maxW = Math.max(...weights);
+    if(minW === maxW){ minW -= 1; maxW += 1; }
+    else { const pad = (maxW - minW) * 0.05; minW -= pad; maxW += pad; }
+    
+    const x = i => P.l + i * (W - P.l - P.r) / (bw.length - 1);
+    const y = w => P.t + (maxW - w) / (maxW - minW) * (H - P.t - P.b);
+    const line = bw.map((b, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(b.w).toFixed(1)}`).join(' ');
+    
+    const midW = (minW + maxW) / 2;
+    const gridVals = [minW, midW, maxW];
+
+    displayHTML = `
+      <div class="stat" style="margin:8px 0 10px;gap:22px">
+        <div><b>${latest.w} ${hesc(db.unit)}</b><span>Latest weight (${fmtDate(latest.date)})</span></div>
+        <div><b>${diffStr}</b><span>Net change</span></div>
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Bodyweight trend over time">
+        ${gridVals.map(v => `<line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}"/>
+          <text x="4" y="${y(v) + 4}">${v.toFixed(1)}</text>`).join('')}
+        <path class="plot" d="${line}"/>
+        ${bw.map((b, i) => `<circle class="dot" cx="${x(i).toFixed(1)}" cy="${y(b.w).toFixed(1)}" r="3.5"/>`).join('')}
+        <text x="${P.l}" y="${H - 6}">${fmtDate(bw[0].date)}</text>
+        <text x="${W - P.r}" y="${H - 6}" text-anchor="end">${fmtDate(bw[bw.length - 1].date)}</text>
+      </svg>`;
+  }
+
+  const historyHTML = bw.length ? `
+    <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
+      <h4 style="font-size:13px;margin:0 0 8px;color:var(--steel);font-weight:700">History</h4>
+      ${bw.slice().reverse().map(b => `
+        <div class="histline" style="align-items:center">
+          <div><b>${b.w} ${hesc(db.unit)}</b> <small>(${fmtDate(b.date)})</small></div>
+          <button class="quiet bw-del" data-id="${b.id}" title="Delete entry" style="padding:2px 6px">×</button>
+        </div>`).join('')}
+    </div>` : '';
+
+  return `
+    <div class="card" id="bw-card">
+      <div class="exhead">
+        <h3>Bodyweight (Optional)</h3>
+      </div>
+      <form id="bw-form" style="margin:10px 0 14px">
+        <div class="row">
+          <input type="number" id="bw-val" placeholder="e.g. 75.5" step="0.1" tabindex="0" class="grow" style="max-width:140px">
+          <span style="font-weight:600;color:var(--steel)">${hesc(db.unit)}</span>
+          <button type="submit">Log weight</button>
+        </div>
+      </form>
+      ${displayHTML}
+      ${historyHTML}
+    </div>`;
+}
+
+function bindBodyweightEvents(){
+  const form = document.getElementById('bw-form');
+  if(form){
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const valInput = document.getElementById('bw-val');
+      const val = parseFloat(valInput?.value);
+      if(!isNaN(val) && val > 0){
+        const timestamp = noon(new Date());
+        const existingIdx = (db.bodyweight || []).findIndex(b => dayKey(b.date) === dayKey(timestamp));
+        if(existingIdx >= 0){
+          db.bodyweight[existingIdx].w = val;
+          db.bodyweight[existingIdx].date = timestamp;
+        } else {
+          const entry = {
+            id: 'bw' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            date: timestamp,
+            w: val
+          };
+          db.bodyweight = db.bodyweight || [];
+          db.bodyweight.push(entry);
+        }
+        db.bodyweight.sort((a, b) => a.date - b.date);
+        save();
+        vProgress();
+      }
+    };
+  }
+
+  document.querySelectorAll('.bw-del').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      db.bodyweight = (db.bodyweight || []).filter(b => b.id !== id);
+      save();
+      vProgress();
+    };
+  });
+}
+
 function vProgress(){
   const names=[...new Set(db.sessions.flatMap(s=>(s.ex||[]).map(e=>e.name)))];
   if(!db.sessions.length){
     view().innerHTML=`<h2>Progress</h2>
+      ${renderBodyweightCard()}
       <div class="empty" style="margin-top:10px">No workouts logged yet. Charts appear once you finish your first session.</div>`;
+    bindBodyweightEvents();
     return;
   }
 
@@ -924,6 +1039,7 @@ function vProgress(){
   }
 
   view().innerHTML=`<h2>Progress</h2>
+    ${renderBodyweightCard()}
     <div class="controls" style="margin-bottom:14px">
       <button class="${isWeekly ? '' : 'ghost'}" id="tf-weekly" aria-pressed="${isWeekly}">Weekly</button>
       <button class="${!isWeekly ? '' : 'ghost'}" id="tf-monthly" aria-pressed="${!isWeekly}">Monthly</button>
@@ -958,6 +1074,8 @@ function vProgress(){
     <h2 style="margin-top:22px">Exercise History & 1RM</h2>
     <select id="pick" style="margin:4px 0 14px">${names.map(n=>`<option ${n===progressEx?'selected':''}>${hesc(n)}</option>`).join('')}</select>
     <div id="chart"></div>`;
+
+  bindBodyweightEvents();
 
   document.getElementById('tf-weekly').onclick = () => { progressTimeframe = 'weekly'; vProgress(); };
   document.getElementById('tf-monthly').onclick = () => { progressTimeframe = 'monthly'; vProgress(); };
