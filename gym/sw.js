@@ -1,5 +1,5 @@
 /* Bump CACHE whenever you edit index.html, otherwise phones keep the old copy. */
-const CACHE = 'ferrodastiro-v11';
+const CACHE = 'ferrodastiro-v12';
 const ASSETS = [
   './',
   'index.html',
