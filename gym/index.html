@@ -79,8 +79,8 @@
     padding:12px 18px calc(env(safe-area-inset-bottom) + 12px);display:none;align-items:center;gap:14px}
   .timerbar.on{display:flex}
   .clock{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;min-width:88px}
-  .timerbar button{background:transparent;border-color:#4A4D4F;color:var(--paper);padding:8px 12px}
-  .timerbar .lbl{font-size:13px;color:#9EA2A4;flex:1}
+  .timerbar button{background:transparent;border-color:var(--steel);color:var(--paper);padding:8px 12px}
+  .timerbar .lbl{font-size:13px;color:var(--steel);flex:1}
   nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--paper);
     border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
   nav button{flex:1;background:transparent;border:none;color:var(--steel);
@@ -102,7 +102,7 @@
     color:var(--paper);font-size:13px;line-height:1.4;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px}
   dialog{border:1px solid var(--ink);border-radius:var(--r);background:var(--paper);
     color:var(--ink);padding:18px;width:min(94vw,420px)}
-  dialog::backdrop{background:rgba(25,27,28,.45)}
+  dialog::backdrop{background:rgba(222,221,216,.85)}
 
   /* calendar */
   .monthbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 12px}
@@ -130,7 +130,7 @@
     padding:10px 2px;border-bottom:1px solid var(--line);width:100%;
     background:transparent;border-left:none;border-right:none;border-top:none;
     color:var(--ink);text-align:left;font-weight:400;border-radius:0}
-  .libitem[aria-pressed=true]{color:var(--rust);font-weight:600}
+  .libitem[aria-pressed=true]{color:var(--slate);font-weight:700}
   .libitem small{color:var(--steel);font-size:12px;display:block;font-weight:400}
   .exline{display:flex;align-items:center;gap:7px;padding:9px 0;border-bottom:1px solid var(--line)}
   .exline:last-of-type{border-bottom:none}
@@ -403,7 +403,7 @@ function renderVolumeChart(buckets,metric){
     const y=H-P.b-barH;
 
     if(val>0){
-      svgHtml+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="3" fill="var(--rust)"/>`;
+      svgHtml+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="3" fill="var(--slate)"/>`;
       const txtY=Math.max(y-5,P.t+10);
       svgHtml+=`<text x="${(x+barW/2).toFixed(1)}" y="${txtY.toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--steel)">${val>=1000 ? (val/1000).toFixed(1)+'k' : Math.round(val)}</text>`;
     } else {
@@ -936,7 +936,7 @@ function chartFor(name){
   const gain=pts[0].v>0 ? (pts.at(-1).v/pts[0].v-1)*100 : 0;
   box.innerHTML=`<div class="card">
       <div class="exhead"><h3>Estimated 1-rep max</h3>
-        <em style="color:${gain>=0?'var(--rust)':'var(--steel)'}">${gain>=0?'+':''}${gain.toFixed(1)}% overall</em></div>
+        <em style="color:${gain>=0?'var(--slate)':'var(--steel)'}">${gain>=0?'+':''}${gain.toFixed(1)}% overall</em></div>
       <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Estimated one-rep max over time">
         ${[lo,(lo+hi)/2,hi].map(t=>`<line class="grid" x1="${P.l}" x2="${W-P.r}" y1="${y(t)}" y2="${y(t)}"/>
           <text x="4" y="${y(t)+4}">${Math.round(t)}</text>`).join('')}
