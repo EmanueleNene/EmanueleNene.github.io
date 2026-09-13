@@ -699,7 +699,8 @@ function beginRepeat(src,dateMs){
 
 function drawDraft(){
   const dr=db.draft;
-  const vol=dr.ex.reduce((a,e)=>a+e.sets.filter(s=>s.done).reduce((b,s)=>b+(+s.w||0)*(+s.r||0),0),0);
+  const isEditing = dr.isEdit || db.sessions.some(s=>s.id===dr.id);
+  const vol=dr.ex.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+(+s.w||0)*(+s.r||0),0),0);
   const doneCount=dr.ex.reduce((a,e)=>a+e.sets.filter(s=>s.done).length,0);
   const total=dr.ex.reduce((a,e)=>a+e.sets.length,0);
   const dayLabel=new Date(dr.date).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
@@ -707,14 +708,14 @@ function drawDraft(){
   view().innerHTML=`<h2 style="margin-top:20px">${dr.day}</h2>
     <p class="note" style="margin-bottom:10px">${isToday?'Today':dayLabel}${dr.program?' · '+dr.program:''}</p>
     <div class="stat">
-      <div><b>${doneCount}/${total}</b><span>sets logged</span></div>
+      <div><b>${total}</b><span>sets</span></div>
       <div><b>${Math.round(vol).toLocaleString()}</b><span>${db.unit} volume</span></div>
     </div>
     <div id="exlist"></div>
     <button class="ghost" id="addex" style="width:100%;margin-bottom:14px">Add an exercise</button>
     <div class="row" style="margin:0 0 4px">
-      <button class="rust grow" id="finish">Finish session</button>
-      <button class="ghost" id="scrap">Discard</button>
+      <button class="rust grow" id="finish">${isEditing?'Save changes':'Finish session'}</button>
+      <button class="ghost" id="scrap">${isEditing?'Cancel edit':'Discard'}</button>
     </div>`;
   const list=document.getElementById('exlist');
   dr.ex.forEach(ex=>{
@@ -730,7 +731,7 @@ function drawDraft(){
     card.innerHTML=`
       <div class="exhead" style="cursor:pointer" title="Tap to toggle diagram">
         <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">🖼️</button></h3>
-        <em style="${complete?'color:var(--rust)':''}">${complete?'complete':`set ${finished+1} of ${ex.sets.length}`}</em>
+        <em>${finished} of ${ex.sets.length} ticked</em>
       </div>
       ${isExpanded ? `
         <div class="ex-diagram">
@@ -802,17 +803,32 @@ function drawDraft(){
   });
   document.getElementById('finish').onclick=()=>{
     const s=JSON.parse(JSON.stringify(dr));
+    delete s.isEdit;
     s.ex=s.ex.filter(e=>e.sets.length);
-    if(!s.ex.length){db.draft=null;save();render();return;}
+    if(!s.ex.length){
+      if(isEditing){
+        db.sessions=db.sessions.filter(x=>x.id!==s.id);
+      }
+      db.draft=null;save();render();return;
+    }
     if(!s.id) s.id='s'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-    db.sessions.unshift(s);
+    const existingIdx = db.sessions.findIndex(x=>x.id===s.id);
+    if(existingIdx >= 0){
+      db.sessions[existingIdx] = s;
+    } else {
+      db.sessions.unshift(s);
+    }
     db.sessions.sort((a,b)=>b.date-a.date);     // backdated sessions slot into place
     db.draft=null; stopTimer(); save();
     const d=new Date(s.date);
     calMonth=new Date(d.getFullYear(),d.getMonth(),1);
     calSel=dayKey(s.date); tab='calendar'; render();
   };
-  document.getElementById('scrap').onclick=()=>{db.draft=null;stopTimer();save();render();};
+  document.getElementById('scrap').onclick=()=>{
+    db.draft=null;stopTimer();save();
+    if(isEditing){ tab='calendar'; }
+    render();
+  };
 }
 
 /* --- Progress --- */
@@ -1323,6 +1339,16 @@ function vCalendar(){
     if(db.draft && dayKey(db.draft.date)===calSel){ tab='train'; render(); }
     else openStart(selMs);
   };
+  box.querySelectorAll('[data-edit]').forEach(b=>{
+    b.onclick=()=>{
+      const id=b.dataset.edit;
+      const s=db.sessions.find(x=>x.id===id);
+      if(!s) return;
+      if(db.draft && !confirm('A workout is already open. Discard it and edit this one?')) return;
+      db.draft={ ...JSON.parse(JSON.stringify(s)), isEdit:true };
+      save(); tab='train'; render();
+    };
+  });
   box.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick=()=>{
       const id=b.dataset.del;
@@ -1342,6 +1368,7 @@ function sessionCard(s){
       <small>${e.sets.map(x=>`${x.w}×${x.r}`).join('  ')}</small></div>`).join('')}
     <div class="row" style="margin-top:10px">
       <p class="note grow" style="margin:0">${s.program||''}${s.program?' · ':''}${Math.round(vol).toLocaleString()} ${db.unit} volume</p>
+      <button class="mini" data-edit="${s.id}">Edit</button>
       <button class="mini" data-del="${s.id}">Delete</button>
     </div>
   </div>`;

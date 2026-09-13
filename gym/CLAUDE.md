@@ -62,7 +62,7 @@ visual inspection missed a dead button twice.
 
 ## After any change to index.html
 
-Bump `CACHE` in `sw.js`. Installed phones serve the cached copy until the version string changes.
+Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v10`). Installed phones serve the cached copy until the version string changes.
 
 ## Exercise diagrams (`img/exercises/`)
 

@@ -786,5 +786,76 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
+// ---------- scenario 15: editing existing logged sessions, canceling edits, unticked volume ----------
+{
+  console.log('\n15. Modify existing workout, cancel edit, unticked set stats');
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'Editor'; tap(d, '#fgo');
+
+  // Log an initial session
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const item = d.querySelector('#lib .libitem');
+  if (item) tap(d, item);
+  tap(d, '#addsel');
+
+  const rows = d.querySelectorAll('.setrow');
+  if (rows.length > 0) {
+    const inputs = rows[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '50'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '10'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  tap(d, '#finish');
+
+  // Verify calendar session card has Edit button
+  const editBtn = d.querySelector('.card [data-edit]');
+  check('Edit button present on logged session card', !!editBtn);
+
+  // Tap Edit
+  if (editBtn) tap(d, editBtn);
+  check('tapping Edit switches to train tab', d.querySelector('nav button[aria-current=true]').dataset.tab === 'train');
+  check('finish button shows Save changes in edit mode', d.querySelector('#finish')?.textContent === 'Save changes');
+  check('discard button shows Cancel edit in edit mode', d.querySelector('#scrap')?.textContent === 'Cancel edit');
+
+  // Verify unticked stats: volume and set count display in train view without ticks
+  const statText = d.querySelector('.stat')?.textContent || '';
+  check('volume is computed and displayed without set tick', statText.includes('500') && statText.includes('volume'));
+  check('sets count displays total sets without requiring set ticks', statText.includes('sets'));
+
+  // Test Cancel Edit: modify weight in draft, then tap Cancel Edit
+  const editRows = d.querySelectorAll('.setrow');
+  if (editRows.length > 0) {
+    const inputs = editRows[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '999'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  tap(d, '#scrap'); // Cancel edit
+  check('canceling edit returns to calendar', d.querySelector('nav button[aria-current=true]').dataset.tab === 'calendar');
+
+  // Verify original session was untouched (volume is still 500, not 9990)
+  const activeId = w.localStorage.getItem('fds.active');
+  let dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  let origSession = dbData.sessions[0];
+  check('original session set weight untouched after cancel edit', origSession.ex[0].sets[0].w === '50', 'weight was ' + origSession.ex[0].sets[0].w);
+
+  // Now Edit again, change weight to 70, and Save changes
+  const editBtn2 = d.querySelector('.card [data-edit]');
+  if (editBtn2) tap(d, editBtn2);
+
+  const editRows2 = d.querySelectorAll('.setrow');
+  if (editRows2.length > 0) {
+    const inputs = editRows2[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '70'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  tap(d, '#finish'); // Save changes
+  check('saving edit returns to calendar', d.querySelector('nav button[aria-current=true]').dataset.tab === 'calendar');
+
+  // Verify session in db.sessions was updated in place
+  dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  const updatedSession = dbData.sessions[0];
+  check('session in db.sessions updated in place with new weight', updatedSession.ex[0].sets[0].w === '70');
+  check('calendar card displays updated volume', [...d.querySelectorAll('.card .note')].some(n => n.textContent.includes('700')));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;
