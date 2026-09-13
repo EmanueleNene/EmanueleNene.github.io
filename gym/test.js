@@ -583,9 +583,20 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   const qInput = d.querySelector('#q');
   qInput.value = '';
   qInput.dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
-  // Filter by Shoulders
+  // Test Biceps and Triceps filter chips
   const chips = [...d.querySelectorAll('.chips button')];
   const shouldersChip = chips.find(b => b.textContent === 'Shoulders');
+  const bicepsChip = chips.find(b => b.textContent === 'Biceps');
+  check('Biceps filter chip present', !!bicepsChip);
+  if (bicepsChip) tap(d, bicepsChip);
+  check('biceps exercises visible when filtered by Biceps', [...d.querySelectorAll('#lib .libitem')].some(b => b.textContent.includes('curl')));
+
+  const tricepsChip = chips.find(b => b.textContent === 'Triceps');
+  check('Triceps filter chip present', !!tricepsChip);
+  if (tricepsChip) tap(d, tricepsChip);
+  check('triceps exercises visible when filtered by Triceps', [...d.querySelectorAll('#lib .libitem')].some(b => b.textContent.includes('Triceps') || b.textContent.includes('dip')));
+
+  // Filter by Shoulders
   if (shouldersChip) tap(d, shouldersChip);
 
   const filteredItems = [...d.querySelectorAll('#lib .libitem')];
@@ -755,6 +766,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   // Check 3: Muscle group breakdown rendered with categories and non-zero counts
   const mbElem = d.querySelector('#muscle-breakdown');
   check('muscle group breakdown section present', !!mbElem);
+  check('muscle breakdown renders SVG pie chart', !!mbElem?.querySelector('.mg-pie-wrap svg'));
   const mbText = mbElem ? mbElem.textContent : '';
   check('muscle group breakdown contains categories', mbText.includes('Chest') || mbText.includes('Legs') || mbText.includes('Back'));
   check('muscle group breakdown contains non-zero set counts', /\d+\s*sets/.test(mbText));
