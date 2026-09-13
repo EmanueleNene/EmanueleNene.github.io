@@ -771,6 +771,28 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check('muscle group breakdown contains categories', mbText.includes('Chest') || mbText.includes('Legs') || mbText.includes('Back'));
   check('muscle group breakdown contains non-zero set counts', /\d+\s*sets/.test(mbText));
 
+  // Check 3b: Interactive Pie Chart slices and center text reset
+  const pieSlices = mbElem ? [...mbElem.querySelectorAll('.pie-slice')] : [];
+  check('Slices in the SVG pie chart are present with data-group and data-pct', pieSlices.length > 0 && pieSlices.every(s => s.dataset.group && s.dataset.pct !== undefined));
+
+  if (pieSlices.length > 0) {
+    const firstSlice = pieSlices[0];
+    const groupName = firstSlice.dataset.group;
+    const groupPct = firstSlice.dataset.pct;
+
+    // Tap the slice
+    tap(d, firstSlice);
+    const pieValAfterTap = mbElem.querySelector('#pie-val')?.textContent;
+    const pieLblAfterTap = mbElem.querySelector('#pie-lbl')?.textContent;
+    check('Tapping a slice updates the center text readout to display that group\'s name and percentage', pieValAfterTap === `${groupPct}%` && pieLblAfterTap.includes(groupName));
+
+    // Tap the same slice again to reset
+    tap(d, firstSlice);
+    const pieValAfterReset = mbElem.querySelector('#pie-val')?.textContent;
+    const pieLblAfterReset = mbElem.querySelector('#pie-lbl')?.textContent;
+    check('Tapping again resets to the total sets view', pieLblAfterReset === 'total sets' && pieValAfterReset !== `${groupPct}%`);
+  }
+
   // Check 4: Single session 1RM note
   const pickSelect = d.querySelector('#pick');
   check('exercise picker dropdown present', !!pickSelect);
