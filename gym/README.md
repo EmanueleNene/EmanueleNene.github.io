@@ -79,7 +79,7 @@ program does not remove sessions already logged under it.
 ## Editing the code
 
 `index.html` is the whole application — markup, styles and logic in one file. After changing it,
-bump `CACHE` in `sw.js` (currently `ferrodastiro-v12`) or installed phones will keep serving the old version.
+bump `CACHE` in `sw.js` (currently `ferrodastiro-v13`) or installed phones will keep serving the old version.
 
 ### Running the tests
 

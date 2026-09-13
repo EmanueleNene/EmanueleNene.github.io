@@ -464,13 +464,16 @@ function renderMuscleBreakdown(buckets){
 
   if (activeGroups.length === 1) {
     const g = activeGroups[0];
+    const sets = groupStats[g].sets;
+    const pct = totalSets > 0 ? (sets / totalSets) : 0;
+    const pctRound = Math.round(pct * 100);
     const color = GROUP_COLORS[g] || '#A33B28';
-    chartSvg = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${color}" />
-      <circle cx="${cx}" cy="${cy}" r="${rInner}" fill="var(--paper)" />`;
+    chartSvg = `<circle class="pie-slice" data-group="${hesc(g)}" data-pct="${pctRound}" data-sets="${sets}" aria-label="${hesc(g)}: ${pctRound}%" cx="${cx}" cy="${cy}" r="${R}" fill="${color}" style="cursor:pointer" />`;
   } else {
     activeGroups.forEach(g => {
       const sets = groupStats[g].sets;
       const pct = sets / totalSets;
+      const pctRound = Math.round(pct * 100);
       const angleSpan = pct * 2 * Math.PI;
       const endAngle = startAngle + angleSpan;
       const color = GROUP_COLORS[g] || '#A33B28';
@@ -495,7 +498,7 @@ function renderMuscleBreakdown(buckets){
         'Z'
       ].join(' ');
 
-      chartSvg += `<path d="${pathData}" fill="${color}" stroke="var(--paper)" stroke-width="1.5" />`;
+      chartSvg += `<path class="pie-slice" data-group="${hesc(g)}" data-pct="${pctRound}" data-sets="${sets}" aria-label="${hesc(g)}: ${pctRound}%" d="${pathData}" fill="${color}" stroke="var(--paper)" stroke-width="1.5" style="cursor:pointer" />`;
       startAngle = endAngle;
     });
   }
@@ -503,8 +506,11 @@ function renderMuscleBreakdown(buckets){
   const pieChart = `<div class="mg-pie-wrap" style="text-align:center;margin:12px 0 16px">
     <svg viewBox="0 0 200 200" width="160" height="160" role="img" aria-label="Muscle group volume breakdown chart" style="display:inline-block">
       ${chartSvg}
-      <text x="${cx}" y="${cy - 4}" text-anchor="middle" font-weight="800" font-size="22" fill="var(--ink)" font-family="inherit">${totalSets}</text>
-      <text x="${cx}" y="${cy + 14}" text-anchor="middle" font-size="11" fill="var(--steel)" font-family="inherit">total sets</text>
+      <circle id="pie-center-hit" cx="${cx}" cy="${cy}" r="${rInner}" fill="var(--paper)" style="cursor:pointer" />
+      <g id="pie-center-text" style="cursor:pointer" data-total-sets="${totalSets}">
+        <text id="pie-val" x="${cx}" y="${cy - 4}" text-anchor="middle" font-weight="800" font-size="22" fill="var(--ink)" font-family="inherit">${totalSets}</text>
+        <text id="pie-lbl" x="${cx}" y="${cy + 14}" text-anchor="middle" font-size="11" fill="var(--steel)" font-family="inherit">total sets</text>
+      </g>
     </svg>
   </div>`;
 
@@ -513,7 +519,7 @@ function renderMuscleBreakdown(buckets){
     if(st.sets===0 && !STANDARD_GROUPS.includes(g)) return '';
     const pct=totalSets>0 ? Math.round((st.sets/totalSets)*100) : 0;
     const color=GROUP_COLORS[g] || '#A33B28';
-    return `<div class="mg-row" style="margin-bottom:12px">
+    return `<div class="mg-row" data-group="${hesc(g)}" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;font-size:13px">
         <span style="font-weight:600"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${color};margin-right:6px"></span>${hesc(g)}</span>
         <span style="color:var(--steel);font-size:12px">${st.sets} set${st.sets===1?'':'s'} · ${st.reps} reps (${pct}%)</span>
@@ -962,6 +968,86 @@ function vProgress(){
   if (pickEl) {
     pickEl.onchange = () => { progressEx = pickEl.value; chartFor(progressEx); };
     chartFor(pickEl.value);
+  }
+
+  // Interactive Pie Chart handling
+  const mbEl = document.getElementById('muscle-breakdown');
+  if (mbEl) {
+    let selectedGroup = null;
+
+    const resetPie = () => {
+      selectedGroup = null;
+      const pieVal = mbEl.querySelector('#pie-val');
+      const pieLbl = mbEl.querySelector('#pie-lbl');
+      const pieTextGroup = mbEl.querySelector('#pie-center-text');
+      const totalSets = pieTextGroup ? pieTextGroup.dataset.totalSets : '';
+
+      if (pieVal) pieVal.textContent = totalSets;
+      if (pieLbl) pieLbl.textContent = 'total sets';
+
+      mbEl.querySelectorAll('.pie-slice').forEach(el => {
+        el.classList.remove('selected');
+        el.style.opacity = '1';
+        el.style.stroke = el.tagName.toLowerCase() === 'circle' ? '' : 'var(--paper)';
+        el.style.strokeWidth = el.tagName.toLowerCase() === 'circle' ? '' : '1.5';
+      });
+
+      mbEl.querySelectorAll('.mg-row').forEach(row => {
+        row.classList.remove('selected');
+        row.style.opacity = '1';
+        row.style.fontWeight = '';
+      });
+    };
+
+    mbEl.querySelectorAll('.pie-slice').forEach(slice => {
+      slice.onclick = (e) => {
+        e.stopPropagation();
+        const g = slice.dataset.group;
+        const pct = slice.dataset.pct;
+        const sets = +slice.dataset.sets;
+
+        if (selectedGroup === g) {
+          resetPie();
+        } else {
+          selectedGroup = g;
+          const pieVal = mbEl.querySelector('#pie-val');
+          const pieLbl = mbEl.querySelector('#pie-lbl');
+          if (pieVal) pieVal.textContent = `${pct}%`;
+          if (pieLbl) pieLbl.textContent = `${g} · ${sets} set${sets === 1 ? '' : 's'}`;
+
+          mbEl.querySelectorAll('.pie-slice').forEach(el => {
+            if (el.dataset.group === g) {
+              el.classList.add('selected');
+              el.style.opacity = '1';
+              el.style.stroke = 'var(--ink)';
+              el.style.strokeWidth = '3';
+            } else {
+              el.classList.remove('selected');
+              el.style.opacity = '0.35';
+              el.style.stroke = el.tagName.toLowerCase() === 'circle' ? '' : 'var(--paper)';
+              el.style.strokeWidth = el.tagName.toLowerCase() === 'circle' ? '' : '1.5';
+            }
+          });
+
+          mbEl.querySelectorAll('.mg-row').forEach(row => {
+            if (row.dataset.group === g) {
+              row.classList.add('selected');
+              row.style.opacity = '1';
+              row.style.fontWeight = '600';
+            } else {
+              row.classList.remove('selected');
+              row.style.opacity = '0.4';
+              row.style.fontWeight = '';
+            }
+          });
+        }
+      };
+    });
+
+    const centerHit = mbEl.querySelector('#pie-center-hit');
+    const centerText = mbEl.querySelector('#pie-center-text');
+    if (centerHit) centerHit.onclick = (e) => { e.stopPropagation(); resetPie(); };
+    if (centerText) centerText.onclick = (e) => { e.stopPropagation(); resetPie(); };
   }
 }
 
