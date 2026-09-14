@@ -13,7 +13,7 @@ Safari → Add to Home Screen. Used by one family; each person has a profile on 
   from Google. `jsdom` is a dev dependency for tests only.
 - **No `<dialog>`.** It was removed after failing in an embedded webview. Full-screen views
   driven by the `screen` state variable replaced it. Don't reintroduce modals.
-- **localStorage only.** No server, no sync, no account. Data must never leave the device.
+- **Local storage & IndexedDB only.** No server, no sync, no iCloud share, no account. Data must never leave the device.
 - **iOS Safari is the only target that matters.** Test assumptions against it, not Chrome.
 
 ## Architecture
@@ -37,7 +37,7 @@ Handlers are attached to nodes after `innerHTML` is set. Writing to the same con
 still renders and does nothing. This has bitten this codebase once already (`innerHTML +=` in
 the calendar day panel). Build the full HTML string, assign once, then wire.
 
-## Storage
+## Storage & Durability
 
 ```
 fds.profiles      [{id, name}]
@@ -45,7 +45,10 @@ fds.active        profile id
 fds.data.<id>     {unit, programId, custom:{}, customEx:[], sessions:[], draft}
 ```
 
-A one-time migration from the old `ironlog.*` keys runs at startup. Leave it in place.
+- **Dual-layer persistence:** Synchronous reads and writes use `localStorage` for zero-latency UI updates. Every write is asynchronously mirrored to IndexedDB (`fds_store` / `kv`).
+- **Auto-resurrection:** If Safari or WebKit clears `localStorage` under storage pressure, FerroDaStiro automatically restores profiles and data blobs from IndexedDB into `localStorage` upon boot.
+- **WebKit Persistent Storage API:** Calls `navigator.storage.persist()` on boot and initial interaction to request eviction immunity from the browser. Persistence status is shown under Settings.
+- A one-time migration from the old `ironlog.*` keys runs at startup. Leave it in place.
 
 Session shape: `{id, date, day, program, ex:[{name, sets:[{w, r, done}]}]}`. Dates are stamped at
 **midday** so daylight-saving shifts can't move a session onto the neighbouring day.
@@ -57,12 +60,12 @@ node gym/test.js
 # or: cd gym && npm install jsdom && node test.js
 ```
 
-178 checks across 18 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
+Checks across 19 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
 visual inspection missed a dead button twice.
 
 ## After any change to index.html
 
-Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v16`). Installed phones serve the cached copy until the version string changes.
+Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v17`). Installed phones serve the cached copy until the version string changes.
 
 ## Exercise diagrams (`img/exercises/`)
 

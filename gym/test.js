@@ -16,8 +16,107 @@ try {
 
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
-function boot(seed) {
-  const dom = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true, url: 'https://x.test/' });
+function createMockIndexedDB() {
+  const stores = {};
+  return {
+    _stores: stores,
+    open(name, version) {
+      const req = {
+        result: null,
+        error: null,
+        onsuccess: null,
+        onerror: null,
+        onupgradeneeded: null
+      };
+      setTimeout(() => {
+        if (!stores[name]) {
+          stores[name] = { objectStores: {} };
+        }
+        const dbObj = {
+          name,
+          version,
+          objectStoreNames: {
+            contains(sName) { return !!stores[name].objectStores[sName]; }
+          },
+          createObjectStore(sName) {
+            if (!stores[name].objectStores[sName]) {
+              stores[name].objectStores[sName] = new Map();
+            }
+            return {};
+          },
+          transaction(sNames, mode) {
+            return {
+              objectStore(sName) {
+                const storeMap = stores[name].objectStores[sName] || new Map();
+                return {
+                  put(val, key) {
+                    storeMap.set(key, JSON.parse(JSON.stringify(val)));
+                    const r = { onsuccess: null, onerror: null };
+                    setTimeout(() => { if (r.onsuccess) r.onsuccess(); }, 0);
+                    return r;
+                  },
+                  get(key) {
+                    const r = { result: undefined, onsuccess: null, onerror: null };
+                    setTimeout(() => {
+                      r.result = storeMap.has(key) ? JSON.parse(JSON.stringify(storeMap.get(key))) : undefined;
+                      if (r.onsuccess) r.onsuccess();
+                    }, 0);
+                    return r;
+                  },
+                  delete(key) {
+                    storeMap.delete(key);
+                    const r = { onsuccess: null, onerror: null };
+                    setTimeout(() => { if (r.onsuccess) r.onsuccess(); }, 0);
+                    return r;
+                  },
+                  getAll() {
+                    const r = { result: [], onsuccess: null, onerror: null };
+                    setTimeout(() => {
+                      r.result = Array.from(storeMap.values()).map(v => JSON.parse(JSON.stringify(v)));
+                      if (r.onsuccess) r.onsuccess();
+                    }, 0);
+                    return r;
+                  },
+                  getAllKeys() {
+                    const r = { result: [], onsuccess: null, onerror: null };
+                    setTimeout(() => {
+                      r.result = Array.from(storeMap.keys());
+                      if (r.onsuccess) r.onsuccess();
+                    }, 0);
+                    return r;
+                  }
+                };
+              }
+            };
+          },
+          close() {}
+        };
+        req.result = dbObj;
+        if (req.onupgradeneeded) req.onupgradeneeded({ target: req });
+        if (req.onsuccess) req.onsuccess({ target: req });
+      }, 0);
+      return req;
+    }
+  };
+}
+
+function boot(options = {}) {
+  const dom = new JSDOM(html, {
+    runScripts: 'dangerously',
+    pretendToBeVisual: true,
+    url: 'https://x.test/',
+    beforeParse(window) {
+      if (options.mockIdb) {
+        window.indexedDB = options.mockIdb;
+      }
+      if (options.persistState !== undefined) {
+        window.navigator.storage = {
+          persisted: async () => options.persistState,
+          persist: async () => options.persistState
+        };
+      }
+    }
+  });
   const w = dom.window;
   w.scrollTo = () => {};
   w.alert = m => log.push('ALERT: ' + m);
@@ -1185,5 +1284,79 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
-console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
-if (fails > 0) process.exitCode = 1;
+// ---------- scenario 19: persistent storage api, dual indexeddb mirroring & auto-resurrection ----------
+(async () => {
+  console.log('\n19. Level 1 Storage Permanence: Persistent Storage API & IndexedDB Mirroring');
+  const mockIdb = createMockIndexedDB();
+  const { w, d, log } = boot({ mockIdb, persistState: true });
+
+  // 1. Check persistent storage initialization
+  check('Persistent storage API initialization', typeof w.checkPersistence === 'function' && typeof w.requestPersistence === 'function');
+
+  // Let initial microtasks settle for persist request
+  await new Promise(r => setTimeout(r, 20));
+  check('Persistence status checked and enabled', w.storageStatus.persisted === true);
+
+  // 2. Dual-layer write mirroring: create profile and log a workout session
+  d.querySelector('#fname').value = 'Durable Hero';
+  tap(d, '#fgo');
+
+  tap(d, '#startHere');
+  tap(d, '#fromLib');
+  const item = d.querySelector('#lib .libitem');
+  tap(d, item);
+  tap(d, '#addsel');
+
+  const rows = d.querySelectorAll('.setrow');
+  if (rows.length > 0) {
+    const inputs = rows[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '90'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '8'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  tap(d, '#finish');
+
+  // Wait for async idbPut to complete
+  await new Promise(r => setTimeout(r, 20));
+
+  const idbStore = mockIdb._stores['fds_store']?.objectStores['kv'];
+  check('IndexedDB dual-layer write: saving a profile or workout session mirrors data to IndexedDB',
+    idbStore && idbStore.has('fds.profiles') && idbStore.get('fds.profiles')[0].name === 'Durable Hero');
+
+  const activeId = w.localStorage.getItem('fds.active');
+  const storedDb = idbStore ? idbStore.get('fds.data.' + activeId) : null;
+  check('IndexedDB holds complete session payload', storedDb && storedDb.sessions && storedDb.sessions.length > 0);
+
+  // 3. Storage recovery / auto-resurrection: wipe localStorage and boot a fresh instance
+  // The fresh instance has an empty localStorage, but shares the same mock IndexedDB
+  const bootRecover = boot({ mockIdb, persistState: true });
+  const w2 = bootRecover.w;
+  const d2 = bootRecover.d;
+
+  check('Fresh instance starts with empty localStorage before resurrection', !w2.localStorage.getItem('fds.profiles'));
+
+  // Trigger autoResurrect
+  const restored = await w2.autoResurrect();
+  check('Storage recovery / auto-resurrection: when localStorage is cleared, the app successfully restores profile and session data from IndexedDB',
+    restored === true && !!w2.localStorage.getItem('fds.profiles'));
+
+  // Load resurrected data and check calendar/sessions
+  w2.loadProfiles();
+  w2.loadData();
+  w2.render();
+
+  const restoredProfiles = JSON.parse(w2.localStorage.getItem('fds.profiles') || '[]');
+  const profileId = restoredProfiles[0]?.id;
+  const dbData2 = JSON.parse(w2.localStorage.getItem('fds.data.' + profileId) || '{}');
+  check('Resurrected profile has restored workout sessions', dbData2.sessions && dbData2.sessions.length > 0);
+
+  // 4. Settings view renders the storage durability card and status
+  tap(d2, 'nav button[data-tab=programs]');
+  const viewText = d2.querySelector('#view')?.textContent || '';
+  check('Settings view renders the storage durability card and status',
+    viewText.includes('Storage & Durability') && viewText.includes('Storage: Persistent & Protected (IndexedDB mirrored)'));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+
+  console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
+  if (fails > 0) process.exitCode = 1;
+})();
