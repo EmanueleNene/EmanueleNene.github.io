@@ -224,6 +224,65 @@ const BUILTIN = {
 /* ---------- exercise library ----------
    n = name, g = muscle group, s/r = sensible default sets/reps,
    t = measured in seconds rather than reps                          */
+const BENCHMARK_BALANCE = {
+  Chest: { ratio: 1.00, idealRatio: 1.00, benchmark: 'Barbell Bench Press' },
+  Shoulders: { ratio: 0.65, idealRatio: 0.65, benchmark: 'Standing Overhead Press' },
+  Biceps: { ratio: 0.40, idealRatio: 0.40, benchmark: 'Barbell Curl' },
+  Legs: { ratio: 1.45, idealRatio: 1.45, benchmark: 'Back Squat' },
+  Back: { ratio: 1.00, idealRatio: 1.00, benchmark: 'Barbell Row / Pull-up' },
+  Triceps: { ratio: 0.75, idealRatio: 0.75, benchmark: 'Close-Grip Bench' }
+};
+
+const RADAR_GROUPS = ['Chest', 'Shoulders', 'Biceps', 'Legs', 'Back', 'Triceps'];
+
+const GROUP_HINTS = {
+  Chest: 'Add bench press, incline press, or dips to balance pushing strength.',
+  Back: 'Add more rows or pull-ups to balance horizontal push/pull.',
+  Shoulders: 'Add overhead press or lateral raises to build overhead strength and stability.',
+  Legs: 'Add back squats, front squats, or leg presses for lower-body foundation.',
+  Biceps: 'Add barbell or dumbbell curls to reinforce pulling and elbow flexion.',
+  Triceps: 'Add close-grip bench or dips to reinforce lockout and pressing strength.'
+};
+
+const EXER_EQUIV_MAP = {
+  Chest: {
+    'Bench press': 1.0, 'Incline barbell press': 0.85, 'Dumbbell bench press': 0.82,
+    'Incline dumbbell press': 0.75, 'Machine chest press': 1.05, 'Dumbbell fly': 0.35,
+    'Cable crossover': 0.35, 'Push-up': 0.65, 'Dip': 1.05
+  },
+  Back: {
+    'Barbell row': 1.0, 'Pendlay row': 1.0, 'T-bar row': 1.0, 'Cable row': 0.95,
+    'Lat pulldown': 0.95, 'Pull-up': 1.0, 'Chin-up': 1.0, 'Deadlift': 1.45,
+    'Rack pull': 1.50, 'Dumbbell row': 0.90, 'Straight-arm pulldown': 0.40, 'Shrug': 1.25
+  },
+  Shoulders: {
+    'Overhead press': 1.0, 'Seated dumbbell press': 0.80, 'Machine shoulder press': 1.05,
+    'Arnold press': 0.72, 'Upright row': 0.80, 'Lateral raise': 0.25,
+    'Cable lateral raise': 0.25, 'Rear delt fly': 0.25, 'Face pull': 0.45
+  },
+  Legs: {
+    'Back squat': 1.0, 'Front squat': 0.80, 'Hack squat': 1.15, 'Leg press': 1.85,
+    'Romanian deadlift': 0.95, 'Stiff-leg deadlift': 0.90, 'Bulgarian split squat': 0.90,
+    'Walking lunge': 0.90, 'Step-up': 0.40, 'Leg extension': 0.55, 'Leg curl': 0.45,
+    'Hip thrust': 1.25, 'Glute bridge': 1.10, 'Good morning': 0.60,
+    'Standing calf raise': 0.90, 'Seated calf raise': 0.60
+  },
+  Biceps: {
+    'Barbell curl': 1.0, 'EZ-bar curl': 0.98, 'Dumbbell curl': 0.90,
+    'Hammer curl': 0.90, 'Incline dumbbell curl': 0.85, 'Preacher curl': 0.90, 'Cable curl': 0.90
+  },
+  Triceps: {
+    'Close-grip bench press': 1.0, 'Triceps pushdown': 0.75,
+    'Overhead triceps extension': 0.65, 'Skull crusher': 0.70, 'Bench dip': 0.80
+  }
+};
+
+const EXER_EQUIV_FLAT = {};
+Object.values(EXER_EQUIV_MAP).forEach(map => Object.assign(EXER_EQUIV_FLAT, map));
+const EXERCISE_EQUIV = new Proxy(EXER_EQUIV_FLAT, {
+  get: (target, prop) => (prop in target ? target[prop] : 1.0)
+});
+
 const GROUPS = ['Chest','Back','Shoulders','Legs','Biceps','Triceps','Core','Conditioning'];
 const EXERCISES = [
   {n:'Bench press',g:'Chest',s:4,r:6},{n:'Incline barbell press',g:'Chest',s:4,r:8},
@@ -279,6 +338,9 @@ function hesc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').r
 window.exSlug = exSlug;
 window.exMeta = exMeta;
 window.isTimed = isTimed;
+window.EXERCISE_EQUIV = EXERCISE_EQUIV;
+window.BENCHMARK_BALANCE = BENCHMARK_BALANCE;
+window.RADAR_GROUPS = RADAR_GROUPS;
 
 const dayKey = d => { const x=new Date(d);
   return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
@@ -286,7 +348,7 @@ const dayKey = d => { const x=new Date(d);
 let profiles=[], me=null, db=BLANK(), tab='calendar';
 let calMonth=(()=>{const d=new Date();d.setDate(1);d.setHours(0,0,0,0);return d;})();
 let calSel=dayKey(new Date()), editing=null;
-let progressTimeframe='weekly', progressMetric='weight', progressEx=null;
+let progressTimeframe='weekly', progressMetric='weight', progressEx=null, progressRadarMode='relative', progressRadarSel=null;
 
 function getWeekStart(d){
   const dt=new Date(d); dt.setHours(0,0,0,0);
@@ -1028,6 +1090,352 @@ function bindBodyweightEvents(){
   });
 }
 
+function getExercisePeak1RM(name, sessions = db.sessions){
+  let peak = 0;
+  for(const s of (sessions || [])){
+    const matchingExs = (s.ex || []).filter(e => e.name === name);
+    for(const ex of matchingExs){
+      if(!ex.sets || !ex.sets.length) continue;
+      const validSets = ex.sets.filter(x => (+x.w || 0) > 0 && (+x.r || 0) > 0);
+      if(!validSets.length) continue;
+      const heavySets = validSets.filter(x => (+x.r || 0) <= 5);
+      const targetSets = heavySets.length ? heavySets : validSets;
+      const best = Math.max(...targetSets.map(x => e1rm(+x.w || 0, +x.r || 0)));
+      if(best > peak) peak = best;
+    }
+  }
+  return peak;
+}
+
+function computeMuscularBalance(sessions = db.sessions){
+  const groups = RADAR_GROUPS;
+  const loggedNames = [...new Set((sessions || []).flatMap(s => (s.ex || []).map(e => e.name)))];
+
+  const data = {};
+  for(const g of groups){
+    const idealRatio = BENCHMARK_BALANCE[g].ratio;
+    const benchmark = BENCHMARK_BALANCE[g].benchmark;
+
+    const exNamesInGroup = loggedNames.filter(name => {
+      const meta = exMeta(name);
+      return meta && meta.g === g;
+    });
+
+    let bestNorm1rm = 0;
+    let bestRaw1rm = 0;
+    let bestExName = null;
+
+    for(const name of exNamesInGroup){
+      const raw1rm = getExercisePeak1RM(name, sessions);
+      if(raw1rm > 0){
+        const mult = EXERCISE_EQUIV[name] || 1.0;
+        const norm = raw1rm / mult;
+        if(norm > bestNorm1rm){
+          bestNorm1rm = norm;
+          bestRaw1rm = raw1rm;
+          bestExName = name;
+        }
+      }
+    }
+
+    data[g] = {
+      group: g,
+      idealRatio,
+      ratio: idealRatio,
+      benchmark,
+      norm1rm: bestNorm1rm,
+      raw1rm: bestRaw1rm,
+      exercise: bestExName,
+      hasData: bestNorm1rm > 0
+    };
+  }
+
+  const groupsWithData = groups.filter(g => data[g].hasData);
+  let scaleFactor = 0;
+  if(groupsWithData.length > 0){
+    scaleFactor = Math.max(...groupsWithData.map(g => data[g].norm1rm / data[g].idealRatio));
+  }
+
+  for(const g of groups){
+    const item = data[g];
+    item.target1rm = scaleFactor > 0 ? scaleFactor * item.idealRatio : 0;
+    item.pct = (item.hasData && item.target1rm > 0)
+      ? (item.norm1rm / item.target1rm) * 100
+      : 0;
+  }
+
+  return {
+    groups,
+    data,
+    scaleFactor,
+    groupsWithDataCount: groupsWithData.length
+  };
+}
+
+function renderRadarSvg(balance, mode, selGroup){
+  const W = 360, H = 290, cx = 180, cy = 142, R = 90;
+  const groups = balance.groups;
+  const n = groups.length;
+  const isRel = mode === 'relative';
+
+  const angles = groups.map((_, i) => -Math.PI / 2 + i * (2 * Math.PI / n));
+
+  let levels = [];
+  let userR = [];
+  let refR = [];
+
+  if(isRel){
+    levels = [0.25, 0.50, 0.75, 1.00, 1.25];
+    const maxPct = 125;
+    userR = groups.map(g => {
+      const pct = balance.data[g]?.pct || 0;
+      return (Math.min(pct, maxPct) / maxPct) * R;
+    });
+    refR = groups.map(() => (100 / maxPct) * R);
+  } else {
+    const maxVal = Math.max(...groups.map(g => Math.max(balance.data[g]?.norm1rm || 0, balance.data[g]?.target1rm || 0)), 10);
+    const niceMax = Math.ceil(maxVal / 25) * 25 || 100;
+    levels = [0.25, 0.50, 0.75, 1.00].map(lvl => ({ lvl, val: Math.round(niceMax * lvl) }));
+
+    userR = groups.map(g => {
+      const val = balance.data[g]?.norm1rm || 0;
+      return (Math.min(val, niceMax) / niceMax) * R;
+    });
+
+    refR = groups.map(g => {
+      const val = balance.data[g]?.target1rm || 0;
+      return (Math.min(val, niceMax) / niceMax) * R;
+    });
+  }
+
+  let svg = `<svg id="radar-chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Muscular balance radar chart" style="overflow:visible">`;
+
+  // Concentric grid hexagons
+  if(isRel){
+    levels.forEach(lvl => {
+      const r = (lvl / 1.25) * R;
+      const pts = angles.map(a => `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`).join(' ');
+      const isRef = lvl === 1.00;
+      svg += `<polygon ${isRef ? 'class="radar-ref-poly"' : ''} points="${pts}" fill="none" stroke="${isRef ? 'var(--steel)' : 'var(--line)'}" stroke-width="${isRef ? '1.5' : '1'}" stroke-dasharray="${isRef ? '4 3' : 'none'}"/>`;
+      svg += `<text x="${cx + 4}" y="${(cy - r + 3).toFixed(1)}" font-size="9" fill="var(--steel)">${Math.round(lvl * 100)}%</text>`;
+    });
+  } else {
+    levels.forEach(({ lvl, val }) => {
+      const r = lvl * R;
+      const pts = angles.map(a => `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`).join(' ');
+      svg += `<polygon points="${pts}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+      svg += `<text x="${cx + 4}" y="${(cy - r + 3).toFixed(1)}" font-size="9" fill="var(--steel)">${val}</text>`;
+    });
+
+    if(balance.scaleFactor > 0){
+      const targetPts = groups.map((_, i) => `${(cx + refR[i] * Math.cos(angles[i])).toFixed(1)},${(cy + refR[i] * Math.sin(angles[i])).toFixed(1)}`).join(' ');
+      svg += `<polygon class="radar-target-poly" points="${targetPts}" fill="none" stroke="var(--steel)" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>`;
+    }
+  }
+
+  // 6 radial axes
+  angles.forEach(a => {
+    const x2 = cx + R * Math.cos(a);
+    const y2 = cy + R * Math.sin(a);
+    svg += `<line class="grid" x1="${cx}" y1="${cy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`;
+  });
+
+  // User polygon
+  const hasAnyData = groups.some(g => balance.data[g]?.hasData);
+  if(hasAnyData){
+    const userPts = groups.map((_, i) => `${(cx + userR[i] * Math.cos(angles[i])).toFixed(1)},${(cy + userR[i] * Math.sin(angles[i])).toFixed(1)}`).join(' ');
+    svg += `<polygon class="radar-user-poly" points="${userPts}" fill="rgba(163, 59, 40, 0.22)" stroke="var(--rust)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  }
+
+  // Dots and labels
+  groups.forEach((g, i) => {
+    const a = angles[i];
+    const item = balance.data[g];
+    const dotX = cx + userR[i] * Math.cos(a);
+    const dotY = cy + userR[i] * Math.sin(a);
+    const isSel = selGroup === g;
+
+    if(item?.hasData){
+      svg += `<circle class="radar-dot" data-group="${hesc(g)}" cx="${dotX.toFixed(1)}" cy="${dotY.toFixed(1)}" r="${isSel ? 6 : 4}" fill="${isSel ? 'var(--ink)' : 'var(--rust)'}" stroke="var(--paper)" stroke-width="1.5" style="cursor:pointer"/>`;
+    }
+
+    const rLbl = R + 14;
+    let lx = cx + rLbl * Math.cos(a);
+    let ly = cy + rLbl * Math.sin(a);
+    let anchor = 'middle';
+
+    if(i === 0){ lx = cx; ly = cy - R - 10; anchor = 'middle'; }
+    else if(i === 1){ lx = cx + rLbl * Math.cos(a); ly = cy + rLbl * Math.sin(a) + 3; anchor = 'start'; }
+    else if(i === 2){ lx = cx + rLbl * Math.cos(a); ly = cy + rLbl * Math.sin(a) + 3; anchor = 'start'; }
+    else if(i === 3){ lx = cx; ly = cy + R + 18; anchor = 'middle'; }
+    else if(i === 4){ lx = cx + rLbl * Math.cos(a); ly = cy + rLbl * Math.sin(a) + 3; anchor = 'end'; }
+    else if(i === 5){ lx = cx + rLbl * Math.cos(a); ly = cy + rLbl * Math.sin(a) + 3; anchor = 'end'; }
+
+    svg += `<text class="radar-label" data-group="${hesc(g)}" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" font-size="12" font-weight="${isSel ? '800' : '600'}" fill="${isSel ? 'var(--rust)' : 'var(--ink)'}" style="cursor:pointer">${hesc(g)}</text>`;
+
+    const outerX = cx + R * Math.cos(a);
+    const outerY = cy + R * Math.sin(a);
+    svg += `<circle class="radar-hit" data-group="${hesc(g)}" cx="${outerX.toFixed(1)}" cy="${outerY.toFixed(1)}" r="18" fill="transparent" style="cursor:pointer"/>`;
+    if(item?.hasData && (Math.abs(dotX - outerX) > 10 || Math.abs(dotY - outerY) > 10)){
+      svg += `<circle class="radar-hit" data-group="${hesc(g)}" cx="${dotX.toFixed(1)}" cy="${dotY.toFixed(1)}" r="18" fill="transparent" style="cursor:pointer"/>`;
+    }
+  });
+
+  svg += `</svg>`;
+  return svg;
+}
+
+function renderMuscularBalanceCard(){
+  const balance = computeMuscularBalance(db.sessions);
+  const isRel = progressRadarMode === 'relative';
+  const unit = hesc(db.unit);
+
+  let detailHtml = '';
+  if(progressRadarSel){
+    const item = balance.data[progressRadarSel];
+    if(item && item.hasData){
+      const pct = Math.round(item.pct);
+      const pctNote = (pct === 100) ? '100% balanced' : `${pct}% of balance`;
+      const normExtra = (item.norm1rm !== item.raw1rm)
+        ? `<span style="color:var(--steel);font-size:12px"> · norm: ${Math.round(item.norm1rm)} ${unit}</span>`
+        : '';
+      const targetExtra = !isRel
+        ? `<span style="color:var(--steel);font-size:12px"> · target: ${Math.round(item.target1rm)} ${unit}</span>`
+        : '';
+      detailHtml = `<div><b>${item.group}</b>: ${Math.round(item.raw1rm)} ${unit} via ${hesc(item.exercise)} (${pctNote})${normExtra}${targetExtra}</div>`;
+    } else if(item){
+      const targetStr = item.target1rm > 0 ? ` (target: ${Math.round(item.target1rm)} ${unit})` : '';
+      detailHtml = `<div><b>${item.group}</b>: No logged exercises${targetStr} · Benchmark: ${hesc(item.benchmark)}</div>`;
+    }
+  } else {
+    detailHtml = `<span style="color:var(--steel)">Tap any vertex or label to inspect normalized lift &amp; symmetry</span>`;
+  }
+
+  let summaryHtml = '';
+  if(balance.groupsWithDataCount < 2){
+    summaryHtml = `<p class="note" style="text-align:center;margin:6px 0">Log workouts with at least 2 different muscle groups to see symmetry analytics.</p>`;
+  } else {
+    const groupsWithData = balance.groups.filter(g => balance.data[g].hasData);
+    const dominant = groupsWithData.reduce((best, g) => (!best || balance.data[g].pct > best.pct ? balance.data[g] : best), null);
+    const lagging = groupsWithData.reduce((worst, g) => (!worst || balance.data[g].pct < worst.pct ? balance.data[g] : worst), null);
+    const allBalanced = groupsWithData.every(g => balance.data[g].pct >= 90);
+
+    const domHtml = `<div style="margin-bottom:8px">
+      <small style="color:var(--steel);text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.04em">Dominant Group</small>
+      <div style="font-size:14px;font-weight:600;margin-top:2px">${dominant.group}: ${Math.round(dominant.norm1rm)} ${unit} (${Math.round(dominant.pct)}% balance)</div>
+    </div>`;
+
+    if(allBalanced){
+      summaryHtml = `<div style="display:flex;flex-direction:column;gap:8px">
+        ${domHtml}
+        <p class="note" style="color:var(--slate);font-weight:600;margin:4px 0 2px">Well-balanced physique! All muscle groups are within 10% of ideal biomechanical ratios.</p>
+      </div>`;
+    } else {
+      const deficit = Math.max(0, 100 - Math.round(lagging.pct));
+      const hint = GROUP_HINTS[lagging.group] || 'Focus on progressive overload for this muscle group.';
+      summaryHtml = `<div style="display:flex;flex-direction:column;gap:8px">
+        ${domHtml}
+        <div>
+          <small style="color:var(--rust);text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.04em">Lagging Group / Imbalance Alert</small>
+          <div style="font-size:14px;font-weight:600;margin-top:2px">${lagging.group}: ${Math.round(lagging.norm1rm)} ${unit} (${Math.round(lagging.pct)}% balance · ${deficit}% deficit)</div>
+          <p class="note" style="margin-top:3px">${hint}</p>
+        </div>
+      </div>`;
+    }
+  }
+
+  return `<div class="card" id="radar-card">
+    <div class="exhead" style="flex-wrap:wrap">
+      <h3>Muscular Balance &amp; Symmetry</h3>
+      <div style="display:flex;gap:4px">
+        <button class="${isRel ? '' : 'ghost'} mini" id="radar-mode-rel" aria-pressed="${isRel}">Relative (% Balance)</button>
+        <button class="${!isRel ? '' : 'ghost'} mini" id="radar-mode-abs" aria-pressed="${!isRel}">Absolute (${unit})</button>
+      </div>
+    </div>
+    <p class="note" style="margin-bottom:8px">${isRel ? 'Symmetry relative to your strongest compound lift (ideal balanced = 100%)' : 'Normalized compound 1RM vs biomechanically balanced targets in ' + unit}</p>
+    <div id="radar-chart-wrap" style="text-align:center;margin:6px 0">
+      ${renderRadarSvg(balance, progressRadarMode, progressRadarSel)}
+    </div>
+    <div style="display:flex;justify-content:center;gap:18px;margin:2px 0 8px;font-size:12px;color:var(--steel)">
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <span style="display:inline-block;width:14px;height:3px;background:var(--rust);border-radius:1px"></span>
+        ${isRel ? 'Actual balance' : 'Actual 1RM'}
+      </span>
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <span style="display:inline-block;width:14px;height:0;border-top:2px dashed var(--steel)"></span>
+        ${isRel ? 'Balanced reference (100%)' : 'Balanced target'}
+      </span>
+    </div>
+    <div id="radar-detail" style="margin:8px 0;padding:7px 10px;background:var(--concrete);border-radius:var(--r);font-size:13px;text-align:center;min-height:36px;display:flex;flex-direction:column;justify-content:center">
+      ${detailHtml}
+    </div>
+    <div id="radar-summary" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">
+      ${summaryHtml}
+    </div>
+  </div>`;
+}
+
+function bindRadarEvents(){
+  const rcEl = document.getElementById('radar-card');
+  if(!rcEl) return;
+
+  const relBtn = document.getElementById('radar-mode-rel');
+  const absBtn = document.getElementById('radar-mode-abs');
+  if(relBtn) relBtn.onclick = () => { progressRadarMode = 'relative'; vProgress(); };
+  if(absBtn) absBtn.onclick = () => { progressRadarMode = 'absolute'; vProgress(); };
+
+  const balance = computeMuscularBalance(db.sessions);
+  const isRel = progressRadarMode === 'relative';
+  const unit = hesc(db.unit);
+
+  const setRadarSelection = (g) => {
+    progressRadarSel = (progressRadarSel === g) ? null : g;
+    const detEl = rcEl.querySelector('#radar-detail');
+    if(detEl){
+      if(!progressRadarSel){
+        detEl.innerHTML = `<span style="color:var(--steel)">Tap any vertex or label to inspect normalized lift &amp; symmetry</span>`;
+      } else {
+        const item = balance.data[progressRadarSel];
+        if(item && item.hasData){
+          const pct = Math.round(item.pct);
+          const pctNote = (pct === 100) ? '100% balanced' : `${pct}% of balance`;
+          const normExtra = (item.norm1rm !== item.raw1rm)
+            ? `<span style="color:var(--steel);font-size:12px"> · norm: ${Math.round(item.norm1rm)} ${unit}</span>`
+            : '';
+          const targetExtra = !isRel
+            ? `<span style="color:var(--steel);font-size:12px"> · target: ${Math.round(item.target1rm)} ${unit}</span>`
+            : '';
+          detEl.innerHTML = `<div><b>${item.group}</b>: ${Math.round(item.raw1rm)} ${unit} via ${hesc(item.exercise)} (${pctNote})${normExtra}${targetExtra}</div>`;
+        } else if(item){
+          const targetStr = item.target1rm > 0 ? ` (target: ${Math.round(item.target1rm)} ${unit})` : '';
+          detEl.innerHTML = `<div><b>${item.group}</b>: No logged exercises${targetStr} · Benchmark: ${hesc(item.benchmark)}</div>`;
+        }
+      }
+    }
+    rcEl.querySelectorAll('.radar-dot').forEach(dot => {
+      const sel = dot.dataset.group === progressRadarSel;
+      dot.setAttribute('r', sel ? '6' : '4');
+      dot.setAttribute('fill', sel ? 'var(--ink)' : 'var(--rust)');
+    });
+    rcEl.querySelectorAll('.radar-label').forEach(lbl => {
+      const sel = lbl.dataset.group === progressRadarSel;
+      lbl.setAttribute('font-weight', sel ? '800' : '600');
+      lbl.setAttribute('fill', sel ? 'var(--rust)' : 'var(--ink)');
+    });
+  };
+
+  rcEl.querySelectorAll('.radar-dot, .radar-label, .radar-hit').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      const g = el.dataset.group;
+      if(g) setRadarSelection(g);
+    };
+  });
+}
+
+window.getExercisePeak1RM = getExercisePeak1RM;
+window.computeMuscularBalance = computeMuscularBalance;
+
 function vProgress(){
   const names=[...new Set(db.sessions.flatMap(s=>(s.ex||[]).map(e=>e.name)))];
   if(!db.sessions.length){
@@ -1079,11 +1487,14 @@ function vProgress(){
       </div>
     </div>
 
+    ${renderMuscularBalanceCard()}
+
     <h2 style="margin-top:22px">Exercise History & 1RM</h2>
     <select id="pick" style="margin:4px 0 14px">${names.map(n=>`<option ${n===progressEx?'selected':''}>${hesc(n)}</option>`).join('')}</select>
     <div id="chart"></div>`;
 
   bindBodyweightEvents();
+  bindRadarEvents();
 
   document.getElementById('tf-weekly').onclick = () => { progressTimeframe = 'weekly'; vProgress(); };
   document.getElementById('tf-monthly').onclick = () => { progressTimeframe = 'monthly'; vProgress(); };
