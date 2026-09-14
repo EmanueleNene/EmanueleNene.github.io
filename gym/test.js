@@ -1067,5 +1067,123 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
+// ---------- scenario 18: Muscular Balance Radar Chart with multi-exercise equivalence ----------
+{
+  console.log('\n18. Muscular Balance Radar Chart with multi-exercise equivalence');
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'Radar Scribe'; tap(d, '#fgo');
+
+  // 1. Equivalence multipliers & Benchmark balance ratios
+  const equiv = w.window.EXERCISE_EQUIV;
+  const ratios = w.window.BENCHMARK_BALANCE;
+
+  check('Equivalence multiplier: Leg press is 1.85 (185 kg converts to 100 kg squat equivalence)',
+    equiv['Leg press'] === 1.85 && Math.abs(185 / equiv['Leg press'] - 100) < 0.001);
+  check('Equivalence multiplier: Incline barbell press is 0.85 (85 kg converts to 100 kg bench equivalence)',
+    equiv['Incline barbell press'] === 0.85 && Math.abs(85 / equiv['Incline barbell press'] - 100) < 0.001);
+  check('Equivalence multiplier: default for unlisted exercise is 1.0',
+    equiv['Nonexistent Unknown Lift'] === 1.0);
+  check('Benchmark balance ratios: Chest=1.00, Shoulders=0.65, Biceps=0.40, Legs=1.45, Back=1.00, Triceps=0.75',
+    ratios.Chest.ratio === 1.00 && ratios.Shoulders.ratio === 0.65 && ratios.Biceps.ratio === 0.40 &&
+    ratios.Legs.ratio === 1.45 && ratios.Back.ratio === 1.00 && ratios.Triceps.ratio === 0.75);
+
+  // 2. Multi-exercise group selection & Imbalance detection
+  // Log session with:
+  // - Incline dumbbell press (Chest, mult=0.75): 60 kg x 1 rep -> norm1rm = 80 kg
+  // - Bench press (Chest, mult=1.0): 100 kg x 1 rep -> norm1rm = 100 kg
+  //   => Highest normalized 1RM in Chest should be 100 kg from Bench press
+  // - Barbell row (Back, mult=1.0): 50 kg x 1 rep -> norm1rm = 50 kg
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems = d.querySelectorAll('#lib .libitem');
+  const benchBtn = [...libItems].find(b => b.textContent.includes('Bench press'));
+  const incDbBtn = [...libItems].find(b => b.textContent.includes('Incline dumbbell press'));
+  const rowBtn = [...libItems].find(b => b.textContent.includes('Barbell row'));
+
+  tap(d, benchBtn);
+  tap(d, incDbBtn);
+  tap(d, rowBtn);
+  tap(d, '#addsel');
+
+  // Fill sets:
+  // Bench press (card 0): 100 kg x 1 rep
+  // Incline dumbbell press (card 1): 60 kg x 1 rep
+  // Barbell row (card 2): 50 kg x 1 rep
+  const cards = d.querySelectorAll('#exlist .card');
+  if (cards.length >= 3) {
+    const set0 = cards[0].querySelector('.setrow');
+    if (set0) {
+      const inputs = set0.querySelectorAll('input');
+      if (inputs[0]) { inputs[0].value = '100'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+      if (inputs[1]) { inputs[1].value = '1'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    }
+    const set1 = cards[1].querySelector('.setrow');
+    if (set1) {
+      const inputs = set1.querySelectorAll('input');
+      if (inputs[0]) { inputs[0].value = '60'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+      if (inputs[1]) { inputs[1].value = '1'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    }
+    const set2 = cards[2].querySelector('.setrow');
+    if (set2) {
+      const inputs = set2.querySelectorAll('input');
+      if (inputs[0]) { inputs[0].value = '50'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+      if (inputs[1]) { inputs[1].value = '1'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    }
+  }
+  tap(d, '#finish');
+
+  // Verify multi-exercise group selection in computeMuscularBalance
+  const balance = w.window.computeMuscularBalance();
+  check('Multi-exercise group selection: when a user logs multiple exercises in a group, the highest normalized 1RM is chosen',
+    balance.data.Chest.norm1rm === 100 && balance.data.Chest.exercise === 'Bench press');
+
+  // 3. Progress tab UI verification
+  tap(d, 'nav button[data-tab=progress]');
+  const radarCard = d.querySelector('#radar-card');
+  check('Radar chart rendering: Progress tab renders the Muscular Balance card',
+    !!radarCard && radarCard.textContent.includes('Muscular Balance & Symmetry'));
+
+  const radarSvg = d.querySelector('#radar-chart');
+  check('Radar chart rendering: the SVG radar chart is rendered',
+    !!radarSvg && radarSvg.querySelectorAll('.radar-label').length === 6);
+
+  const radarSummary = d.querySelector('#radar-summary');
+  check('Radar chart rendering: and the symmetry summary is rendered', !!radarSummary);
+
+  // 4. Mode toggle verification (Relative vs Absolute)
+  const relBtn = d.querySelector('#radar-mode-rel');
+  const absBtn = d.querySelector('#radar-mode-abs');
+  check('Default view mode is Relative (% Balance)',
+    relBtn && relBtn.getAttribute('aria-pressed') === 'true' && !!radarSvg.querySelector('.radar-ref-poly'));
+
+  tap(d, absBtn);
+  check('Toggle between Relative and Absolute modes updates the view',
+    d.querySelector('#radar-mode-abs').getAttribute('aria-pressed') === 'true' &&
+    d.querySelector('#radar-mode-rel').getAttribute('aria-pressed') === 'false' &&
+    !!d.querySelector('#radar-chart .radar-target-poly'));
+
+  tap(d, d.querySelector('#radar-mode-rel'));
+  check('Toggling back to Relative mode restores relative view',
+    d.querySelector('#radar-mode-rel').getAttribute('aria-pressed') === 'true' &&
+    d.querySelector('#radar-mode-abs').getAttribute('aria-pressed') === 'false');
+
+  // 5. Imbalance detection (Chest 100 kg vs Back 50 kg -> 50% deficit)
+  const sumText = radarSummary ? radarSummary.textContent : '';
+  check('Imbalance detection: when Chest is strong (100 kg) and Back is lagging (50 kg), the summary flags Back as lagging with correct percentage deficit',
+    sumText.includes('Back') && (sumText.includes('50% deficit') || sumText.includes('50% balance')));
+  check('Imbalance detection: shows Dominant Group (Chest: 100 kg)',
+    sumText.includes('Chest: 100 kg') || sumText.includes('Chest: 100'));
+  check('Imbalance detection: provides actionable hint for Back',
+    sumText.includes('Add more rows or pull-ups to balance horizontal push/pull'));
+
+  // 6. Interactive vertex click
+  const chestLabel = d.querySelector('.radar-label[data-group=Chest]');
+  if (chestLabel) tap(d, chestLabel);
+  const detailText = d.querySelector('#radar-detail')?.textContent || '';
+  check('Interactive vertex inspection: highlights muscle group best exercise and exact stats',
+    detailText.includes('Chest') && detailText.includes('100 kg') && detailText.includes('Bench press') && detailText.includes('100% balanced'));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;

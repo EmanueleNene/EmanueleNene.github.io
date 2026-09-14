@@ -62,7 +62,7 @@ visual inspection missed a dead button twice.
 
 ## After any change to index.html
 
-Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v15`). Installed phones serve the cached copy until the version string changes.
+Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v16`). Installed phones serve the cached copy until the version string changes.
 
 ## Exercise diagrams (`img/exercises/`)
 
@@ -79,3 +79,4 @@ Two-frame vector SVGs (`viewBox="0 0 300 150"`), transparent background:
 - Estimated 1RM uses combined Epley + Brzycki formula (`(epley + brzycki) / 2`, exact weight for 1 rep) with heavy-set prioritization (`r ≤ 5` prioritized over high-rep sets `r > 5`).
 - Calendar weeks start Monday.
 - Timed exercises (`t:1` in `EXERCISES`) label their column `sec`, not `reps`.
+- Muscular balance radar evaluates 6 functional muscle groups (Chest, Shoulders, Biceps, Legs, Back, Triceps) using biomechanical benchmark balance ratios relative to Chest: Bench (1.00), OHP (0.65), Curl (0.40), Squat (1.45), Row/Pull-up (1.00), Close-Grip Bench (0.75). Multi-exercise equivalence table (`EXERCISE_EQUIV`) normalizes any lift in that group to its compound benchmark equivalent, picking the group's highest normalized 1RM across sessions.
