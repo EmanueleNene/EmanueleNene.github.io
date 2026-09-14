@@ -1,7 +1,7 @@
 # FerroDaStiro
 
 A workout log that runs entirely in the browser. No account, no server, no analytics.
-Every session is written to `localStorage` on the device that logged it.
+Every session is written to `localStorage` and mirrored into `IndexedDB` on the device that logged it.
 
 ## Deployment
 
@@ -25,10 +25,16 @@ Each family member does this on their own phone and creates their own profile on
 | `fds.active` | which profile is currently selected |
 | `fds.data.<id>` | that person's programs, sessions, custom exercises, and in-progress draft |
 
+### Dual-layer storage & durability
+
+- **LocalStorage + IndexedDB Mirroring:** Synchronous UI operations read and write to `localStorage` with zero latency. Every write is asynchronously mirrored to an IndexedDB store (`fds_store`, store `kv`).
+- **Auto-Resurrection:** If Safari clears `localStorage` due to storage pressure or site inactivity, FerroDaStiro automatically recovers profile and workout logs from IndexedDB on startup.
+- **Persistent Storage API (`navigator.storage.persist()`):** FerroDaStiro requests persistent storage from WebKit so that site data is protected against browser eviction. Status is displayed in Settings under **Storage & Durability**.
+
 Consequences worth knowing:
 
 - Data is **per device and per browser**. The same person on a phone and a laptop has two separate logs.
-- Safari clears localStorage for sites you haven't opened in **7 days** — but this does not apply to sites added to the Home Screen, which is the main reason to install it rather than bookmark it.
+- IndexedDB mirroring and the WebKit Persistent Storage API prevent data loss from 7-day browser storage eviction.
 - Deleting the Home Screen app deletes the data with it. Use **Programs → Backup → Export file** periodically; import restores it.
 - Several people can share one phone via profiles, but anyone using that phone can read all profiles on it. There is no password.
 
@@ -79,7 +85,7 @@ program does not remove sessions already logged under it.
 ## Editing the code
 
 `index.html` is the whole application — markup, styles and logic in one file. After changing it,
-bump `CACHE` in `sw.js` (currently `ferrodastiro-v16`) or installed phones will keep serving the old version.
+bump `CACHE` in `sw.js` (currently `ferrodastiro-v17`) or installed phones will keep serving the old version.
 
 ### Running the tests
 

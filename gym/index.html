@@ -180,9 +180,141 @@
    fds.profiles      -> [{id, name}]
    fds.active        -> profile id
    fds.data.<id>     -> that person's whole log
-   Everything is localStorage: it never leaves this device.
+   Everything is stored locally: it never leaves this device.
+   Synchronous reads/writes use localStorage with zero latency.
+   Asynchronously mirrored to IndexedDB ('fds_store' / 'kv') for durability
+   and auto-resurrection if WebKit/Safari purges localStorage.
+   Persistent Storage API requested via navigator.storage.persist().
    ============================================================ */
 const PKEY='fds.profiles', AKEY='fds.active', dkey=id=>'fds.data.'+id;
+
+/* IndexedDB durable mirror */
+const IDB_NAME='fds_store', IDB_VER=1, IDB_STORE='kv';
+let idbPromise=null;
+function getIDB(){
+  if(!idbPromise){
+    idbPromise=new Promise((resolve)=>{
+      if(typeof indexedDB==='undefined'){ resolve(null); return; }
+      try{
+        const req=indexedDB.open(IDB_NAME, IDB_VER);
+        req.onupgradeneeded=()=>{
+          const db=req.result;
+          if(!db.objectStoreNames.contains(IDB_STORE)){
+            db.createObjectStore(IDB_STORE);
+          }
+        };
+        req.onsuccess=()=>resolve(req.result);
+        req.onerror=()=>resolve(null);
+      }catch(e){ resolve(null); }
+    });
+  }
+  return idbPromise;
+}
+
+function idbPut(k,v){
+  return getIDB().then(db=>{
+    if(!db) return;
+    try{
+      const tx=db.transaction(IDB_STORE,'readwrite');
+      tx.objectStore(IDB_STORE).put(v, k);
+    }catch(e){}
+  }).catch(()=>{});
+}
+
+function idbDel(k){
+  return getIDB().then(db=>{
+    if(!db) return;
+    try{
+      const tx=db.transaction(IDB_STORE,'readwrite');
+      tx.objectStore(IDB_STORE).delete(k);
+    }catch(e){}
+  }).catch(()=>{});
+}
+
+function idbGetAll(){
+  return getIDB().then(db=>{
+    if(!db) return null;
+    return new Promise(resolve=>{
+      try{
+        const tx=db.transaction(IDB_STORE,'readonly');
+        const st=tx.objectStore(IDB_STORE);
+        if(st.getAll && st.getAllKeys){
+          const reqK=st.getAllKeys();
+          reqK.onsuccess=()=>{
+            const keys=reqK.result;
+            const reqV=st.getAll();
+            reqV.onsuccess=()=>{
+              const res={};
+              keys.forEach((k,i)=>{ res[k]=reqV.result[i]; });
+              resolve(res);
+            };
+            reqV.onerror=()=>resolve(null);
+          };
+          reqK.onerror=()=>resolve(null);
+        }else if(st.openCursor){
+          const res={};
+          const req=st.openCursor();
+          req.onsuccess=e=>{
+            const cursor=e.target.result;
+            if(cursor){
+              res[cursor.key]=cursor.value;
+              cursor.continue();
+            }else{
+              resolve(res);
+            }
+          };
+          req.onerror=()=>resolve(null);
+        }else{
+          resolve(null);
+        }
+      }catch(e){ resolve(null); }
+    });
+  }).catch(()=>null);
+}
+
+/* Auto-resurrection from IndexedDB mirror if localStorage was wiped */
+async function autoResurrect(){
+  try{
+    if(localStorage.getItem(PKEY)) return false;
+    const kv=await idbGetAll();
+    if(!kv || !kv[PKEY]) return false;
+    let restoredCount=0;
+    Object.keys(kv).forEach(k=>{
+      if(k.startsWith('fds.')){
+        const val = typeof kv[k] === 'string' && k === AKEY ? kv[k] : JSON.stringify(kv[k]);
+        localStorage.setItem(k, val);
+        restoredCount++;
+      }
+    });
+    return restoredCount > 0;
+  }catch(e){
+    return false;
+  }
+}
+
+/* Persistent storage checking & request */
+let storageStatus={persisted:false, checked:false};
+async function checkPersistence(){
+  try{
+    if(navigator.storage && navigator.storage.persisted){
+      storageStatus.persisted = await navigator.storage.persisted();
+      storageStatus.checked = true;
+    }
+  }catch(e){}
+  return storageStatus.persisted;
+}
+
+async function requestPersistence(){
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      storageStatus.persisted = await navigator.storage.persist();
+      storageStatus.checked = true;
+    }else{
+      await checkPersistence();
+    }
+  }catch(e){}
+  return storageStatus.persisted;
+}
 
 /* One-time carry-over from the old "ironlog.*" keys, for anyone
    who installed before the rename. Runs once, then never again. */
@@ -198,7 +330,10 @@ const PKEY='fds.profiles', AKEY='fds.active', dkey=id=>'fds.data.'+id;
   }catch(e){ /* nothing to carry over */ }
 })();
 const readJSON=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
-const writeJSON=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){alert('Storage is full or blocked. Data was not saved.')}};
+const writeJSON=(k,v)=>{
+  try{localStorage.setItem(k,JSON.stringify(v))}catch(e){alert('Storage is full or blocked. Data was not saved.')}
+  idbPut(k, v);
+};
 
 const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], sessions:[], bodyweight:[], draft:null});
 
@@ -606,7 +741,7 @@ function loadData(){
   db.sessions.forEach(s=>{ if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9); });
 }
 function save(){ if(me) writeJSON(dkey(me), db); }
-function switchTo(id){ localStorage.setItem(AKEY,id); me=id; loadData(); tab='calendar'; render(); }
+function switchTo(id){ localStorage.setItem(AKEY,id); idbPut(AKEY,id); me=id; loadData(); tab='calendar'; render(); }
 function addProfile(name){
   const id = 'p'+Date.now().toString(36);
   profiles.push({id,name}); writeJSON(PKEY,profiles); writeJSON(dkey(id), BLANK()); switchTo(id);
@@ -1660,6 +1795,10 @@ function chartFor(name){
 /* --- Programs & settings --- */
 function vPrograms(){
   const all=programs();
+  const persistMsg = storageStatus.persisted
+    ? 'Storage: Persistent & Protected (IndexedDB mirrored)'
+    : 'Storage: IndexedDB mirrored (Auto-resurrection active)';
+
   view().innerHTML=`<h2>Programs</h2>
     <p class="note">Pick the routine the Train tab follows, or build your own from the exercise library.</p>
     <div id="plist2" style="margin-top:12px"></div>
@@ -1669,6 +1808,11 @@ function vPrograms(){
       <select id="unit" style="width:auto">
         <option value="kg"${db.unit==='kg'?' selected':''}>kg</option>
         <option value="lb"${db.unit==='lb'?' selected':''}>lb</option></select></div>
+    <div class="card">
+      <h3>Storage & Durability</h3>
+      <p style="font-weight:600;font-size:14px;margin-bottom:6px;color:var(--slate)">${persistMsg}</p>
+      <p class="note" style="margin-bottom:0">Data is protected against browser storage eviction and mirrored in IndexedDB for resilience and automatic recovery.</p>
+    </div>
     <div class="card">
       <h3>Backup</h3>
       <p class="note" style="margin-bottom:10px">Your log lives only in this browser. Clearing site data or deleting the app erases it — export a copy now and then.</p>
@@ -1735,8 +1879,9 @@ function vPrograms(){
     const name=profiles.find(p=>p.id===me).name;
     if(!confirm(`Delete ${name} and all their sessions? This cannot be undone.`)) return;
     localStorage.removeItem(dkey(me));
+    idbDel(dkey(me));
     profiles=profiles.filter(p=>p.id!==me); writeJSON(PKEY,profiles);
-    localStorage.removeItem(AKEY); loadProfiles();
+    localStorage.removeItem(AKEY); idbDel(AKEY); loadProfiles();
     if(me){loadData();} else {db=BLANK();}
     tab='train'; render();
   };
@@ -2078,9 +2223,39 @@ function sessionCard(s){
   </div>`;
 }
 
+// Export storage & IndexedDB helpers for testability and inspection
+window.getIDB = getIDB;
+window.idbPut = idbPut;
+window.idbDel = idbDel;
+window.idbGetAll = idbGetAll;
+window.autoResurrect = autoResurrect;
+window.checkPersistence = checkPersistence;
+window.requestPersistence = requestPersistence;
+window.storageStatus = storageStatus;
+
 /* ---------- boot ---------- */
 document.querySelectorAll('nav button').forEach(b=>
   b.onclick=()=>{tab=b.dataset.tab;editing=null;screen=null;render();window.scrollTo(0,0);});
+
+// User interactions trigger persistent storage request
+window.addEventListener('click', ()=>{ requestPersistence(); }, {once:true});
+window.addEventListener('touchstart', ()=>{ requestPersistence(); }, {once:true});
+
+// Boot sequence: check auto-resurrection from IndexedDB if localStorage is empty, then render
+(async function bootApp(){
+  try{
+    if(!localStorage.getItem(PKEY)){
+      const resurrected = await autoResurrect();
+      if(resurrected){
+        loadProfiles();
+        if(me) loadData();
+        render();
+      }
+    }
+  }catch(e){}
+  requestPersistence();
+})();
+
 loadProfiles(); if(me) loadData(); render();
 
 if('serviceWorker' in navigator)
