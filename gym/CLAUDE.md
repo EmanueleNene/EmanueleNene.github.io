@@ -62,7 +62,7 @@ visual inspection missed a dead button twice.
 
 ## After any change to index.html
 
-Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v14`). Installed phones serve the cached copy until the version string changes.
+Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v15`). Installed phones serve the cached copy until the version string changes.
 
 ## Exercise diagrams (`img/exercises/`)
 
@@ -76,6 +76,6 @@ Two-frame vector SVGs (`viewBox="0 0 300 150"`), transparent background:
 
 - Weights are remembered **per set position**, so a 60/70/80 ramp returns as 60/70/80.
 - Changing an exercise's target reps only rewrites sets **not yet logged**, keeping history honest.
-- Estimated 1RM uses Epley (`w × (1 + r/30)`), accurate to roughly ±5% under ~10 reps.
+- Estimated 1RM uses combined Epley + Brzycki formula (`(epley + brzycki) / 2`, exact weight for 1 rep) with heavy-set prioritization (`r ≤ 5` prioritized over high-rep sets `r > 5`).
 - Calendar weeks start Monday.
 - Timed exercises (`t:1` in `EXERCISES`) label their column `sec`, not `reps`.

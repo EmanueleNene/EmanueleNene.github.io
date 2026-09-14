@@ -553,7 +553,15 @@ function addProfile(name){
 const programs = () => Object.assign({}, BUILTIN, db.custom);
 const prog = () => programs()[db.programId] || BUILTIN.ul;
 const fmtDate = d => new Date(d).toLocaleDateString(undefined,{day:'numeric',month:'short'});
-const e1rm = (w,r) => w*(1+r/30);
+const e1rm = (w, r) => {
+  w = +w || 0;
+  r = +r || 0;
+  if (w <= 0 || r <= 0) return 0;
+  if (r === 1) return w;
+  const epley = w * (1 + r / 30);
+  const brzycki = r < 36 ? w * (36 / (37 - r)) : epley;
+  return (epley + brzycki) / 2;
+};
 const view = () => document.getElementById('view');
 
 /* ---------- rest timer ---------- */
@@ -1172,9 +1180,14 @@ function vProgress(){
 function chartFor(name){
   const pts=db.sessions.slice().reverse().flatMap(s=>{
     const ex=(s.ex||[]).find(e=>e.name===name); if(!ex || !ex.sets || !ex.sets.length) return [];
-    const best=Math.max(...ex.sets.map(x=>e1rm(+x.w||0,+x.r||0)));
+    const validSets=ex.sets.filter(x=> (+x.w||0) > 0 && (+x.r||0) > 0);
+    if(!validSets.length) return [];
+    const heavySets=validSets.filter(x=> (+x.r||0) <= 5);
+    const targetSets=heavySets.length ? heavySets : validSets;
+    const best=Math.max(...targetSets.map(x=>e1rm(+x.w||0,+x.r||0)));
+    const isHeavyPeak=heavySets.length > 0;
     const vol=ex.sets.reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0);
-    return [{d:s.date,v:best,vol}];
+    return [{d:s.date,v:best,vol,isHeavyPeak}];
   });
   const box=document.getElementById('chart');
   if(!box) return;
@@ -1184,12 +1197,14 @@ function chartFor(name){
     return;
   }
 
+  const noteHTML = `<p class="note">Estimated 1RM: Epley & Brzycki average with heavy-set priority (sets ≤5 reps prioritized over higher reps), best set of each session, in ${hesc(db.unit)}.</p>`;
+
   if(pts.length===1){
     const p=pts[0];
     box.innerHTML=`<div class="card">
       <div class="exhead"><h3>Estimated 1-rep max</h3><em>1 session logged</em></div>
       <div class="stat" style="margin:8px 0 10px">
-        <div><b>${Math.round(p.v)} ${hesc(db.unit)}</b><span>Best Epley 1RM</span></div>
+        <div><b>${Math.round(p.v)} ${hesc(db.unit)}</b><span>Best 1RM (Epley + Brzycki)</span></div>
       </div>
       <p class="note">Trend line will appear once you log a second session with this exercise.</p>
     </div>
@@ -1201,6 +1216,8 @@ function chartFor(name){
     return;
   }
 
+  const overallPeak = pts.reduce((max, p) => p.v > max.v ? p : max, pts[0]);
+
   const W=560,H=210,P={l:38,r:12,t:14,b:26};
   const vs=pts.map(p=>p.v), lo=Math.min(...vs)*0.94, hi=Math.max(...vs)*1.04||1;
   const x=i=>P.l+i*(W-P.l-P.r)/(pts.length-1);
@@ -1210,6 +1227,9 @@ function chartFor(name){
   box.innerHTML=`<div class="card">
       <div class="exhead"><h3>Estimated 1-rep max</h3>
         <em style="color:${gain>=0?'var(--slate)':'var(--steel)'}">${gain>=0?'+':''}${gain.toFixed(1)}% overall</em></div>
+      <div class="stat" style="margin:8px 0 10px">
+        <div><b>${Math.round(overallPeak.v)} ${hesc(db.unit)}</b><span>Peak 1RM (${overallPeak.isHeavyPeak ? '≤5 reps' : '>5 reps'})</span></div>
+      </div>
       <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Estimated one-rep max over time">
         ${[lo,(lo+hi)/2,hi].map(t=>`<line class="grid" x1="${P.l}" x2="${W-P.r}" y1="${y(t)}" y2="${y(t)}"/>
           <text x="4" y="${y(t)+4}">${Math.round(t)}</text>`).join('')}
@@ -1218,7 +1238,7 @@ function chartFor(name){
         <text x="${P.l}" y="${H-6}">${fmtDate(pts[0].d)}</text>
         <text x="${W-P.r}" y="${H-6}" text-anchor="end">${fmtDate(pts.at(-1).d)}</text>
       </svg>
-      <p class="note">Epley estimate: weight × (1 + reps ÷ 30), best set of each session, in ${hesc(db.unit)}.</p>
+      ${noteHTML}
     </div>
     <div class="card"><h3 style="margin-bottom:8px">Session volume</h3>
       ${pts.slice().reverse().slice(0,6).map(p=>`<div class="histline">

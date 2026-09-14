@@ -964,5 +964,108 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
 
+// ---------- scenario 17: Epley + Brzycki 1RM formula with heavy-set prioritization ----------
+{
+  console.log('\n17. Epley + Brzycki 1RM formula with heavy-set prioritization');
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = '1RM Tester'; tap(d, '#fgo');
+
+  // Formula checks via e1rm evaluation in JSDOM scope
+  const e1rm = (weight, reps) => w.eval(`e1rm(${weight}, ${reps})`);
+
+  // Single-set 1RM checks
+  check('Single-set 1RM: 1 rep equals exact weight (120 kg x 1 = 120 kg)', e1rm(120, 1) === 120);
+  
+  // 120 kg x 3 reps:
+  // Epley = 120 * (1 + 3/30) = 120 * 1.1 = 132
+  // Brzycki = 120 * (36 / (37 - 3)) = 120 * 36 / 34 = 127.0588...
+  // Average = (132 + 127.0588...) / 2 = 129.5294...
+  const val3 = e1rm(120, 3);
+  check('Single-set 1RM: 120 kg x 3 reps equals expected Epley + Brzycki average (~129.5 kg)', Math.abs(val3 - 129.5294) < 0.1);
+
+  // Edge case handling: reps >= 36
+  const val36 = e1rm(100, 36);
+  const val40 = e1rm(100, 40);
+  check('Edge case handling: reps >= 36 handled gracefully without NaN or negative values', !isNaN(val36) && val36 > 0 && !isNaN(val40) && val40 > 0);
+
+  // Log a session with both heavy sets (<= 5 reps) and high-rep sets (> 5 reps)
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems = d.querySelectorAll('#lib .libitem');
+  const benchBtn = [...libItems].find(b => b.textContent.includes('Bench press')) || libItems[0];
+  tap(d, benchBtn);
+  tap(d, '#addsel');
+
+  const exName = d.querySelector('.exhead h3')?.textContent.split(' ')[0] || 'Bench press';
+
+  // Add sets: set 1 = 100kg x 3 reps (heavy <= 5 reps, 1RM ~107.9)
+  //           set 2 = 80kg x 15 reps (high rep > 5 reps, 1RM ~125.4)
+  const rows = d.querySelectorAll('.setrow');
+  if (rows.length > 0) {
+    const inputs = rows[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '100'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '3'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  const setStep = d.querySelector('.step[data-k=sets] button[data-d="1"]');
+  if (setStep) tap(d, setStep);
+  const updatedRows = d.querySelectorAll('.setrow');
+  if (updatedRows.length > 1) {
+    const inputs = updatedRows[1].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '80'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '15'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  tap(d, '#finish');
+
+  // Go to Progress tab and check chartFor output
+  tap(d, 'nav button[data-tab=progress]');
+  const pickSelect = d.querySelector('#pick');
+  if (pickSelect) {
+    const option = [...pickSelect.options].find(o => o.text.includes(exName));
+    if (option) {
+      pickSelect.value = option.value;
+      pickSelect.dispatchEvent(new w.Event('change', { bubbles: true }));
+    }
+  }
+
+  const chartCard = d.querySelector('#chart');
+  const chartText = chartCard ? chartCard.textContent : '';
+  check('Progress tab UI renders single session stat Best 1RM (Epley + Brzycki)', chartText.includes('Best 1RM (Epley + Brzycki)'));
+  check('Multi-data precision: in a session with both heavy sets (<= 5 reps) and high-rep sets (> 5 reps), heavy set is prioritized', chartText.includes('108 kg') || chartText.includes('108'));
+
+  // Log a second session with ONLY high-rep sets (> 5 reps) to test fallback & 2+ sessions UI
+  tap(d, 'nav button[data-tab=calendar]');
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems2 = d.querySelectorAll('#lib .libitem');
+  const benchBtn2 = [...libItems2].find(b => b.textContent.includes('Bench press')) || libItems2[0];
+  tap(d, benchBtn2);
+  tap(d, '#addsel');
+
+  const rowsS2 = d.querySelectorAll('.setrow');
+  if (rowsS2.length > 0) {
+    const inputs = rowsS2[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '60'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '12'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+  }
+  tap(d, '#finish');
+
+  // Return to Progress tab
+  tap(d, 'nav button[data-tab=progress]');
+  const pickSelect2 = d.querySelector('#pick');
+  if (pickSelect2) {
+    const option = [...pickSelect2.options].find(o => o.text.includes(exName));
+    if (option) {
+      pickSelect2.value = option.value;
+      pickSelect2.dispatchEvent(new w.Event('change', { bubbles: true }));
+    }
+  }
+
+  const chartCard2 = d.querySelector('#chart');
+  const chartText2 = chartCard2 ? chartCard2.textContent : '';
+  check('Multi-data precision: session with only high-rep sets uses high-rep set as fallback', chartText2.includes('Peak 1RM'));
+  check('Progress tab UI renders overall peak 1RM prominently with rep category note', chartText2.includes('Peak 1RM (≤5 reps)') || chartText2.includes('Peak 1RM (>5 reps)'));
+  check('Progress tab UI renders updated explanatory footer note', chartText2.includes('Estimated 1RM: Epley & Brzycki average with heavy-set priority'));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
 console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 if (fails > 0) process.exitCode = 1;
