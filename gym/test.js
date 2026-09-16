@@ -1357,6 +1357,43 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 
+  // ---------- scenario 20: hyperextension exercises catalog & diagram tests ----------
+  console.log('\n20. Hyperextension exercises catalog & diagram tests');
+  const all = w2.EXERCISES ? w2.EXERCISES : []; // or via JSDOM window
+  const allExList = typeof w2.allExercises === 'function' ? w2.allExercises() : (w2.eval('allExercises()'));
+  const exBack = allExList.find(e => e.n === 'Hyperextension (back)');
+  check('Hyperextension (back) is present in allExercises()', !!exBack);
+  if (exBack) {
+    check('Hyperextension (back) belongs to group Back', exBack.g === 'Back');
+    check('Hyperextension (back) defaults to 3 sets and 15 reps', exBack.s === 3 && exBack.r === 15);
+    check('Hyperextension (back) resolves to slug hyperextension-back', w2.eval("exSlug('Hyperextension (back)')") === 'hyperextension-back');
+  }
+
+  const exThighs = allExList.find(e => e.n === 'Hyperextensions (thighs)');
+  check('Hyperextensions (thighs) is present in allExercises()', !!exThighs);
+  if (exThighs) {
+    check('Hyperextensions (thighs) belongs to group Legs', exThighs.g === 'Legs');
+    check('Hyperextensions (thighs) defaults to 3 sets and 15 reps', exThighs.s === 3 && exThighs.r === 15);
+    check('Hyperextensions (thighs) resolves to slug hyperextensions-thighs', w2.eval("exSlug('Hyperextensions (thighs)')") === 'hyperextensions-thighs');
+  }
+
+  ['hyperextension-back.svg', 'hyperextensions-thighs.svg'].forEach(filename => {
+    const filePath = path.join(__dirname, 'img', 'exercises', filename);
+    const exists = fs.existsSync(filePath);
+    check(`${filename} exists in gym/img/exercises/`, exists);
+    if (exists) {
+      const svgContent = fs.readFileSync(filePath, 'utf8');
+      try {
+        const dom = new JSDOM(svgContent, { contentType: 'image/svg+xml' });
+        const doc = dom.window.document;
+        const parseError = doc.querySelector('parsererror');
+        check(`${filename} parses cleanly as valid XML`, !parseError);
+      } catch (err) {
+        check(`${filename} parses cleanly as valid XML`, false);
+      }
+    }
+  });
+
   console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   if (fails > 0) process.exitCode = 1;
 })();
