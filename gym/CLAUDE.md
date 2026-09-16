@@ -6,9 +6,7 @@ Safari → Add to Home Screen. Used by one family; each person has a profile on 
 
 ## Hard constraints
 
-- **One file.** All markup, CSS and JavaScript live in `index.html`. Do not split it into
-  modules, add a bundler, or introduce a framework. It has to be openable and editable as
-  one file, and served as a static asset.
+- **No build step or bundler.** Markup and main logic live in `index.html`, with the exercise catalog in `exercises.js`. Do not add a bundler or framework. Assets must be directly openable and served statically.
 - **No dependencies.** No npm packages in the app itself, no CDN scripts, no fonts fetched
   from Google. `jsdom` is a dev dependency for tests only.
 - **No `<dialog>`.** It was removed after failing in an embedded webview. Full-screen views
@@ -60,12 +58,12 @@ node gym/test.js
 # or: cd gym && npm install jsdom && node test.js
 ```
 
-Checks across 19 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
+Checks across 21 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
 visual inspection missed a dead button twice.
 
-## After any change to index.html
+## After any change to index.html or exercises.js
 
-Bump `CACHE` in `sw.js` (e.g. `ferrodastiro-v17`). Installed phones serve the cached copy until the version string changes.
+Bump `CACHE` in `sw.js`. Installed phones serve the cached copy until the version string changes.
 
 ## Exercise diagrams (`img/exercises/`)
 

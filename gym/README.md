@@ -84,8 +84,7 @@ program does not remove sessions already logged under it.
 
 ## Editing the code
 
-`index.html` is the whole application — markup, styles and logic in one file. After changing it,
-bump `CACHE` in `sw.js` (currently `ferrodastiro-v17`) or installed phones will keep serving the old version.
+`index.html` contains the markup, styles, and core application logic, while the exercise catalog and equivalence helpers live in `exercises.js`. After changing application code, bump `CACHE` in `sw.js` or installed phones will keep serving the old version.
 
 ### Running the tests
 

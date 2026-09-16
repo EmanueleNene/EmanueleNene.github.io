@@ -1,8 +1,9 @@
 /* Bump CACHE whenever you edit index.html, otherwise phones keep the old copy. */
-const CACHE = 'ferrodastiro-v18';
+const CACHE = 'ferrodastiro-v19';
 const ASSETS = [
   './',
   'index.html',
+  'exercises.js',
   'manifest.webmanifest',
   'icon-192.png',
   'icon-512.png',
