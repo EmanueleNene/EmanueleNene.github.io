@@ -92,6 +92,17 @@
     border-color: rgba(140, 179, 137, 0.3);
 }
 
+[data-theme="dark"] .navbar .logo,
+[data-theme="dark"] .nav-links a,
+[data-theme="dark"] .hamburger {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .nav-links a:hover,
+[data-theme="dark"] .nav-links a.active {
+    color: #ffffff;
+}
+
 /* Reset & Base */
 * {
     margin: 0;
@@ -184,11 +195,15 @@ h3 {
     position: relative;
     display: inline-grid;
     vertical-align: baseline;
+    background: none;
+    -webkit-text-fill-color: initial;
 }
 
 .text-morph-anchor {
     visibility: hidden;
     grid-area: 1 / 1;
+    pointer-events: none;
+    user-select: none;
 }
 
 .text-morph-word {

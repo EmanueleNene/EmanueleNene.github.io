@@ -254,7 +254,7 @@ function initTextMorph() {
     const longest = words.reduce((a, b) => (b.length > a.length ? b : a), '');
 
     el.innerHTML =
-        `<span class="text-morph-anchor">${longest}</span>` +
+        `<span class="text-morph-anchor" aria-hidden="true">${longest}</span>` +
         words.map((word, i) => {
             const delay = (slot * i).toFixed(3);
             return `<span class="text-morph-word" style="animation: heroTextMorph ${cycle}s ${delay}s infinite ease-in-out;">${word}</span>`;
