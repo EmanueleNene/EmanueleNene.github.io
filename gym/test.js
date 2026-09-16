@@ -1396,8 +1396,6 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     }
   });
 
-  console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
-
   // ---------- scenario 21: modular exercises.js catalog, require/eval & offline cache ----------
   console.log('\n21. Exercise catalog modularity & offline caching');
   const exModulePath = path.join(__dirname, 'exercises.js');
@@ -1414,6 +1412,8 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
   check("sw.js cache version bumped to ferrodastiro-v19", swContent.includes("ferrodastiro-v19"));
+
+  console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
   if (fails > 0) process.exitCode = 1;
 })();
