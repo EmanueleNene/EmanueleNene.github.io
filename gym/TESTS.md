@@ -8,13 +8,13 @@ The test suite for FerroDaStiro lives in `test.js` and runs in Node.js via `jsdo
 NODE_PATH=/home/emanuele/n8n-local/node_modules node gym/test.js
 ```
 
-The entire suite of 14 scenarios and ~130 assertions executes in under 4 seconds with zero external test runners or browser binaries required.
+The entire suite of 21 scenarios and ~130 assertions executes in under 4 seconds with zero external test runners or browser binaries required.
 
 ---
 
 ## Architecture
 
-* **Engine:** Pure Node.js + `jsdom`. Reads `index.html` directly, evaluates scripts in a virtual DOM context (`runScripts: 'dangerously'`).
+* **Engine:** Pure Node.js + `jsdom`. Evaluates `exercises.js` and reads `index.html` directly in a virtual DOM context (`runScripts: 'dangerously'`).
 * **Isolation (`boot()`):** Each scenario calls `boot()`, which instantiates a fresh DOM window with isolated `localStorage`, mocked `alert` / `confirm` / `scrollTo`, and captures all runtime errors.
 * **Realistic Event Simulation (`tap()`):** Dispatches native DOM events (`MouseEvent('click')`, `Event('input')`) to test real user interactions rather than calling internal functions directly.
 * **Assertions (`check()`):** Minimalist assertion runner that tracks passing and failing checks with diagnostic logs.
