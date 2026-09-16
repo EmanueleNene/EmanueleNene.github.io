@@ -106,6 +106,8 @@ function boot(options = {}) {
     pretendToBeVisual: true,
     url: 'https://x.test/',
     beforeParse(window) {
+      const exercisesJs = fs.readFileSync(path.join(__dirname, 'exercises.js'), 'utf8');
+      window.eval(exercisesJs);
       if (options.mockIdb) {
         window.indexedDB = options.mockIdb;
       }
@@ -1395,5 +1397,23 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   });
 
   console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
+
+  // ---------- scenario 21: modular exercises.js catalog, require/eval & offline cache ----------
+  console.log('\n21. Exercise catalog modularity & offline caching');
+  const exModulePath = path.join(__dirname, 'exercises.js');
+  const exExists = fs.existsSync(exModulePath);
+  check('gym/exercises.js exists and can be required/evaluated', exExists);
+  if (exExists) {
+    const exModule = require(exModulePath);
+    check('EXERCISES array in exercises.js contains expected exercises',
+      Array.isArray(exModule.EXERCISES) &&
+      exModule.EXERCISES.some(e => e.n === 'Hyperextension (back)') &&
+      exModule.EXERCISES.some(e => e.n === 'Hyperextensions (thighs)'));
+    check('GROUPS array in exercises.js is present', Array.isArray(exModule.GROUPS) && exModule.GROUPS.includes('Chest'));
+  }
+  const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
+  check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
+  check("sw.js cache version bumped to ferrodastiro-v19", swContent.includes("ferrodastiro-v19"));
+
   if (fails > 0) process.exitCode = 1;
 })();
