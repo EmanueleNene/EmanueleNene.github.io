@@ -340,7 +340,7 @@ const writeJSON=(k,v)=>{
   idbPut(k, v);
 };
 
-const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], sessions:[], bodyweight:[], draft:null});
+const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], exEdits:{}, sessions:[], bodyweight:[], draft:null});
 
 const BUILTIN = {
   ul:{name:'Upper / Lower', note:'4 days · balanced strength', days:[
@@ -361,12 +361,19 @@ const BUILTIN = {
     {name:'Day 3', ex:[['Front squat',3,8],['Incline dumbbell press',3,10],['Cable row',3,10],['Lateral raise',3,15]]}]}
 };
 
-const exMeta = name => EXERCISES.find(e=>e.n===name) || (db.customEx||[]).find(e=>e.n===name) || null;
-const isTimed = name => !!exMeta(name)?.t;
-const allExercises = () => [...EXERCISES, ...(db.customEx||[])];
+const allExercises = () => [
+  ...EXERCISES.map(e => (db && db.exEdits && db.exEdits[e.n]) ? { ...e, ...db.exEdits[e.n] } : { ...e }),
+  ...(db && db.customEx ? db.customEx : [])
+];
+const exMeta = name => allExercises().find(e=>e.n===name) || null;
+const isTimed = name => {
+  const m = getExMeasurement(name);
+  return m === 'sec' || m === 'min';
+};
 function hesc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 window.exMeta = exMeta;
 window.isTimed = isTimed;
+window.allExercises = allExercises;
 
 const dayKey = d => { const x=new Date(d);
   return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
@@ -507,7 +514,7 @@ function renderVolumeChart(buckets,metric){
 }
 
 function renderMuscleBreakdown(buckets){
-  const STANDARD_GROUPS=['Chest','Back','Legs','Shoulders','Biceps','Triceps','Core','Conditioning'];
+  const STANDARD_GROUPS=['Chest','Back','Legs','Shoulders','Biceps','Triceps','Core','Conditioning','Cardio'];
   const groupStats={};
   STANDARD_GROUPS.forEach(g=>{ groupStats[g]={sets:0,reps:0,weightVol:0}; });
 
@@ -928,12 +935,12 @@ function drawDraft(){
         </div>
         <div class="step" data-k="reps">
           <button data-d="-1" ${ex.target<=1?'disabled':''} aria-label="One rep fewer">−</button>
-          <span>${ex.target} ${isTimed(ex.name)?'sec':'reps'}</span>
+          <span>${ex.target} ${getExMeasurement(ex.name)}</span>
           <button data-d="1" ${ex.target>=50?'disabled':''} aria-label="One rep more">+</button>
         </div>
         <button class="mini dropex" aria-label="Remove ${ex.name} from this session">Drop</button>
       </div>
-      <div class="units"><div></div><div>${db.unit}</div><div>${isTimed(ex.name)?'sec':'reps'}</div><div></div></div>
+      <div class="units"><div></div><div>${db.unit}</div><div>${getExMeasurement(ex.name)}</div><div></div></div>
       <div class="sets"></div>`;
 
     const handle=card.querySelector('.drag-handle');
@@ -1245,10 +1252,12 @@ function computeMuscularBalance(sessions = db.sessions){
     let bestExName = null;
 
     for(const name of exNamesInGroup){
+      const coeff = getExCoeff(name);
+      if(!coeff || coeff <= 0) continue;
+
       const raw1rm = getExercisePeak1RM(name, sessions);
       if(raw1rm > 0){
-        const mult = EXERCISE_EQUIV[name] || 1.0;
-        const norm = raw1rm / mult;
+        const norm = raw1rm / coeff;
         if(norm > bestNorm1rm){
           bestNorm1rm = norm;
           bestRaw1rm = raw1rm;
@@ -1914,11 +1923,14 @@ function vEditor(){
     day.ex.forEach((e,ei)=>{
       const [name,sets,reps]=e;
       const row=document.createElement('div'); row.className='exline';
+      const mUnit=getExMeasurement(name);
+      const unitLabel=mUnit==='min'?'Minutes':(mUnit==='sec'?'Seconds':'Reps');
+      const unitAbbr=mUnit==='min'?'min':(mUnit==='sec'?'s':'reps');
       row.innerHTML=`<span class="nm">${name}</span>
         <input type="number" min="1" max="12" value="${sets}" aria-label="Sets">
         <span class="x">×</span>
-        <input type="number" min="1" max="600" value="${reps}" aria-label="${isTimed(name)?'Seconds':'Reps'}">
-        <span class="x">${isTimed(name)?'s':'reps'}</span>
+        <input type="number" min="1" max="600" value="${reps}" aria-label="${unitLabel}">
+        <span class="x">${unitAbbr}</span>
         <button class="mini up" aria-label="Move up" ${ei===0?'disabled':''}>↑</button>
         <button class="mini rm" aria-label="Remove exercise">×</button>`;
       const [sIn,rIn]=row.querySelectorAll('input');
@@ -1964,10 +1976,13 @@ function openLibrary(onAdd, extra){
 
 function sLibrary(){
   const st=screen;
-  // If creating mode, show creation form inline
-  if(st.creating){
+  // If creating or editing mode, show exercise form inline
+  if(st.creating || st.editingEx){
+    const isEdit = !!st.editingEx;
+    const isCustom = isEdit && !!(db.customEx||[]).find(c=>c.n===st.editingEx);
+    const mType = st.cxm || 'reps';
     view().innerHTML=`
-      <h2>New exercise</h2>
+      <h2>${isEdit ? 'Edit exercise' : 'New exercise'}</h2>
       <div class="card" style="margin-top:10px">
         <div style="margin-bottom:12px">
           <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">Exercise name</label>
@@ -1981,8 +1996,9 @@ function sLibrary(){
         <div style="margin-bottom:12px">
           <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px">Measurement</label>
           <div style="display:flex;gap:8px">
-            <button id="cxreps" class="${(st.cxt||0)?'ghost':'rust'}" style="flex:1">Reps</button>
-            <button id="cxsecs" class="${(st.cxt||0)?'rust':'ghost'}" style="flex:1">Seconds</button>
+            <button id="cxreps" class="${mType==='reps'?'rust':'ghost'}" style="flex:1">Reps</button>
+            <button id="cxsecs" class="${mType==='sec'?'rust':'ghost'}" style="flex:1">Seconds</button>
+            <button id="cxmin" class="${mType==='min'?'rust':'ghost'}" style="flex:1">Minutes</button>
           </div>
         </div>
         <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px">
@@ -1991,13 +2007,14 @@ function sLibrary(){
             <input id="cxsets" type="number" inputmode="numeric" min="1" max="12" value="${st.cxsets||3}">
           </div>
           <div style="flex:1">
-            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">${(st.cxt||0)?'Seconds':'Reps'}</label>
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">${mType==='min'?'Minutes':(mType==='sec'?'Seconds':'Reps')}</label>
             <input id="cxrepsv" type="number" inputmode="numeric" min="1" max="600" value="${st.cxrepsv||10}">
           </div>
         </div>
-        <div class="row">
-          <button class="rust grow" id="cxsave">Create exercise</button>
+        <div class="row" style="gap:8px">
+          <button class="rust grow" id="cxsave">${isEdit ? 'Save exercise' : 'Create exercise'}</button>
           <button class="ghost" id="cxcancel">Cancel</button>
+          ${isCustom ? '<button class="danger" id="cxdel">Delete exercise</button>' : ''}
         </div>
       </div>`;
 
@@ -2012,20 +2029,98 @@ function sLibrary(){
     document.getElementById('cxname').oninput=e=>{ st.cxname=e.target.value; };
     document.getElementById('cxsets').oninput=e=>{ st.cxsets=Math.min(12,Math.max(1,+e.target.value||1)); };
     document.getElementById('cxrepsv').oninput=e=>{ st.cxrepsv=Math.min(600,Math.max(1,+e.target.value||1)); };
-    document.getElementById('cxreps').onclick=()=>{ st.cxt=0; sLibrary(); };
-    document.getElementById('cxsecs').onclick=()=>{ st.cxt=1; sLibrary(); };
-    document.getElementById('cxcancel').onclick=()=>{ st.creating=false; sLibrary(); };
+    document.getElementById('cxreps').onclick=()=>{ st.cxm='reps'; sLibrary(); };
+    document.getElementById('cxsecs').onclick=()=>{ st.cxm='sec'; sLibrary(); };
+    document.getElementById('cxmin').onclick=()=>{ st.cxm='min'; sLibrary(); };
+    document.getElementById('cxcancel').onclick=()=>{ st.creating=false; st.editingEx=null; sLibrary(); };
+
+    const delBtn = document.getElementById('cxdel');
+    if (delBtn) {
+      delBtn.onclick = () => {
+        const oldName = st.editingEx;
+        db.customEx = (db.customEx || []).filter(c => c.n !== oldName);
+        save();
+        st.editingEx = null;
+        st.creating = false;
+        sLibrary();
+      };
+    }
+
     document.getElementById('cxsave').onclick=()=>{
       const name=(st.cxname||'').trim();
       if(!name){ alert('Please enter an exercise name.'); document.getElementById('cxname').focus(); return; }
-      if(allExercises().some(e=>e.n.toLowerCase()===name.toLowerCase())){
-        alert('An exercise with that name already exists.'); document.getElementById('cxname').focus(); return; }
-      const ex={n:name, g:st.cxgroup||GROUPS[0], s:+(st.cxsets||3), r:+(st.cxrepsv||10)};
-      if(st.cxt) ex.t=1;
-      db.customEx = db.customEx||[];
-      db.customEx.push(ex);
+
+      const oldName = st.editingEx;
+      const isEditEx = !!oldName;
+
+      if(!isEditEx || oldName.toLowerCase() !== name.toLowerCase()){
+        if(allExercises().some(e=>e.n.toLowerCase()===name.toLowerCase() && e.n !== oldName)){
+          alert('An exercise with that name already exists.'); document.getElementById('cxname').focus(); return;
+        }
+      }
+
+      const mTypeSel = st.cxm || 'reps';
+      const meta = isEditEx ? exMeta(oldName) : null;
+      const updated = {
+        n: name,
+        g: st.cxgroup || GROUPS[0],
+        s: +(st.cxsets || 3),
+        r: +(st.cxrepsv || 10),
+        m: mTypeSel
+      };
+      if (mTypeSel === 'sec') updated.t = 1;
+      else if (mTypeSel === 'min') updated.t = 'min';
+      if (meta && meta.coeff !== undefined) updated.coeff = meta.coeff;
+
+      if(isEditEx){
+        const customIdx = (db.customEx||[]).findIndex(c => c.n === oldName);
+        if(customIdx >= 0){
+          db.customEx[customIdx] = updated;
+        } else {
+          const origName = EXERCISES.find(b => b.n === oldName || (db.exEdits && db.exEdits[b.n] && db.exEdits[b.n].n === oldName))?.n || oldName;
+          db.exEdits = db.exEdits || {};
+          db.exEdits[origName] = updated;
+        }
+
+        if(oldName !== name){
+          if(db.custom){
+            Object.values(db.custom).forEach(p => {
+              (p.days||[]).forEach(d => {
+                (d.ex||[]).forEach(tuple => {
+                  if(tuple[0] === oldName) tuple[0] = name;
+                });
+              });
+            });
+          }
+          if(db.draft && db.draft.ex){
+            db.draft.ex.forEach(e => {
+              if(e.name === oldName) e.name = name;
+            });
+          }
+          if(db.sessions){
+            db.sessions.forEach(s => {
+              (s.ex||[]).forEach(e => {
+                if(e.name === oldName) e.name = name;
+              });
+            });
+          }
+          if(st.picked){
+            const pIdx = st.picked.indexOf(oldName);
+            if(pIdx >= 0) st.picked[pIdx] = name;
+          }
+          if(progressEx === oldName) progressEx = name;
+        }
+      } else {
+        db.customEx = db.customEx || [];
+        db.customEx.push(updated);
+      }
+
       save();
-      st.creating=false; st.cxname=''; st.q=name.toLowerCase(); sLibrary();
+      st.creating = false;
+      st.editingEx = null;
+      st.cxname = '';
+      st.q = name.toLowerCase();
+      sLibrary();
     };
     // Focus name input
     const ni=document.getElementById('cxname'); if(ni && !ni.value) ni.focus();
@@ -2068,16 +2163,19 @@ function sLibrary(){
     const slug=exSlug(e.n);
     const isExpanded=!!st.showDiag[e.n];
     const isCustom=!!(db.customEx||[]).find(c=>c.n===e.n);
+    const mUnit=getExMeasurement(e);
+    const unitStr=mUnit==='min'?' min':(mUnit==='sec'?' sec':'');
     const row=document.createElement('div');
     row.className='libitem-row';
     row.style.borderBottom='1px solid var(--line)';
     row.innerHTML=`
-      <div style="display:flex;align-items:center;gap:8px;width:100%;">
+      <div style="display:flex;align-items:center;gap:6px;width:100%;">
         <button class="libitem" aria-pressed="${on}" style="border-bottom:none;flex:1;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 2px;">
           <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" onerror="this.style.display='none'" class="ex-thumb">
-          <span style="flex:1;min-width:0">${hesc(e.n)}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${hesc(e.g)} · ${hesc(e.s)}×${hesc(e.r)}${e.t?' sec':''}</small></span>
+          <span style="flex:1;min-width:0">${hesc(e.n)}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${hesc(e.g)} · ${hesc(e.s)}×${hesc(e.r)}${unitStr}</small></span>
           <span style="font-size:15px">${on?'✓':'+'}</span>
         </button>
+        <button class="quiet ex-edit" aria-label="Edit ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">✏️</button>
         <button class="quiet diag-toggle" aria-label="Toggle diagram for ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
       </div>
       ${isExpanded ? `
@@ -2086,6 +2184,18 @@ function sLibrary(){
         </div>` : ''}
     `;
     row.querySelector('.libitem').onclick=()=>{ on ? st.picked.splice(st.picked.indexOf(e.n),1) : st.picked.push(e.n); sLibrary(); };
+    row.querySelector('.ex-edit').onclick=(ev)=>{
+      ev.stopPropagation();
+      const meta = exMeta(e.n);
+      st.creating = false;
+      st.editingEx = e.n;
+      st.cxname = e.n;
+      st.cxgroup = meta?.g || e.g;
+      st.cxm = getExMeasurement(meta || e);
+      st.cxsets = meta?.s || e.s || 3;
+      st.cxrepsv = meta?.r || e.r || 10;
+      sLibrary();
+    };
     row.querySelector('.diag-toggle').onclick=()=>{ st.showDiag[e.n] = !st.showDiag[e.n]; sLibrary(); };
     lib.appendChild(row);
   });
@@ -2093,7 +2203,7 @@ function sLibrary(){
   const q=document.getElementById('q');
   q.oninput=ev=>{ st.q=ev.target.value; const pos=ev.target.selectionStart;
     sLibrary(); const nq=document.getElementById('q'); if(nq){ nq.focus(); nq.setSelectionRange(pos,pos); } };
-  document.getElementById('newex').onclick=()=>{ st.creating=true; st.cxname=st.q?st.q:''; st.cxgroup=GROUPS[0]; st.cxt=0; st.cxsets=3; st.cxrepsv=10; sLibrary(); };
+  document.getElementById('newex').onclick=()=>{ st.creating=true; st.editingEx=null; st.cxname=st.q?st.q:''; st.cxgroup=GROUPS[0]; st.cxm='reps'; st.cxsets=3; st.cxrepsv=10; sLibrary(); };
   document.getElementById('cancel').onclick=closeScreen;
   document.getElementById('addsel').onclick=()=>{
     const chosen=st.picked.map(n=>allExercises().find(e=>e.n===n)).filter(Boolean);

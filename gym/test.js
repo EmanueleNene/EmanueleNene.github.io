@@ -1411,9 +1411,8 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v20", swContent.includes("ferrodastiro-v20"));
+  check("sw.js cache version bumped to ferrodastiro-v21", swContent.includes("ferrodastiro-v21"));
 
-<<<<<<< HEAD
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
   {
@@ -1540,7 +1539,150 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     } else {
       check('library has at least 2 items for reordering test', false);
     }
->>>>>>> 9ecf841 (feat(gym): add drag-and-drop and touch reordering for workout exercise cards)
+  }
+
+  // ---------- scenario 24: Cardio exercises, editable exercises & catalogue equivalence coefficients ----------
+  console.log('\n24. Cardio exercises, editable exercises & catalogue equivalence coefficients');
+  {
+    const { w, d, log } = boot();
+    d.querySelector('#fname').value = 'CardioEditTester'; tap(d, '#fgo');
+
+    // 1. Verify Cardio exercises exist in exercises module and app library
+    const exModule = require('./exercises.js');
+    check('GROUPS includes Cardio category', exModule.GROUPS.includes('Cardio'));
+
+    const treadmill = exModule.EXERCISES.find(e => e.n === 'Treadmill (run)');
+    const bike = exModule.EXERCISES.find(e => e.n === 'Stationary bike');
+    const rower = exModule.EXERCISES.find(e => e.n === 'Rowing machine');
+    const elliptical = exModule.EXERCISES.find(e => e.n === 'Elliptical');
+    const stairmaster = exModule.EXERCISES.find(e => e.n === 'Stairmaster');
+    const inclineWalk = exModule.EXERCISES.find(e => e.n === 'Incline walk');
+
+    check('Cardio exercises exist in EXERCISES array', !!treadmill && !!bike && !!rower && !!elliptical && !!stairmaster && !!inclineWalk);
+    check('Cardio exercise Treadmill (run) has Cardio group and min measurement', treadmill && treadmill.g === 'Cardio' && treadmill.m === 'min');
+    check('Cardio exercise Stationary bike has Cardio group and min measurement', bike && bike.g === 'Cardio' && bike.m === 'min');
+    check('Cardio exercise Rowing machine has Cardio group and min measurement', rower && rower.g === 'Cardio' && rower.m === 'min');
+
+    // Check measurement helper functions
+    check('getExMeasurement returns "min" for Treadmill (run)', w.getExMeasurement('Treadmill (run)') === 'min');
+    check('isTimed returns true for min measurement exercises', w.isTimed('Treadmill (run)') === true);
+
+    // 2. Test editing an exercise (built-in exercise rename, group, measurement, coeff)
+    tap(d, '#startHere');
+    tap(d, '#fromLib');
+
+    // Find and select Bench press into draft
+    const benchLibBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Bench press'));
+    if (benchLibBtn) tap(d, benchLibBtn);
+    tap(d, '#addsel');
+
+    // Draft workout is active with Bench press
+    let draft = w.eval('db.draft');
+    check('draft active workout opened with Bench press', draft && draft.ex.some(e => e.name === 'Bench press'));
+
+    // Fill sets and finish session to create historical session
+    const setRows = d.querySelectorAll('.setrow');
+    if (setRows.length > 0) {
+      const inputs = setRows[0].querySelectorAll('input');
+      if (inputs[0]) { inputs[0].value = '100'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+      if (inputs[1]) { inputs[1].value = '5'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    }
+    tap(d, '#finish');
+
+    // Verify session stored with Bench press
+    let sessions = w.eval('db.sessions');
+    check('session stored with Bench press', sessions.length > 0 && sessions[0].ex.some(e => e.name === 'Bench press'));
+
+    // Start second workout with Bench press so we have an active draft
+    tap(d, '#startHere');
+    tap(d, '#fromLib');
+    const benchLibBtn2 = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Bench press'));
+    if (benchLibBtn2) tap(d, benchLibBtn2);
+    tap(d, '#addsel');
+
+    draft = w.eval('db.draft');
+    check('second draft active workout opened with Bench press', draft && draft.ex.some(e => e.name === 'Bench press'));
+
+    // Open library to edit exercise
+    w.openLibrary(null);
+
+    // Find Edit button for Bench press in library
+    const libRows = [...d.querySelectorAll('.libitem-row')];
+    const benchRow = libRows.find(r => r.querySelector('.libitem')?.textContent.includes('Bench press'));
+    check('Bench press row found in library', !!benchRow);
+    const editBtn = benchRow?.querySelector('.ex-edit');
+    check('Edit button present on Bench press library item', !!editBtn);
+
+    if (editBtn) {
+      tap(d, editBtn);
+      // Verify edit form opened with Bench press prefilled
+      const cxNameIn = d.querySelector('#cxname');
+      check('Exercise edit form rendered with name', cxNameIn && cxNameIn.value === 'Bench press');
+
+      // Verify UI form does not expose Equivalence Coefficient to users
+      check('UI form does not contain #cxcoeff or Equivalence Coefficient input', !d.querySelector('#cxcoeff'));
+
+      // Edit fields: Name -> Super Bench Press, Group -> Shoulders, Measurement -> Minutes
+      cxNameIn.value = 'Super Bench Press';
+      cxNameIn.dispatchEvent(new w.Event('input', { bubbles: true }));
+
+      // Select Shoulders chip
+      const shouldersChip = [...d.querySelectorAll('#cxchips .chip')].find(c => c.textContent === 'Shoulders');
+      if (shouldersChip) tap(d, shouldersChip);
+
+      // Select Minutes measurement
+      const minBtn = d.querySelector('#cxmin');
+      if (minBtn) tap(d, minBtn);
+
+      // Save exercise edit
+      tap(d, '#cxsave');
+
+      // Verify edits saved in db.exEdits
+      const exEdits = w.eval('db.exEdits');
+      check('exEdits stores override for Bench press', exEdits && exEdits['Bench press'] && exEdits['Bench press'].n === 'Super Bench Press');
+
+      // Verify cascading name update in active draft
+      draft = w.eval('db.draft');
+      check('active draft exlist updated with cascaded name Super Bench Press', draft && draft.ex.some(e => e.name === 'Super Bench Press'));
+
+      // Verify cascading name update in historical sessions
+      sessions = w.eval('db.sessions');
+      check('historical sessions updated with cascaded name Super Bench Press', sessions.length > 0 && sessions[0].ex.some(e => e.name === 'Super Bench Press'));
+
+      // Verify metadata & measurement updates
+      const meta = w.exMeta('Super Bench Press');
+      check('exMeta reflects updated group Shoulders', meta && meta.g === 'Shoulders');
+      check('getExMeasurement reflects updated unit min', w.getExMeasurement('Super Bench Press') === 'min');
+      check('getExCoeff preserves internal coefficient 1.0', w.getExCoeff('Super Bench Press') === 1.0);
+    }
+
+    // 3. Catalogue equivalence coefficients, alias matching, and strict radar calculation policy
+    check('Bench press catalogue exercise has explicit coeff 1.0', exModule.EXERCISES.find(e => e.n === 'Bench press').coeff === 1.0);
+    check('Leg press catalogue exercise has explicit coeff 1.85', exModule.EXERCISES.find(e => e.n === 'Leg press').coeff === 1.85);
+
+    // Test alias matching for 45° leg press
+    check('Alias matching for "45 Leg Press" returns 1.85 coefficient', w.getExCoeff('45 Leg Press') === 1.85);
+    check('Alias matching for "45° Leg Press" returns 1.85 coefficient', w.getExCoeff('45° Leg Press') === 1.85);
+
+    // Test strict radar calculation policy: unvetted exercise with no coefficient is SKIPPED
+    check('Unvetted exercise without coeff returns undefined from getExCoeff', w.getExCoeff('Unknown Unvetted Machine') === undefined);
+
+    // Log session with an unvetted exercise
+    const customSessions = [
+      {
+        id: 's_test_radar',
+        day: 'Upper A',
+        date: new Date().toISOString(),
+        ex: [
+          { name: 'Unknown Unvetted Machine', sets: [{ w: 100, r: 10 }] }
+        ]
+      }
+    ];
+
+    const radarResult = w.computeMuscularBalance(customSessions);
+    check('Strict radar policy: unvetted exercise without coefficient is SKIPPED from radar balance (groupsWithDataCount === 0)', radarResult.groupsWithDataCount === 0);
+
+    console.log('  errors:', log.length ? log.join(' | ') : 'none');
   }
 
   console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
