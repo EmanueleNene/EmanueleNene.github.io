@@ -1413,6 +1413,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
   check("sw.js cache version bumped to ferrodastiro-v20", swContent.includes("ferrodastiro-v20"));
 
+<<<<<<< HEAD
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
   {
@@ -1480,6 +1481,66 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     check('Progress tab weight volume excludes timed exercise (0 kg)', progStatText.includes('0 kg'));
 
     console.log('  errors:', log.length ? log.join(' | ') : 'none');
+  }
+
+  // ---------- scenario 23: exercise card drag-and-drop & touch reordering ----------
+  console.log('\n23. Exercise card reordering in active workout draft');
+  {
+    const { w, d } = boot();
+    d.querySelector('#fname').value = 'ReorderTester';
+    tap(d, '#fgo');
+    tap(d, '#startHere');
+    tap(d, '#fromLib');
+
+    const libItems1 = d.querySelectorAll('#lib .libitem');
+    if (libItems1.length >= 2) {
+      tap(d, libItems1[0]);
+      const libItems2 = d.querySelectorAll('#lib .libitem');
+      tap(d, libItems2[1]);
+      tap(d, '#addsel');
+
+      const draft = w.eval('db.draft');
+      check('draft active workout opened with at least 2 exercises', draft && draft.ex.length >= 2);
+
+      const handles = d.querySelectorAll('#exlist .card .drag-handle');
+      const cards = d.querySelectorAll('#exlist .card');
+      check('exercise cards render drag handles', handles.length >= 2);
+      check('drag handle has aria-label and draggable attribute', handles[0] && handles[0].getAttribute('aria-label').includes('Drag to reorder') && handles[0].getAttribute('draggable') === 'true');
+
+      const initialEx0Name = draft.ex[0].name;
+      const initialEx1Name = draft.ex[1].name;
+      check('initial exercise order retrieved (' + initialEx0Name + ', ' + initialEx1Name + ')', !!initialEx0Name && !!initialEx1Name && initialEx0Name !== initialEx1Name);
+
+      // Desktop HTML5 drag & drop simulation (drag handle 0, drop on card 1)
+      handles[0].dispatchEvent(new w.Event('dragstart', { bubbles: true }));
+      cards[1].dispatchEvent(new w.Event('drop', { bubbles: true }));
+
+      const draftAfterDrag = w.eval('db.draft');
+      check('reordering via desktop drag & drop swaps/moves items in db.draft.ex', draftAfterDrag.ex[0].name === initialEx1Name && draftAfterDrag.ex[1].name === initialEx0Name);
+
+      // Verify persistence in localStorage
+      const meId = w.eval('me');
+      const reloadedDb = JSON.parse(w.localStorage.getItem('fds.data.' + meId) || '{}');
+      check('reordered state persists in localStorage draft', reloadedDb.draft && reloadedDb.draft.ex[0].name === initialEx1Name);
+
+      // Touch-based reordering simulation (touchstart handle 0, touchmove on card 1, touchend)
+      const handlesAfter = d.querySelectorAll('#exlist .card .drag-handle');
+      const cardsAfter = d.querySelectorAll('#exlist .card');
+
+      w.document.elementFromPoint = (x, y) => cardsAfter[1];
+
+      handlesAfter[0].dispatchEvent(new w.Event('touchstart', { bubbles: true }));
+      const touchMoveEvt = new w.Event('touchmove', { bubbles: true });
+      touchMoveEvt.touches = [{ clientX: 50, clientY: 150 }];
+      handlesAfter[0].dispatchEvent(touchMoveEvt);
+      handlesAfter[0].dispatchEvent(new w.Event('touchend', { bubbles: true }));
+
+      const draftAfterTouch = w.eval('db.draft');
+      check('reordering via touch swaps/moves items back in db.draft.ex', draftAfterTouch.ex[0].name === initialEx0Name && draftAfterTouch.ex[1].name === initialEx1Name);
+    } else {
+      check('library has at least 2 items for reordering test', false);
+    }
+>>>>>>> 9ecf841 (feat(gym): add drag-and-drop and touch reordering for workout exercise cards)
   }
 
   console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
