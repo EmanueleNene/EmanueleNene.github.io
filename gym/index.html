@@ -35,6 +35,10 @@
   p.note{color:var(--steel);font-size:14px;margin:6px 0 0}
   .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
     padding:14px;margin-bottom:10px}
+  .card.dragging{opacity:.4;transform:scale(.98);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+  .card.drag-over{border:2px dashed var(--slate);background:rgba(51,80,92,.05)}
+  .drag-handle{cursor:grab;touch-action:none;padding:2px 6px;font-size:16px;color:var(--steel);user-select:none;-webkit-user-select:none}
+  .drag-handle:active{cursor:grabbing}
   .row{display:flex;align-items:center;gap:10px}
   .grow{flex:1;min-width:0}
   button{font:inherit;cursor:pointer;border-radius:var(--r);border:1px solid var(--ink);
@@ -889,7 +893,10 @@ function drawDraft(){
       <button class="ghost" id="scrap">${isEditing?'Cancel edit':'Discard'}</button>
     </div>`;
   const list=document.getElementById('exlist');
-  dr.ex.forEach(ex=>{
+  let dragSrcIdx=null;
+  let touchSrcIdx=null;
+  let touchTargetIdx=null;
+  dr.ex.forEach((ex,idx)=>{
     const finished = ex.sets.filter(s=>s.done).length;
     const complete = finished===ex.sets.length;
     const nowIdx = ex.sets.findIndex(s=>!s.done);   // the set you're on
@@ -899,9 +906,13 @@ function drawDraft(){
 
     const card=document.createElement('div');
     card.className='card'+(complete?' done':'');
+    card.dataset.idx=idx;
     card.innerHTML=`
       <div class="exhead" style="cursor:pointer" title="Tap to toggle diagram">
-        <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">🖼️</button></h3>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button type="button" class="quiet drag-handle" aria-label="Drag to reorder ${ex.name}" draggable="true" style="cursor:grab;touch-action:none;padding:2px 6px;font-size:16px;color:var(--steel);">⋮⋮</button>
+          <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">🖼️</button></h3>
+        </div>
         <em>${finished} of ${ex.sets.length} ticked</em>
       </div>
       ${isExpanded ? `
@@ -925,8 +936,91 @@ function drawDraft(){
       <div class="units"><div></div><div>${db.unit}</div><div>${isTimed(ex.name)?'sec':'reps'}</div><div></div></div>
       <div class="sets"></div>`;
 
-    card.querySelector('.exhead').onclick=()=>{
+    const handle=card.querySelector('.drag-handle');
+
+    card.querySelector('.exhead').onclick=(e)=>{
+      if(e.target.closest('.drag-handle')) return;
       ex.showDiag = !ex.showDiag; save(); drawDraft();
+    };
+
+    // Desktop HTML5 Drag & Drop
+    handle.ondragstart=(e)=>{
+      dragSrcIdx=idx;
+      if(e.dataTransfer){
+        e.dataTransfer.effectAllowed='move';
+        e.dataTransfer.setData('text/plain',String(idx));
+      }
+      card.classList.add('dragging');
+    };
+    handle.ondragend=()=>{
+      dragSrcIdx=null;
+      document.querySelectorAll('#exlist .card').forEach(c=>c.classList.remove('dragging','drag-over'));
+    };
+    card.ondragover=(e)=>{
+      e.preventDefault();
+      if(e.dataTransfer) e.dataTransfer.dropEffect='move';
+      if(dragSrcIdx!==null && dragSrcIdx!==idx){
+        card.classList.add('drag-over');
+      }
+    };
+    card.ondragleave=()=>{
+      card.classList.remove('drag-over');
+    };
+    card.ondrop=(e)=>{
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if(dragSrcIdx!==null && dragSrcIdx!==idx){
+        const fromIdx=dragSrcIdx;
+        const toIdx=idx;
+        dragSrcIdx=null;
+        const [moved]=db.draft.ex.splice(fromIdx,1);
+        db.draft.ex.splice(toIdx,0,moved);
+        save(); drawDraft();
+      }
+    };
+
+    // Mobile Touch Support
+    handle.ontouchstart=()=>{
+      touchSrcIdx=idx;
+      touchTargetIdx=idx;
+      card.classList.add('dragging');
+    };
+    handle.ontouchmove=(e)=>{
+      if(touchSrcIdx===null) return;
+      const touch=e.touches && e.touches[0];
+      if(!touch) return;
+      const elem=document.elementFromPoint(touch.clientX,touch.clientY);
+      const targetCard=elem?elem.closest('#exlist .card'):null;
+      document.querySelectorAll('#exlist .card').forEach(c=>c.classList.remove('drag-over'));
+      if(targetCard && targetCard.dataset.idx!==undefined){
+        const tIdx=parseInt(targetCard.dataset.idx,10);
+        if(tIdx!==touchSrcIdx){
+          touchTargetIdx=tIdx;
+          targetCard.classList.add('drag-over');
+        }else{
+          touchTargetIdx=touchSrcIdx;
+        }
+      }
+    };
+    handle.ontouchend=()=>{
+      if(touchSrcIdx!==null && touchTargetIdx!==null && touchSrcIdx!==touchTargetIdx){
+        const fromIdx=touchSrcIdx;
+        const toIdx=touchTargetIdx;
+        touchSrcIdx=null;
+        touchTargetIdx=null;
+        const [moved]=db.draft.ex.splice(fromIdx,1);
+        db.draft.ex.splice(toIdx,0,moved);
+        save(); drawDraft();
+      }else{
+        touchSrcIdx=null;
+        touchTargetIdx=null;
+        document.querySelectorAll('#exlist .card').forEach(c=>c.classList.remove('dragging','drag-over'));
+      }
+    };
+    handle.ontouchcancel=()=>{
+      touchSrcIdx=null;
+      touchTargetIdx=null;
+      document.querySelectorAll('#exlist .card').forEach(c=>c.classList.remove('dragging','drag-over'));
     };
     card.querySelectorAll('.step button').forEach(b=>{
       b.onclick=()=>{
