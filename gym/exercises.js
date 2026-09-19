@@ -26,8 +26,9 @@ const EXER_EQUIV_MAP = {
     'Incline dumbbell press': 0.75, 'Machine chest press': 1.05, 'Push-up': 0.65, 'Dip': 1.05
   },
   Back: {
-    'Deadlift': 1.0, 'Barbell row': 0.60, 'Pendlay row': 0.60, 'T-bar row': 0.60,
-    'Cable row': 0.55, 'Lat pulldown': 0.55, 'Pull-up': 0.60, 'Chin-up': 0.60
+    'Deadlift': 1.0, 'Rack pull': 1.20, 'T-bar row': 0.72, 'Barbell row': 0.60,
+    'Pendlay row': 0.52, 'Cable row': 0.55, 'Lat pulldown': 0.55, 'Pull-up': 0.60,
+    'Chin-up': 0.60
   },
   Shoulders: {
     'Overhead press': 1.0, 'Seated dumbbell press': 0.80, 'Machine shoulder press': 1.05,
@@ -104,9 +105,9 @@ const EXERCISES = [
   {n:'Pec deck fly',g:'Chest',s:3,r:12},
   {n:'Incline machine chest press',g:'Chest',s:3,r:10},
 
-  {n:'Deadlift',g:'Back',s:3,r:5,coeff:1.0},{n:'Rack pull',g:'Back',s:3,r:6},
-  {n:'Barbell row',g:'Back',s:4,r:8,coeff:0.60},{n:'Pendlay row',g:'Back',s:4,r:6,coeff:0.60},
-  {n:'Dumbbell row',g:'Back',s:3,r:10},{n:'T-bar row',g:'Back',s:3,r:10,coeff:0.60},
+  {n:'Deadlift',g:'Back',s:3,r:5,coeff:1.0},{n:'Rack pull',g:'Back',s:3,r:6,coeff:1.20},
+  {n:'Barbell row',g:'Back',s:4,r:8,coeff:0.60},{n:'Pendlay row',g:'Back',s:4,r:6,coeff:0.52},
+  {n:'Dumbbell row',g:'Back',s:3,r:10},{n:'T-bar row',g:'Back',s:3,r:10,coeff:0.72},
   {n:'Cable row',g:'Back',s:3,r:12,coeff:0.55},{n:'Lat pulldown',g:'Back',s:3,r:10,coeff:0.55},
   {n:'Pull-up',g:'Back',s:4,r:6,coeff:0.60},{n:'Chin-up',g:'Back',s:4,r:8,coeff:0.60},
   {n:'Straight-arm pulldown',g:'Back',s:3,r:15},{n:'Shrug',g:'Back',s:3,r:12},

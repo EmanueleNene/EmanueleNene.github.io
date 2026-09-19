@@ -1706,10 +1706,21 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     const rowNorm = 120 / rowCoeff;
     check('Barbell row 120 kg normalizes to 200 kg Deadlift equivalent (120 / 0.60 = 200)', Math.abs(rowNorm - 200) < 0.001);
 
-    // Also check other Back coefficients (Deadlift=1.0, Pendlay row=0.60, T-bar row=0.60, Lat pulldown=0.55, Cable row=0.55)
+    // Also check all Back coefficients relative to Deadlift (1.00)
     check('Deadlift coefficient is 1.0', w.getExCoeff('Deadlift') === 1.0);
-    check('Lat pulldown coefficient is 0.55', w.getExCoeff('Lat pulldown') === 0.55);
+    check('Rack pull coefficient is 1.20', w.getExCoeff('Rack pull') === 1.20);
+    check('T-bar row coefficient is 0.72', w.getExCoeff('T-bar row') === 0.72);
+    check('Barbell row coefficient is 0.60', w.getExCoeff('Barbell row') === 0.60);
+    check('Pendlay row coefficient is 0.52', w.getExCoeff('Pendlay row') === 0.52);
     check('Cable row coefficient is 0.55', w.getExCoeff('Cable row') === 0.55);
+    check('Lat pulldown coefficient is 0.55', w.getExCoeff('Lat pulldown') === 0.55);
+    check('Pull-up coefficient is 0.60', w.getExCoeff('Pull-up') === 0.60);
+    check('Chin-up coefficient is 0.60', w.getExCoeff('Chin-up') === 0.60);
+
+    // Verify accessory/isolation Back exercises have NO coefficient
+    const accessoryBackList = ['Dumbbell row', 'Single-arm dumbbell row', 'Single-arm cable lat pulldown', 'Single-arm cable seated row', 'Shrug', 'Straight-arm pulldown', 'Hyperextension (back)'];
+    const unallowedCoeffs = accessoryBackList.filter(name => w.getExCoeff(name) !== undefined);
+    check('Accessory and isolation back exercises have no coefficient', unallowedCoeffs.length === 0, unallowedCoeffs.join(', '));
 
     // 3. Test newly added exercises are present in catalog and selectable into workouts
     const newExList = [
