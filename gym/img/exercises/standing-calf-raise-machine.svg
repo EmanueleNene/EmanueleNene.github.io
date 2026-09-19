@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <g>
+    <line x1="45" y1="20" x2="45" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <rect x="62" y="44" width="26" height="8" rx="2" fill="#52525B" />
+    <line x1="45" y1="48" x2="62" y2="48" stroke="#71717A" stroke-width="3" />
+    <rect x="70" y="115" width="20" height="8" rx="1" fill="#71717A" />
+    <circle cx="75" cy="36" r="6" fill="#18181B" />
+    <line x1="75" y1="42" x2="75" y2="85" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+    <path d="M 75 85 L 75 120" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" fill="none" />
+    <path d="M 75 120 L 80 124" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" fill="none" />
+  </g>
+  <g>
+    <line x1="195" y1="20" x2="195" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <rect x="212" y="36" width="26" height="8" rx="2" fill="#52525B" />
+    <line x1="195" y1="40" x2="212" y2="40" stroke="#71717A" stroke-width="3" />
+    <rect x="220" y="115" width="20" height="8" rx="1" fill="#71717A" />
+    <circle cx="225" cy="28" r="6" fill="#18181B" />
+    <line x1="225" y1="34" x2="225" y2="77" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+    <path d="M 225 77 L 225 110 L 230 115" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <line x1="225" y1="120" x2="225" y2="110" stroke="#C25E3E" stroke-width="1.8" stroke-dasharray="2 2" />
+    <path d="M 222 80 C 228 80 230 92 225 102" stroke="#C25E3E" stroke-width="2" stroke-linecap="round" fill="none" />
+  </g>
+</svg>
