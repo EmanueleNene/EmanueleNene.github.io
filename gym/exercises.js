@@ -20,6 +20,8 @@ const GROUP_HINTS = {
   Triceps: 'Add close-grip bench or dips to reinforce lockout and pressing strength.'
 };
 
+/* Exercises are connected to the main movement of their muscle group that has coefficient 1.0.
+   The comparison for the radar chart is instead done with other coefficients. Look at "BENCHMARK_BALANCE". */
 const EXER_EQUIV_MAP = {
   Chest: {
     'Bench press': 1.0, 'Incline barbell press': 0.85, 'Dumbbell bench press': 0.82,
