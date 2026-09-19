@@ -1413,7 +1413,6 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
   check("sw.js cache version bumped to ferrodastiro-v20", swContent.includes("ferrodastiro-v20"));
 
-<<<<<<< HEAD
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
   {
@@ -1540,7 +1539,6 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     } else {
       check('library has at least 2 items for reordering test', false);
     }
->>>>>>> 9ecf841 (feat(gym): add drag-and-drop and touch reordering for workout exercise cards)
   }
 
   console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
