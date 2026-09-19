@@ -1619,7 +1619,10 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
       const cxNameIn = d.querySelector('#cxname');
       check('Exercise edit form rendered with name', cxNameIn && cxNameIn.value === 'Bench press');
 
-      // Edit fields: Name -> Super Bench Press, Group -> Shoulders, Measurement -> Minutes, Coeff -> 0.95
+      // Verify UI form does not expose Equivalence Coefficient to users
+      check('UI form does not contain #cxcoeff or Equivalence Coefficient input', !d.querySelector('#cxcoeff'));
+
+      // Edit fields: Name -> Super Bench Press, Group -> Shoulders, Measurement -> Minutes
       cxNameIn.value = 'Super Bench Press';
       cxNameIn.dispatchEvent(new w.Event('input', { bubbles: true }));
 
@@ -1630,13 +1633,6 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
       // Select Minutes measurement
       const minBtn = d.querySelector('#cxmin');
       if (minBtn) tap(d, minBtn);
-
-      // Set equivalence coefficient to 0.95
-      const coeffIn = d.querySelector('#cxcoeff');
-      if (coeffIn) {
-        coeffIn.value = '0.95';
-        coeffIn.dispatchEvent(new w.Event('input', { bubbles: true }));
-      }
 
       // Save exercise edit
       tap(d, '#cxsave');
@@ -1657,7 +1653,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
       const meta = w.exMeta('Super Bench Press');
       check('exMeta reflects updated group Shoulders', meta && meta.g === 'Shoulders');
       check('getExMeasurement reflects updated unit min', w.getExMeasurement('Super Bench Press') === 'min');
-      check('getExCoeff returns updated coefficient 0.95', w.getExCoeff('Super Bench Press') === 0.95);
+      check('getExCoeff preserves internal coefficient 1.0', w.getExCoeff('Super Bench Press') === 1.0);
     }
 
     // 3. Catalogue equivalence coefficients, alias matching, and strict radar calculation policy
