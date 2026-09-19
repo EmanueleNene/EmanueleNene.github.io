@@ -1411,7 +1411,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v22", swContent.includes("ferrodastiro-v22"));
+  check("sw.js cache version bumped to ferrodastiro-v23", swContent.includes("ferrodastiro-v23"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -1804,6 +1804,106 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
     console.log('  errors:', log.length ? log.join(' | ') : 'none');
   }
+
+  // ---------- scenario 26: 2-frame vector SVG exercise diagrams for 29 newly added exercises ----------
+  console.log('\n26. Exercise diagram vector SVGs (29 newly added catalog exercises)');
+  const new29Exercises = [
+    'high-to-low-cable-fly.svg',
+    'low-to-high-cable-fly.svg',
+    'pec-deck-fly.svg',
+    'incline-machine-chest-press.svg',
+    'single-arm-dumbbell-row.svg',
+    'single-arm-cable-lat-pulldown.svg',
+    'single-arm-cable-seated-row.svg',
+    'single-arm-cable-lateral-raise.svg',
+    'single-arm-dumbbell-lateral-raise.svg',
+    'single-arm-dumbbell-shoulder-press.svg',
+    'cable-front-raise.svg',
+    'cable-face-pull.svg',
+    'single-leg-extension.svg',
+    'single-leg-curl.svg',
+    'single-leg-45-press.svg',
+    'seated-leg-curl.svg',
+    'lying-leg-curl.svg',
+    'standing-calf-raise-machine.svg',
+    'single-arm-cable-curl.svg',
+    'single-arm-dumbbell-curl.svg',
+    'ez-bar-preacher-curl.svg',
+    'single-arm-triceps-pushdown.svg',
+    'single-arm-overhead-cable-extension.svg',
+    'rope-triceps-pushdown.svg',
+    'cable-triceps-kickback.svg',
+    'cable-woodchopper.svg',
+    'elliptical.svg',
+    'stairmaster.svg',
+    'incline-walk.svg'
+  ];
+
+  check('exactly 29 newly added exercise diagrams specified', new29Exercises.length === 29);
+
+  const exDir26 = path.join(__dirname, 'img', 'exercises');
+  check('img/exercises directory exists', fs.existsSync(exDir26));
+
+  let missingFiles26 = 0;
+  let parseErrors26 = 0;
+  let specErrors26 = 0;
+
+  for (const filename of new29Exercises) {
+    const filePath = path.join(exDir26, filename);
+    if (!fs.existsSync(filePath)) {
+      missingFiles26++;
+      continue;
+    }
+
+    const raw = fs.readFileSync(filePath, 'utf8');
+    let dom;
+    try {
+      dom = new JSDOM(raw, { contentType: 'image/svg+xml' });
+    } catch (e) {
+      parseErrors26++;
+      continue;
+    }
+
+    const doc = dom.window.document;
+    if (doc.querySelector('parsererror')) {
+      parseErrors26++;
+      continue;
+    }
+
+    const svg = doc.documentElement;
+    const viewBox = svg.getAttribute('viewBox');
+    const width = svg.getAttribute('width');
+    const height = svg.getAttribute('height');
+
+    if (viewBox !== '0 0 300 150' || width !== '100%' || height !== '100%') {
+      specErrors26++;
+    }
+
+    // Divider line at x=150
+    const lines = Array.from(svg.querySelectorAll('line'));
+    const divider = lines.find(l => l.getAttribute('x1') === '150' && l.getAttribute('x2') === '150');
+    if (!divider || divider.getAttribute('y1') !== '15' || divider.getAttribute('y2') !== '135' ||
+        divider.getAttribute('stroke') !== '#E4E4E7' || divider.getAttribute('stroke-dasharray') !== '3 3') {
+      specErrors26++;
+    }
+
+    // START label
+    const texts = Array.from(svg.querySelectorAll('text'));
+    const startText = texts.find(t => t.textContent.trim() === 'START');
+    if (!startText || startText.getAttribute('x') !== '75' || startText.getAttribute('y') !== '142') {
+      specErrors26++;
+    }
+
+    // MID label
+    const midText = texts.find(t => t.textContent.trim() === 'MID');
+    if (!midText || midText.getAttribute('x') !== '225' || midText.getAttribute('y') !== '142') {
+      specErrors26++;
+    }
+  }
+
+  check('all 29 newly added exercise SVG files exist', missingFiles26 === 0, `${missingFiles26} missing`);
+  check('all 29 newly added exercise SVGs parse cleanly as valid XML', parseErrors26 === 0, `${parseErrors26} parse errors`);
+  check('all 29 newly added exercise SVGs meet design standards (viewBox 0 0 300 150, START at 75, MID at 225, dashed vertical divider at x=150)', specErrors26 === 0, `${specErrors26} spec errors`);
 
   if (fails > 0) process.exitCode = 1;
 })();

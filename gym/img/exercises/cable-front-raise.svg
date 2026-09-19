@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <g>
+    <line x1="45" y1="15" x2="45" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <circle cx="45" cy="120" r="3" fill="#71717A" />
+    <circle cx="75" cy="40" r="6" fill="#18181B" />
+    <line x1="75" y1="46" x2="75" y2="85" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+    <path d="M 75 85 L 68 125 M 75 85 L 82 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 75 52 L 80 92" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" fill="none" />
+    <line x1="45" y1="120" x2="80" y2="92" stroke="#71717A" stroke-width="1.8" stroke-dasharray="2 2" />
+    <rect x="76" y="88" width="8" height="8" rx="2" fill="#52525B" />
+  </g>
+  <g>
+    <line x1="195" y1="15" x2="195" y2="125" stroke="#52525B" stroke-width="3" stroke-linecap="round" />
+    <circle cx="195" cy="120" r="3" fill="#71717A" />
+    <circle cx="225" cy="40" r="6" fill="#18181B" />
+    <line x1="225" y1="46" x2="225" y2="85" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" />
+    <path d="M 225 85 L 218 125 M 225 85 L 232 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 225 52 L 265 52" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" fill="none" />
+    <line x1="195" y1="120" x2="265" y2="52" stroke="#71717A" stroke-width="1.8" stroke-dasharray="2 2" />
+    <rect x="261" y="48" width="8" height="8" rx="2" fill="#52525B" />
+    <path d="M 230 92 A 45 45 0 0 1 265 55" stroke="#C25E3E" stroke-width="1.8" stroke-dasharray="2 2" fill="none" />
+    <circle cx="232" cy="50" r="3.5" fill="#C25E3E" />
+  </g>
+</svg>

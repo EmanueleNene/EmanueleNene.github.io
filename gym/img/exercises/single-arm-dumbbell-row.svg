@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <g>
+    <line x1="40" y1="85" x2="110" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <line x1="50" y1="85" x2="50" y2="125" stroke="#71717A" stroke-width="3" />
+    <line x1="100" y1="85" x2="100" y2="125" stroke="#71717A" stroke-width="3" />
+    <circle cx="36" cy="58" r="6" fill="#18181B" />
+    <path d="M 42 62 L 90 65" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" fill="none" />
+    <path d="M 90 65 L 90 85 M 90 65 L 115 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 48 63 L 48 85" stroke="#18181B" stroke-width="2.2" stroke-linecap="round" fill="none" />
+    <path d="M 60 63 L 60 102" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" fill="none" />
+    <rect x="54" y="98" width="12" height="6" rx="2" fill="#52525B" />
+  </g>
+  <g>
+    <line x1="190" y1="85" x2="260" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <line x1="200" y1="85" x2="200" y2="125" stroke="#71717A" stroke-width="3" />
+    <line x1="250" y1="85" x2="250" y2="125" stroke="#71717A" stroke-width="3" />
+    <circle cx="186" cy="58" r="6" fill="#18181B" />
+    <path d="M 192 62 L 240 65" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" fill="none" />
+    <path d="M 240 65 L 240 85 M 240 65 L 265 125" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <path d="M 198 63 L 198 85" stroke="#18181B" stroke-width="2.2" stroke-linecap="round" fill="none" />
+    <path d="M 210 63 L 225 45 L 214 62" stroke="#18181B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <rect x="208" y="58" width="12" height="6" rx="2" fill="#52525B" />
+    <path d="M 210 98 Q 212 78 214 64" stroke="#C25E3E" stroke-width="1.8" stroke-dasharray="2 2" fill="none" />
+    <path d="M 200 64 C 210 58 225 60 230 65" stroke="#C25E3E" stroke-width="2" stroke-linecap="round" fill="none" />
+  </g>
+</svg>

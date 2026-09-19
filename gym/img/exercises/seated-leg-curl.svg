@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="100%" height="100%">
+  <line x1="150" y1="15" x2="150" y2="135" stroke="#E4E4E7" stroke-dasharray="3 3" />
+  <text x="75" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">START</text>
+  <text x="225" y="142" text-anchor="middle" font-size="10" font-family="system-ui, sans-serif" font-weight="600" fill="#71717A">MID</text>
+  <g>
+    <line x1="45" y1="45" x2="55" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <line x1="55" y1="85" x2="80" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <rect x="62" y="78" width="16" height="6" rx="2" fill="#52525B" />
+    <circle cx="42" cy="35" r="6" fill="#18181B" />
+    <path d="M 47 41 L 56 82" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" fill="none" />
+    <path d="M 56 82 L 115 85" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" fill="none" />
+    <circle cx="112" cy="80" r="4" fill="#52525B" />
+  </g>
+  <g>
+    <line x1="195" y1="45" x2="205" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <line x1="205" y1="85" x2="230" y2="85" stroke="#71717A" stroke-width="4" stroke-linecap="round" />
+    <rect x="212" y="78" width="16" height="6" rx="2" fill="#52525B" />
+    <circle cx="192" cy="35" r="6" fill="#18181B" />
+    <path d="M 197 41 L 206 82" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" fill="none" />
+    <path d="M 206 82 L 230 85 L 225 118" stroke="#18181B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <circle cx="225" cy="118" r="4" fill="#52525B" />
+    <path d="M 260 85 A 30 30 0 0 1 228 118" stroke="#C25E3E" stroke-width="1.8" stroke-dasharray="3 2" fill="none" />
+    <path d="M 215 90 C 220 95 222 108 226 112" stroke="#C25E3E" stroke-width="2.2" stroke-linecap="round" fill="none" />
+  </g>
+</svg>
