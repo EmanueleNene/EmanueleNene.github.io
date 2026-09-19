@@ -407,10 +407,11 @@ function getWeeklyBuckets(sessions,numWeeks=8){
         w.workouts++;
         w.sessions.push(s);
         for(const ex of (s.ex||[])){
+          const timed=isTimed(ex.name);
           for(const set of (ex.sets||[])){
             const r=+set.r||0, weight=+set.w||0;
             w.repsVol+=r;
-            w.weightVol+=weight*r;
+            if(!timed) w.weightVol+=weight*r;
           }
         }
         break;
@@ -445,10 +446,11 @@ function getMonthlyBuckets(sessions,numMonths=6){
         m.workouts++;
         m.sessions.push(s);
         for(const ex of (s.ex||[])){
+          const timed=isTimed(ex.name);
           for(const set of (ex.sets||[])){
             const r=+set.r||0, weight=+set.w||0;
             m.repsVol+=r;
-            m.weightVol+=weight*r;
+            if(!timed) m.weightVol+=weight*r;
           }
         }
         break;
@@ -510,12 +512,13 @@ function renderMuscleBreakdown(buckets){
     (s.ex||[]).forEach(ex=>{
       const meta=exMeta(ex.name);
       const g=meta?.g||'Other';
+      const timed=isTimed(ex.name);
       if(!groupStats[g]) groupStats[g]={sets:0,reps:0,weightVol:0};
       (ex.sets||[]).forEach(set=>{
         const r=+set.r||0, w=+set.w||0;
         groupStats[g].sets+=1;
         groupStats[g].reps+=r;
-        groupStats[g].weightVol+=w*r;
+        if(!timed) groupStats[g].weightVol+=w*r;
       });
     });
   });
@@ -868,7 +871,7 @@ function beginRepeat(src,dateMs){
 function drawDraft(){
   const dr=db.draft;
   const isEditing = dr.isEdit || db.sessions.some(s=>s.id===dr.id);
-  const vol=dr.ex.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+(+s.w||0)*(+s.r||0),0),0);
+  const vol=dr.ex.reduce((a,e)=>a+(isTimed(e.name)?0:e.sets.reduce((b,s)=>b+(+s.w||0)*(+s.r||0),0)),0);
   const doneCount=dr.ex.reduce((a,e)=>a+e.sets.filter(s=>s.done).length,0);
   const total=dr.ex.reduce((a,e)=>a+e.sets.length,0);
   const dayLabel=new Date(dr.date).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
@@ -1619,7 +1622,7 @@ function chartFor(name){
     const targetSets=heavySets.length ? heavySets : validSets;
     const best=Math.max(...targetSets.map(x=>e1rm(+x.w||0,+x.r||0)));
     const isHeavyPeak=heavySets.length > 0;
-    const vol=ex.sets.reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0);
+    const vol=isTimed(name) ? 0 : ex.sets.reduce((a,x)=>a+(+x.w||0)*(+x.r||0),0);
     return [{d:s.date,v:best,vol,isHeavyPeak}];
   });
   const box=document.getElementById('chart');
@@ -1960,7 +1963,8 @@ function sLibrary(){
   });
 
   const lib=document.getElementById('lib');
-  const list=allEx.filter(e=>(st.group==='All'||e.g===st.group) && e.n.toLowerCase().includes(st.q));
+  const qTokens=(st.q||'').toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const list=allEx.filter(e=>(st.group==='All'||e.g===st.group) && (!qTokens.length||qTokens.every(t=>e.n.toLowerCase().includes(t))));
   if(!list.length){
     lib.innerHTML=`<div class="empty">Nothing matches that search.</div>`;
   }
@@ -1993,8 +1997,8 @@ function sLibrary(){
   });
 
   const q=document.getElementById('q');
-  q.oninput=ev=>{ st.q=ev.target.value.toLowerCase().trim(); const pos=ev.target.selectionStart;
-    sLibrary(); const nq=document.getElementById('q'); nq.focus(); nq.setSelectionRange(pos,pos); };
+  q.oninput=ev=>{ st.q=ev.target.value; const pos=ev.target.selectionStart;
+    sLibrary(); const nq=document.getElementById('q'); if(nq){ nq.focus(); nq.setSelectionRange(pos,pos); } };
   document.getElementById('newex').onclick=()=>{ st.creating=true; st.cxname=st.q?st.q:''; st.cxgroup=GROUPS[0]; st.cxt=0; st.cxsets=3; st.cxrepsv=10; sLibrary(); };
   document.getElementById('cancel').onclick=closeScreen;
   document.getElementById('addsel').onclick=()=>{
@@ -2013,7 +2017,7 @@ function vCalendar(){
   const lead=(first.getDay()+6)%7;                       // Monday-first week
   const todayK=dayKey(new Date());
   const monthSessions=db.sessions.filter(s=>{const d=new Date(s.date);return d.getFullYear()===y&&d.getMonth()===m;});
-  const monthVol=monthSessions.reduce((a,s)=>a+s.ex.reduce((b,e)=>b+e.sets.reduce((c,x)=>c+(+x.w||0)*(+x.r||0),0),0),0);
+  const monthVol=monthSessions.reduce((a,s)=>a+s.ex.reduce((b,e)=>b+(isTimed(e.name)?0:e.sets.reduce((c,x)=>c+(+x.w||0)*(+x.r||0),0)),0),0);
 
   view().innerHTML=`
     <div class="monthbar">
@@ -2096,7 +2100,7 @@ function vCalendar(){
 
 function sessionCard(s){
   if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9);
-  const vol=s.ex.reduce((a,e)=>a+e.sets.reduce((b,x)=>b+(+x.w||0)*(+x.r||0),0),0);
+  const vol=s.ex.reduce((a,e)=>a+(isTimed(e.name)?0:e.sets.reduce((b,x)=>b+(+x.w||0)*(+x.r||0),0)),0);
   return `<div class="card">
     <div class="exhead"><h3>${s.day}</h3>
       <em>${new Date(s.date).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})}</em></div>

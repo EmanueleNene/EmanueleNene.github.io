@@ -1411,7 +1411,76 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v19", swContent.includes("ferrodastiro-v19"));
+  check("sw.js cache version bumped to ferrodastiro-v20", swContent.includes("ferrodastiro-v20"));
+
+  // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
+  console.log('\n22. Library search space handling & timed exercise zero volume');
+  {
+    const { w, d, log } = boot();
+    d.querySelector('#fname').value = 'Tester'; tap(d, '#fgo');
+    tap(d, '#startHere'); tap(d, '#fromLib');
+
+    const qIn = d.querySelector('#q');
+    check('library search input present', !!qIn);
+
+    // Test search with spaces: "bench press"
+    qIn.value = 'bench press';
+    qIn.dispatchEvent(new w.Event('input', { bubbles: true }));
+    let libItems = [...d.querySelectorAll('#lib .libitem')];
+    check('searching "bench press" with space matches Bench press', libItems.some(b => b.textContent.includes('Bench press')));
+
+    // Test search with space & multi-word tokens out of order: "press incline"
+    qIn.value = 'press incline';
+    qIn.dispatchEvent(new w.Event('input', { bubbles: true }));
+    libItems = [...d.querySelectorAll('#lib .libitem')];
+    check('searching "press incline" matches Incline dumbbell press', libItems.some(b => b.textContent.includes('Incline dumbbell press')));
+
+    // Test input retains trailing spaces
+    qIn.value = 'bench ';
+    qIn.dispatchEvent(new w.Event('input', { bubbles: true }));
+    const nqIn = d.querySelector('#q');
+    check('search input element retains trailing space string', nqIn && nqIn.value === 'bench ');
+
+    // Clear search and select Plank (a timed exercise)
+    nqIn.value = 'Plank';
+    nqIn.dispatchEvent(new w.Event('input', { bubbles: true }));
+    libItems = [...d.querySelectorAll('#lib .libitem')];
+    const plankItem = libItems.find(b => b.textContent.includes('Plank') && !b.textContent.includes('Side plank'));
+    check('Plank exercise found in library search', !!plankItem);
+    if (plankItem) tap(d, plankItem);
+    tap(d, '#addsel');
+
+    check('draft active workout opened with Plank', !!d.querySelector('#finish'));
+
+    // Fill sets for Plank: weight=89, reps/sec=45
+    const setRows = d.querySelectorAll('.setrow');
+    if (setRows.length > 0) {
+      const inputs = setRows[0].querySelectorAll('input');
+      if (inputs[0]) { inputs[0].value = '89'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+      if (inputs[1]) { inputs[1].value = '45'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    }
+
+    // Verify active workout stat shows 0 volume
+    const activeStatText = d.querySelector('.stat')?.textContent || '';
+    check('active session volume excludes timed exercise (0 volume logged for 89kg plank)', activeStatText.includes('0kg volume') || activeStatText.includes('0 kg volume'));
+
+    // Finish session
+    tap(d, '#finish');
+
+    // Verify calendar view monthly volume & session card volume
+    const calStatText = d.querySelector('.stat')?.textContent || '';
+    check('monthly volume in calendar excludes timed exercise (0 lifted)', calStatText.includes('0kg lifted') || calStatText.includes('0 kg lifted'));
+
+    const sessionNote = [...d.querySelectorAll('.card .note')].find(n => n.textContent.includes('volume'))?.textContent || '';
+    check('session card note excludes timed exercise volume (0 volume)', sessionNote.includes('0 kg volume') || sessionNote.includes('0 lbs volume'));
+
+    // Check Progress tab analytics
+    tap(d, 'nav button[data-tab=progress]');
+    const progStatText = d.querySelector('.stat')?.textContent || '';
+    check('Progress tab weight volume excludes timed exercise (0 kg)', progStatText.includes('0 kg'));
+
+    console.log('  errors:', log.length ? log.join(' | ') : 'none');
+  }
 
   console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
