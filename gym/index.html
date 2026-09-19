@@ -2212,7 +2212,7 @@ function sLibrary(){
           <span style="flex:1;min-width:0">${hesc(e.n)}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${hesc(e.g)} · ${hesc(e.s)}×${hesc(e.r)}${unitStr}</small></span>
           <span style="font-size:15px">${on?'✓':'+'}</span>
         </button>
-        <button class="quiet ex-edit" aria-label="Edit ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">✏️</button>
+        ${isCustom ? `<button class="quiet ex-edit" aria-label="Edit ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">✏️</button>` : ''}
         <button class="quiet diag-toggle" aria-label="Toggle diagram for ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
       </div>
       ${isExpanded ? `
@@ -2221,18 +2221,21 @@ function sLibrary(){
         </div>` : ''}
     `;
     row.querySelector('.libitem').onclick=()=>{ on ? st.picked.splice(st.picked.indexOf(e.n),1) : st.picked.push(e.n); sLibrary(); };
-    row.querySelector('.ex-edit').onclick=(ev)=>{
-      ev.stopPropagation();
-      const meta = exMeta(e.n);
-      st.creating = false;
-      st.editingEx = e.n;
-      st.cxname = e.n;
-      st.cxgroup = meta?.g || e.g;
-      st.cxm = getExMeasurement(meta || e);
-      st.cxsets = meta?.s || e.s || 3;
-      st.cxrepsv = meta?.r || e.r || 10;
-      sLibrary();
-    };
+    const editBtn = row.querySelector('.ex-edit');
+    if (editBtn) {
+      editBtn.onclick=(ev)=>{
+        ev.stopPropagation();
+        const meta = exMeta(e.n);
+        st.creating = false;
+        st.editingEx = e.n;
+        st.cxname = e.n;
+        st.cxgroup = meta?.g || e.g;
+        st.cxm = getExMeasurement(meta || e);
+        st.cxsets = meta?.s || e.s || 3;
+        st.cxrepsv = meta?.r || e.r || 10;
+        sLibrary();
+      };
+    }
     row.querySelector('.diag-toggle').onclick=()=>{ st.showDiag[e.n] = !st.showDiag[e.n]; sLibrary(); };
     lib.appendChild(row);
   });
