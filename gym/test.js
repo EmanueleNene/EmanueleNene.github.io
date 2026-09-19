@@ -634,7 +634,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check('saving without a name triggers alert', log.some(m => m.startsWith('ALERT:')));
 
   // Fill in name and pick Shoulders group
-  d.querySelector('#cxname').value = 'Cable face pull';
+  d.querySelector('#cxname').value = 'Custom cable face pull';
   d.querySelector('#cxname').dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
   const groupBtns = d.querySelectorAll('#cxchips button');
   const shouldersBtn = [...groupBtns].find(b => b.textContent === 'Shoulders');
@@ -662,8 +662,8 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   const profiles = JSON.parse(w.localStorage.getItem('fds.profiles') || '[]');
   const activeId = w.localStorage.getItem('fds.active');
   const dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
-  check('custom exercise stored in db.customEx', Array.isArray(dbData.customEx) && dbData.customEx.some(e => e.n === 'Cable face pull'));
-  const stored = (dbData.customEx || []).find(e => e.n === 'Cable face pull');
+  check('custom exercise stored in db.customEx', Array.isArray(dbData.customEx) && dbData.customEx.some(e => e.n === 'Custom cable face pull'));
+  const stored = (dbData.customEx || []).find(e => e.n === 'Custom cable face pull');
   if (stored) {
     check('stored exercise has correct group', stored.g === 'Shoulders');
     check('stored exercise is timed (t:1)', stored.t === 1);
@@ -674,11 +674,11 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   // The library should now show it in the list (search was set to the name by save logic)
   check('custom exercise visible in library list', !!d.querySelector('#lib .libitem-row'));
   const libItems = [...d.querySelectorAll('#lib .libitem')];
-  check('custom exercise appears in lib items', libItems.some(b => b.textContent.includes('Cable face pull')));
+  check('custom exercise appears in lib items', libItems.some(b => b.textContent.includes('Custom cable face pull')));
 
   // Check allExercises includes it (via exMeta)
-  check('exMeta finds custom exercise', !!w.exMeta('Cable face pull'));
-  check('isTimed returns true for timed custom exercise', w.isTimed('Cable face pull'));
+  check('exMeta finds custom exercise', !!w.exMeta('Custom cable face pull'));
+  check('isTimed returns true for timed custom exercise', w.isTimed('Custom cable face pull'));
 
   // Clear search and filter to Shoulders to find it
   const qInput = d.querySelector('#q');
@@ -701,10 +701,10 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   if (shouldersChip) tap(d, shouldersChip);
 
   const filteredItems = [...d.querySelectorAll('#lib .libitem')];
-  check('custom exercise visible when filtered by Shoulders', filteredItems.some(b => b.textContent.includes('Cable face pull')));
+  check('custom exercise visible when filtered by Shoulders', filteredItems.some(b => b.textContent.includes('Custom cable face pull')));
 
   // Select it into the workout
-  const customLibBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Cable face pull'));
+  const customLibBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Custom cable face pull'));
   if (customLibBtn) tap(d, customLibBtn);
   check('custom exercise selected (Add button enabled)', !d.querySelector('#addsel').disabled);
 
@@ -714,7 +714,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
   // Check the custom exercise is in the draft
   const exList = d.querySelector('#exlist');
-  check('custom exercise name appears in draft exlist', !!exList && exList.textContent.includes('Cable face pull'));
+  check('custom exercise name appears in draft exlist', !!exList && exList.textContent.includes('Custom cable face pull'));
 
   // Log a set for the custom exercise
   const inputs = d.querySelectorAll('.setrow input');
@@ -736,18 +736,18 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check('session stored in db.sessions', (dbData2.sessions||[]).length > 0);
   if ((dbData2.sessions||[]).length) {
     const last = dbData2.sessions[0];
-    check('custom exercise logged in session', last.ex.some(e => e.name === 'Cable face pull'));
+    check('custom exercise logged in session', last.ex.some(e => e.name === 'Custom cable face pull'));
   }
 
   // Verify the custom exercise badge is shown in the library
   tap(d, '#startHere'); tap(d, '#fromLib');
   const allLibItems = [...d.querySelectorAll('#lib .libitem')];
-  const customBadgeItem = allLibItems.find(b => b.textContent.includes('Cable face pull'));
+  const customBadgeItem = allLibItems.find(b => b.textContent.includes('Custom cable face pull'));
   check('custom exercise shows "custom" badge in library', !!customBadgeItem && customBadgeItem.innerHTML.includes('custom'));
 
   // Duplicate name rejected
   tap(d, '#newex');
-  d.querySelector('#cxname').value = 'Cable face pull';
+  d.querySelector('#cxname').value = 'Custom cable face pull';
   d.querySelector('#cxname').dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
   log.length = 0;
   tap(d, '#cxsave');
@@ -1184,9 +1184,9 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     equiv['Incline barbell press'] === 0.85 && Math.abs(85 / equiv['Incline barbell press'] - 100) < 0.001);
   check('Equivalence multiplier: default for unlisted exercise is 1.0',
     equiv['Nonexistent Unknown Lift'] === 1.0);
-  check('Benchmark balance ratios: Chest=1.00, Shoulders=0.65, Biceps=0.40, Legs=1.45, Back=1.00, Triceps=0.75',
+  check('Benchmark balance ratios: Chest=1.00, Shoulders=0.65, Biceps=0.40, Legs=1.45, Back=1.67, Triceps=0.90',
     ratios.Chest.ratio === 1.00 && ratios.Shoulders.ratio === 0.65 && ratios.Biceps.ratio === 0.40 &&
-    ratios.Legs.ratio === 1.45 && ratios.Back.ratio === 1.00 && ratios.Triceps.ratio === 0.75);
+    ratios.Legs.ratio === 1.45 && ratios.Back.ratio === 1.67 && ratios.Triceps.ratio === 0.90);
 
   // 2. Multi-exercise group selection & Imbalance detection
   // Log session with:
@@ -1411,7 +1411,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v21", swContent.includes("ferrodastiro-v21"));
+  check("sw.js cache version bumped to ferrodastiro-v22", swContent.includes("ferrodastiro-v22"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -1686,6 +1686,156 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
 
   console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
+
+  // ---------- scenario 25: Calibrated Radar, 1:1 Push/Pull Diagnostic & Catalogue Expansion ----------
+  console.log('\n25. Calibrated Radar, 1:1 Push/Pull Diagnostic & Catalogue Expansion');
+  {
+    const { w, d, log } = boot();
+    d.querySelector('#fname').value = 'Scenario25Tester'; tap(d, '#fgo');
+
+    const exModule = require('./exercises.js');
+    const ratios = exModule.BENCHMARK_BALANCE;
+
+    // 1. Test Deadlift as Back benchmark with ratio 1.67
+    check('Back benchmark is Conventional Deadlift with ratio 1.67',
+      ratios.Back.benchmark === 'Conventional Deadlift' && ratios.Back.ratio === 1.67 && ratios.Back.idealRatio === 1.67);
+
+    // 2. Test Barbell row coefficient normalization to Deadlift (0.60 multiplier)
+    const rowCoeff = w.getExCoeff('Barbell row');
+    check('Barbell row coefficient is 0.60', rowCoeff === 0.60);
+    const rowNorm = 120 / rowCoeff;
+    check('Barbell row 120 kg normalizes to 200 kg Deadlift equivalent (120 / 0.60 = 200)', Math.abs(rowNorm - 200) < 0.001);
+
+    // Also check all Back coefficients relative to Deadlift (1.00)
+    check('Deadlift coefficient is 1.0', w.getExCoeff('Deadlift') === 1.0);
+    check('Rack pull coefficient is 1.20', w.getExCoeff('Rack pull') === 1.20);
+    check('T-bar row coefficient is 0.72', w.getExCoeff('T-bar row') === 0.72);
+    check('Barbell row coefficient is 0.60', w.getExCoeff('Barbell row') === 0.60);
+    check('Pendlay row coefficient is 0.52', w.getExCoeff('Pendlay row') === 0.52);
+    check('Cable row coefficient is 0.55', w.getExCoeff('Cable row') === 0.55);
+    check('Lat pulldown coefficient is 0.55', w.getExCoeff('Lat pulldown') === 0.55);
+    check('Pull-up coefficient is 0.60', w.getExCoeff('Pull-up') === 0.60);
+    check('Chin-up coefficient is 0.60', w.getExCoeff('Chin-up') === 0.60);
+
+    // Verify accessory/isolation Back exercises have NO coefficient
+    const accessoryBackList = ['Dumbbell row', 'Single-arm dumbbell row', 'Single-arm cable lat pulldown', 'Single-arm cable seated row', 'Shrug', 'Straight-arm pulldown', 'Hyperextension (back)'];
+    const unallowedCoeffs = accessoryBackList.filter(name => w.getExCoeff(name) !== undefined);
+    check('Accessory and isolation back exercises have no coefficient', unallowedCoeffs.length === 0, unallowedCoeffs.join(', '));
+
+    // 3. Test newly added exercises are present in catalog and selectable into workouts
+    const newExList = [
+      'Single-leg extension',
+      'Single-leg curl',
+      'Single-leg 45° press',
+      'Seated leg curl',
+      'Lying leg curl',
+      'Standing calf raise (machine)',
+      'Single-arm cable lateral raise',
+      'Single-arm dumbbell lateral raise',
+      'Single-arm dumbbell shoulder press',
+      'Single-arm cable curl',
+      'Single-arm dumbbell curl',
+      'Single-arm triceps pushdown',
+      'Single-arm overhead cable extension',
+      'Rope triceps pushdown',
+      'Cable triceps kickback',
+      'Cable front raise',
+      'Cable face pull',
+      'EZ-bar preacher curl',
+      'Single-arm dumbbell row',
+      'Single-arm cable lat pulldown',
+      'Single-arm cable seated row',
+      'High-to-low cable fly',
+      'Low-to-high cable fly',
+      'Pec deck fly',
+      'Incline machine chest press',
+      'Cable woodchopper'
+    ];
+
+    const allEx = exModule.EXERCISES;
+    const missingNewEx = newExList.filter(name => !allEx.some(e => e.n === name));
+    check('All newly added exercises exist in EXERCISES catalogue', missingNewEx.length === 0, missingNewEx.join(', '));
+
+    // Test newly added exercises carry NO coeff (undefined) for radar protection
+    const coeffNewEx = newExList.filter(name => w.getExCoeff(name) !== undefined);
+    check('Radar Protection Rule: Newly added isolation/unilateral exercises carry no coeff', coeffNewEx.length === 0, coeffNewEx.join(', '));
+
+    // Verify selectable into workout draft via Library
+    tap(d, '#startHere');
+    tap(d, '#fromLib');
+    const singleLegExtBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Single-leg extension'));
+    const singleArmLatBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Single-arm cable lateral raise'));
+    const woodchopperBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Cable woodchopper'));
+
+    check('Newly added exercise Single-leg extension visible in library', !!singleLegExtBtn);
+    check('Newly added exercise Single-arm cable lateral raise visible in library', !!singleArmLatBtn);
+    check('Newly added exercise Cable woodchopper visible in library', !!woodchopperBtn);
+
+    if (singleLegExtBtn) tap(d, singleLegExtBtn);
+    if (singleArmLatBtn) tap(d, singleArmLatBtn);
+    if (woodchopperBtn) tap(d, woodchopperBtn);
+
+    tap(d, '#addsel');
+
+    const draft = w.eval('db.draft');
+    check('Newly added exercises are selectable into workout draft',
+      draft && draft.ex.some(e => e.name === 'Single-leg extension') &&
+      draft.ex.some(e => e.name === 'Single-arm cable lateral raise') &&
+      draft.ex.some(e => e.name === 'Cable woodchopper'));
+
+    // Fill set inputs and finish session to test Progress tab 1:1 Push/Pull Balance diagnostic
+    tap(d, '#scrap'); // clear draft
+
+    tap(d, 'nav button[data-tab=calendar]');
+    const todayCell = d.querySelector('.cell.today');
+    if (todayCell) tap(d, todayCell);
+
+    // Start a workout with Bench press & Barbell row
+    tap(d, '#startHere');
+    tap(d, '#fromLib');
+    const benchBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Bench press'));
+    const rowBtn = [...d.querySelectorAll('#lib .libitem')].find(b => b.textContent.includes('Barbell row'));
+    if (benchBtn) tap(d, benchBtn);
+    if (rowBtn) tap(d, rowBtn);
+    tap(d, '#addsel');
+
+    const cards = d.querySelectorAll('#exlist .card');
+    if (cards.length >= 2) {
+      // Bench press 100 kg x 5 reps (Card 0)
+      const set0 = cards[0].querySelector('.setrow');
+      if (set0) {
+        const benchInp = set0.querySelectorAll('input');
+        if (benchInp[0]) { benchInp[0].value = '100'; benchInp[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+        if (benchInp[1]) { benchInp[1].value = '5'; benchInp[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+        const tick0 = set0.querySelector('.tick');
+        if (tick0) tap(d, tick0);
+      }
+
+      // Barbell row 100 kg x 5 reps (Card 1)
+      const set1 = cards[1].querySelector('.setrow');
+      if (set1) {
+        const rowInp = set1.querySelectorAll('input');
+        if (rowInp[0]) { rowInp[0].value = '100'; rowInp[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+        if (rowInp[1]) { rowInp[1].value = '5'; rowInp[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+        const tick1 = set1.querySelector('.tick');
+        if (tick1) tap(d, tick1);
+      }
+    }
+    tap(d, '#finish');
+
+    // 4. Test dedicated 1:1 Push/Pull Balance diagnostic renders in Progress tab
+    tap(d, 'nav button[data-tab=progress]');
+    const progressTab = d.querySelector('#chart');
+    const pushPullDiag = d.querySelector('.push-pull-diag') || progressTab?.querySelector('.push-pull-diag');
+    check('Dedicated 1:1 Push/Pull balance diagnostic renders in Progress tab', !!pushPullDiag);
+    if (pushPullDiag) {
+      check('Push/Pull diagnostic displays Horizontal Push/Pull Balance header', pushPullDiag.textContent.includes('Horizontal Push/Pull Balance'));
+      check('Push/Pull diagnostic displays 1:1 ratio (1:1.0)', pushPullDiag.textContent.includes('1:1.0'));
+      check('Push/Pull diagnostic displays optimal note', pushPullDiag.textContent.includes('1:1 optimal shoulder health balance'));
+    }
+
+    console.log('  errors:', log.length ? log.join(' | ') : 'none');
+  }
 
   if (fails > 0) process.exitCode = 1;
 })();
