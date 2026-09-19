@@ -1440,8 +1440,45 @@ function renderMuscularBalanceCard(){
   }
 
   let summaryHtml = '';
+  const benchPeak1rm = getExercisePeak1RM('Bench press', db.sessions) || getExercisePeak1RM('Barbell Bench Press', db.sessions);
+  const rowPeak1rm = getExercisePeak1RM('Barbell row', db.sessions) || getExercisePeak1RM('Pendlay row', db.sessions);
+
+  let pushPullHtml = '';
+  if (benchPeak1rm > 0 || rowPeak1rm > 0) {
+    let ratioStr = 'N/A';
+    let pushPullNote = 'Log both Bench Press and Barbell Row to compare 1:1 push/pull strength.';
+    if (benchPeak1rm > 0 && rowPeak1rm > 0) {
+      const ratio = rowPeak1rm / benchPeak1rm;
+      ratioStr = `1:${ratio.toFixed(1)}`;
+      if (ratio >= 0.95 && ratio <= 1.05) {
+        pushPullNote = '1:1 optimal shoulder health balance';
+      } else if (ratio < 0.95) {
+        const defPct = Math.round((1 - ratio) * 100);
+        pushPullNote = `${defPct}% pull deficit · increase rowing strength for shoulder health`;
+      } else {
+        const defPct = Math.round((ratio - 1) * 100);
+        pushPullNote = `${defPct}% push deficit · increase bench press strength relative to row`;
+      }
+    } else if (benchPeak1rm > 0) {
+      ratioStr = `Bench: ${Math.round(benchPeak1rm)} ${unit}`;
+      pushPullNote = 'Log Barbell Row to assess 1:1 horizontal push/pull balance.';
+    } else {
+      ratioStr = `Row: ${Math.round(rowPeak1rm)} ${unit}`;
+      pushPullNote = 'Log Bench Press to assess 1:1 horizontal push/pull balance.';
+    }
+
+    pushPullHtml = `<div class="push-pull-diag" style="margin-top:10px;padding:8px 10px;background:var(--concrete);border-radius:var(--r)">
+      <small style="color:var(--steel);text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.04em">Horizontal Push/Pull Balance</small>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+        <span style="font-size:13px;font-weight:600">Bench Press vs Barbell Row</span>
+        <span style="font-size:13px;font-weight:700;color:var(--ink)">${ratioStr}</span>
+      </div>
+      <p class="note" style="margin-top:3px">${pushPullNote}</p>
+    </div>`;
+  }
+
   if(balance.groupsWithDataCount < 2){
-    summaryHtml = `<p class="note" style="text-align:center;margin:6px 0">Log workouts with at least 2 different muscle groups to see symmetry analytics.</p>`;
+    summaryHtml = `<p class="note" style="text-align:center;margin:6px 0">Log workouts with at least 2 different muscle groups to see symmetry analytics.</p>${pushPullHtml}`;
   } else {
     const groupsWithData = balance.groups.filter(g => balance.data[g].hasData);
     const dominant = groupsWithData.reduce((best, g) => (!best || balance.data[g].pct > best.pct ? balance.data[g] : best), null);
@@ -1457,7 +1494,7 @@ function renderMuscularBalanceCard(){
       summaryHtml = `<div style="display:flex;flex-direction:column;gap:8px">
         ${domHtml}
         <p class="note" style="color:var(--slate);font-weight:600;margin:4px 0 2px">Well-balanced physique! All muscle groups are within 10% of ideal biomechanical ratios.</p>
-      </div>`;
+      </div>${pushPullHtml}`;
     } else {
       const deficit = Math.max(0, 100 - Math.round(lagging.pct));
       const hint = GROUP_HINTS[lagging.group] || 'Focus on progressive overload for this muscle group.';
@@ -1468,7 +1505,7 @@ function renderMuscularBalanceCard(){
           <div style="font-size:14px;font-weight:600;margin-top:2px">${lagging.group}: ${Math.round(lagging.norm1rm)} ${unit} (${Math.round(lagging.pct)}% balance · ${deficit}% deficit)</div>
           <p class="note" style="margin-top:3px">${hint}</p>
         </div>
-      </div>`;
+      </div>${pushPullHtml}`;
     }
   }
 
