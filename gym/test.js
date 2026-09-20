@@ -1050,14 +1050,19 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check('Logging a second entry renders net change stat (+1.0 kg)', bwText2.includes('+1.0 kg') || bwText2.includes('Net change'));
   check('SVG trend chart is rendered for 2+ entries', !!bwCard2?.querySelector('svg'));
 
-  // 4. Delete an entry
-  const delBtn = bwCard2?.querySelector('.bw-del');
-  check('delete button present in history list', !!delBtn);
-  if (delBtn) tap(d, delBtn);
+  // 4. Delete an entry via Calendar day detail
+  tap(d, 'nav button[data-tab=calendar]');
+  const selCell = d.querySelector('.cell.sel') || d.querySelector('.cell.today');
+  if (selCell) tap(d, selCell);
+
+  const calBwDelBtn = d.querySelector('#cal-bw-del');
+  check('delete weight button present in calendar day detail', !!calBwDelBtn);
+  if (calBwDelBtn) tap(d, calBwDelBtn);
 
   // Check db and UI after deletion
   dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
   check('Deleting entry removes it from db.bodyweight', dbData.bodyweight.length === 1);
+  tap(d, 'nav button[data-tab=progress]');
   const bwCard3 = d.querySelector('#bw-card');
   const bwText3 = bwCard3 ? bwCard3.textContent : '';
   check('UI updates after deletion back to single entry view', bwText3.includes('Log more entries to see your trend chart'));
@@ -1411,7 +1416,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v24", swContent.includes("ferrodastiro-v24"));
+  check("sw.js cache version bumped to ferrodastiro-v25", swContent.includes("ferrodastiro-v25"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -1836,7 +1841,8 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
   // ---------- scenario 26: 2-frame vector SVG exercise diagrams for 29 newly added exercises ----------
   console.log('\n26. Exercise diagram vector SVGs (29 newly added catalog exercises)');
-  const new29Exercises = [
+  {
+    const new29Exercises = [
     'high-to-low-cable-fly.svg',
     'low-to-high-cable-fly.svg',
     'pec-deck-fly.svg',
@@ -1934,5 +1940,75 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   check('all 29 newly added exercise SVGs parse cleanly as valid XML', parseErrors26 === 0, `${parseErrors26} parse errors`);
   check('all 29 newly added exercise SVGs meet design standards (viewBox 0 0 300 150, START at 75, MID at 225, dashed vertical divider at x=150)', specErrors26 === 0, `${specErrors26} spec errors`);
 
-  if (fails > 0) process.exitCode = 1;
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
+// ---------- scenario 27: Calendar bodyweight tracking & day detail integration ----------
+console.log('\n27. Calendar bodyweight tracking & day detail integration');
+{
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'Cal BW Tester'; tap(d, '#fgo');
+
+  // Navigate to calendar and select today's cell
+  tap(d, 'nav button[data-tab=calendar]');
+  const todayCell = d.querySelector('.cell.today');
+  check('today calendar cell found', !!todayCell);
+  if (todayCell) tap(d, todayCell);
+
+  // Check initial state in day detail: no weight logged, input present
+  const valInput = d.querySelector('#cal-bw-val');
+  const saveBtn = d.querySelector('#cal-bw-save');
+  check('calendar day detail displays inline weight input', !!valInput);
+  check('calendar day detail displays log weight button', !!saveBtn);
+
+  // Log weight 82.4 kg for today
+  if (valInput) {
+    valInput.value = '82.4';
+    valInput.dispatchEvent(new w.Event('input', { bubbles: true }));
+  }
+  if (saveBtn) tap(d, saveBtn);
+
+  // Verify db.bodyweight updated
+  const activeId = w.localStorage.getItem('fds.active');
+  let dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('Logging weight from calendar saves entry to db.bodyweight', Array.isArray(dbData.bodyweight) && dbData.bodyweight.length === 1 && dbData.bodyweight[0].w === 82.4);
+
+  // Verify dot indicator on calendar cell
+  const dotCell = d.querySelector('.cell.today .bw-dot');
+  check('calendar cell renders .bw-dot indicator for days with bodyweight entry', !!dotCell);
+
+  // Verify day detail displays logged weight
+  const dayDetailCard = d.querySelector('#daydetail .card');
+  check('day detail panel displays logged bodyweight', dayDetailCard && dayDetailCard.textContent.includes('Bodyweight: 82.4 kg'));
+
+  // Test updating weight (edit)
+  const editBtn = d.querySelector('#cal-bw-edit');
+  check('edit bodyweight button present in day detail', !!editBtn);
+  if (editBtn) tap(d, editBtn);
+
+  const editInput = d.querySelector('#cal-bw-val');
+  const updateSaveBtn = d.querySelector('#cal-bw-save');
+  check('edit mode shows weight input prepopulated', editInput && editInput.value === '82.4');
+  if (editInput) {
+    editInput.value = '83.0';
+    editInput.dispatchEvent(new w.Event('input', { bubbles: true }));
+  }
+  if (updateSaveBtn) tap(d, updateSaveBtn);
+
+  dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('updating bodyweight in calendar updates db.bodyweight in place', dbData.bodyweight.length === 1 && dbData.bodyweight[0].w === 83.0);
+
+  // Test deleting weight
+  const delBtn = d.querySelector('#cal-bw-del');
+  check('delete bodyweight button present in day detail', !!delBtn);
+  if (delBtn) tap(d, delBtn);
+
+  dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('deleting bodyweight from calendar removes entry from db.bodyweight', (dbData.bodyweight || []).length === 0);
+  check('deleting bodyweight removes .bw-dot from calendar cell', !d.querySelector('.cell.today .bw-dot'));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
+if (fails > 0) process.exitCode = 1;
 })();
