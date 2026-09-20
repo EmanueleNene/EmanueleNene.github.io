@@ -1416,7 +1416,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v27", swContent.includes("ferrodastiro-v27"));
+  check("sw.js cache version bumped to ferrodastiro-v28", swContent.includes("ferrodastiro-v28"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -2030,6 +2030,11 @@ console.log('\n28. Rest Timer, Hidden History, and Backup Export/Restore');
   check('timer bar shows when set ticked', d.querySelector('#timerbar').classList.contains('on'));
   const clockText = d.querySelector('#clock').textContent;
   check('timer formats countdown (e.g. 1:30 or 3:00)', clockText === '1:30' || clockText === '3:00');
+
+  // Verify timerbar bottom offset clears bottom nav menu
+  const timerMatch = html.match(/\.timerbar\s*\{[^}]*bottom\s*:\s*calc\([^}]*?\+\s*(\d+)px\)/);
+  const timerBottomOffset = timerMatch ? parseInt(timerMatch[1], 10) : 0;
+  check('timerbar CSS specifies bottom offset >= 75px above safe area', timerBottomOffset >= 75);
 
   // Test +30s button
   tap(d, '#t30');
