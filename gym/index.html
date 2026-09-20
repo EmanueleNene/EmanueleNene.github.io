@@ -80,7 +80,7 @@
   .units{display:grid;grid-template-columns:26px 1fr 1fr 42px;gap:7px;font-size:11px;
     color:var(--steel);letter-spacing:.04em;margin-bottom:4px}
   .units div{text-align:center}
-  .timerbar{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 50px);left:50%;transform:translateX(-50%);z-index:99;
+  .timerbar{position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 78px);left:50%;transform:translateX(-50%);z-index:99;
     background:var(--ink);color:var(--paper);border:1px solid var(--steel);border-radius:99px;
     padding:8px 16px;display:none;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.25);
     white-space:nowrap;max-width:calc(100vw - 32px)}
