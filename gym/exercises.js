@@ -25,7 +25,7 @@ const GROUP_HINTS = {
 const EXER_EQUIV_MAP = {
   Chest: {
     'Bench press': 1.0, 'Incline barbell press': 0.85, 'Dumbbell bench press': 0.82,
-    'Incline dumbbell press': 0.75, 'Machine chest press': 1.05, 'Push-up': 0.65, 'Dip': 1.05
+    'Incline dumbbell press': 0.75, 'Push-up': 0.65, 'Dip': 1.05
   },
   Back: {
     'Deadlift': 1.0, 'Rack pull': 1.20, 'T-bar row': 0.72, 'Barbell row': 0.60,
@@ -100,7 +100,7 @@ const EXERCISES = [
   {n:'Bench press',g:'Chest',s:4,r:6,coeff:1.0},{n:'Incline barbell press',g:'Chest',s:4,r:8,coeff:0.85},
   {n:'Incline dumbbell press',g:'Chest',s:3,r:10,coeff:0.75},{n:'Dumbbell bench press',g:'Chest',s:3,r:10,coeff:0.82},
   {n:'Dumbbell fly',g:'Chest',s:3,r:12},{n:'Cable crossover',g:'Chest',s:3,r:15},
-  {n:'Machine chest press',g:'Chest',s:3,r:10,coeff:1.05},{n:'Push-up',g:'Chest',s:3,r:15,coeff:0.65},
+  {n:'Machine chest press',g:'Chest',s:3,r:10},{n:'Push-up',g:'Chest',s:3,r:15,coeff:0.65},
   {n:'Dip',g:'Chest',s:3,r:8,coeff:1.05},
   {n:'High-to-low cable fly',g:'Chest',s:3,r:15},
   {n:'Low-to-high cable fly',g:'Chest',s:3,r:15},
@@ -111,6 +111,7 @@ const EXERCISES = [
   {n:'Barbell row',g:'Back',s:4,r:8,coeff:0.60},{n:'Pendlay row',g:'Back',s:4,r:6,coeff:0.52},
   {n:'Dumbbell row',g:'Back',s:3,r:10},{n:'T-bar row',g:'Back',s:3,r:10,coeff:0.72},
   {n:'Cable row',g:'Back',s:3,r:12,coeff:0.55},{n:'Lat pulldown',g:'Back',s:3,r:10,coeff:0.55},
+  {n:'Machine lat pulldown',g:'Back',s:3,r:10},
   {n:'Pull-up',g:'Back',s:4,r:6,coeff:0.60},{n:'Chin-up',g:'Back',s:4,r:8,coeff:0.60},
   {n:'Straight-arm pulldown',g:'Back',s:3,r:15},{n:'Shrug',g:'Back',s:3,r:12},
   {n:'Hyperextension (back)',g:'Back',s:3,r:15},
