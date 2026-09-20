@@ -80,12 +80,16 @@
   .units{display:grid;grid-template-columns:26px 1fr 1fr 42px;gap:7px;font-size:11px;
     color:var(--steel);letter-spacing:.04em;margin-bottom:4px}
   .units div{text-align:center}
-  .timerbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--ink);color:var(--paper);
-    padding:12px 18px calc(env(safe-area-inset-bottom) + 12px);display:none;align-items:center;gap:14px}
+  .timerbar{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 50px);left:50%;transform:translateX(-50%);z-index:99;
+    background:var(--ink);color:var(--paper);border:1px solid var(--steel);border-radius:99px;
+    padding:8px 16px;display:none;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.25);
+    white-space:nowrap;max-width:calc(100vw - 32px)}
   .timerbar.on{display:flex}
-  .clock{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;min-width:88px}
-  .timerbar button{background:transparent;border-color:var(--steel);color:var(--paper);padding:8px 12px}
-  .timerbar .lbl{font-size:13px;color:var(--steel);flex:1}
+  .timerbar.pulse{animation:timerPulse 0.5s ease-in-out infinite alternate}
+  @keyframes timerPulse{from{transform:translateX(-50%) scale(1)}to{transform:translateX(-50%) scale(1.06);box-shadow:0 0 16px var(--rust)}}
+  .clock{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;min-width:54px}
+  .timerbar button{background:transparent;border:1px solid var(--steel);color:var(--paper);padding:4px 10px;font-size:13px;border-radius:99px}
+  .timerbar .lbl{font-size:13px;color:var(--steel);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--paper);
     border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
   nav button{flex:1;background:transparent;border:none;color:var(--steel);
@@ -166,10 +170,10 @@
 </div>
 
 <div class="timerbar" id="timerbar">
-  <div class="clock" id="clock">0:00</div>
+  <div class="clock" id="clock">1:30</div>
   <div class="lbl" id="timerlbl">Rest</div>
   <button id="t30">+30s</button>
-  <button id="tstop">Stop</button>
+  <button id="tstop">Skip</button>
 </div>
 
 <nav>
@@ -665,21 +669,140 @@ const e1rm = (w, r) => {
 const view = () => document.getElementById('view');
 
 /* ---------- rest timer ---------- */
-let tEnd=0,tInt=null;
-function startTimer(sec){
-  tEnd=Date.now()+sec*1000;
-  document.getElementById('timerbar').classList.add('on');
-  clearInterval(tInt); tick(); tInt=setInterval(tick,250);
+const timerState = { active: false, remaining: 0, total: 0, intervalId: null, exerciseName: '' };
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) audioCtx = new AudioContextClass();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+  return audioCtx;
 }
-function tick(){
-  const left=Math.max(0,Math.round((tEnd-Date.now())/1000));
-  document.getElementById('clock').textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
-  document.getElementById('timerlbl').textContent=left?'Rest':'Next set';
-  if(!left){clearInterval(tInt);tInt=null;if(navigator.vibrate)navigator.vibrate([200,90,200]);}
+
+function playGentleChime() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    
+    // First tone (E5 ~ 659.25Hz)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(659.25, now);
+    gain1.gain.setValueAtTime(0.15, now);
+    gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.35);
+
+    // Second tone (A5 ~ 880Hz)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, now + 0.18);
+    gain2.gain.setValueAtTime(0.18, now + 0.18);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.18);
+    osc2.stop(now + 0.6);
+  } catch (e) {}
 }
-function stopTimer(){clearInterval(tInt);tInt=null;document.getElementById('timerbar').classList.remove('on');}
-document.getElementById('t30').onclick=()=>{tEnd+=30000;if(!tInt)tInt=setInterval(tick,250);tick();};
-document.getElementById('tstop').onclick=stopTimer;
+
+function startRestTimer(sec = 90, exName = '') {
+  getAudioContext(); // prime audio context on user action
+  if (timerState.intervalId) clearInterval(timerState.intervalId);
+  
+  timerState.active = true;
+  timerState.remaining = sec;
+  timerState.total = sec;
+  timerState.exerciseName = exName;
+
+  const bar = document.getElementById('timerbar');
+  if (bar) {
+    bar.classList.remove('pulse');
+    bar.classList.add('on');
+  }
+
+  updateTimerUI();
+  timerState.intervalId = setInterval(tickTimer, 1000);
+}
+
+function tickTimer() {
+  if (!timerState.active) return;
+  timerState.remaining--;
+
+  if (timerState.remaining <= 0) {
+    timerState.remaining = 0;
+    updateTimerUI();
+    clearInterval(timerState.intervalId);
+    timerState.intervalId = null;
+
+    playGentleChime();
+    if (navigator.vibrate) {
+      try { navigator.vibrate([100, 50, 100]); } catch (e) {}
+    }
+
+    const bar = document.getElementById('timerbar');
+    if (bar) bar.classList.add('pulse');
+
+    setTimeout(() => {
+      stopRestTimer();
+    }, 1500);
+  } else {
+    updateTimerUI();
+  }
+}
+
+function updateTimerUI() {
+  const clock = document.getElementById('clock');
+  const lbl = document.getElementById('timerlbl');
+  if (clock) {
+    const m = Math.floor(timerState.remaining / 60);
+    const s = String(timerState.remaining % 60).padStart(2, '0');
+    clock.textContent = `${m}:${s}`;
+  }
+  if (lbl) {
+    lbl.textContent = timerState.exerciseName ? timerState.exerciseName : (timerState.remaining ? 'Rest' : 'Done!');
+  }
+}
+
+function addRestTime(sec = 30) {
+  if (!timerState.active) return;
+  timerState.remaining += sec;
+  timerState.total += sec;
+  const bar = document.getElementById('timerbar');
+  if (bar) bar.classList.remove('pulse');
+  updateTimerUI();
+}
+
+function stopRestTimer() {
+  if (timerState.intervalId) clearInterval(timerState.intervalId);
+  timerState.intervalId = null;
+  timerState.active = false;
+  timerState.remaining = 0;
+  timerState.total = 0;
+  timerState.exerciseName = '';
+  const bar = document.getElementById('timerbar');
+  if (bar) {
+    bar.classList.remove('on', 'pulse');
+  }
+}
+
+// Global legacy timer compatibility if any
+function startTimer(sec){ startRestTimer(sec); }
+function stopTimer(){ stopRestTimer(); }
+
+const t30Btn = document.getElementById('t30');
+if (t30Btn) t30Btn.onclick = () => addRestTime(30);
+const tstopBtn = document.getElementById('tstop');
+if (tstopBtn) tstopBtn.onclick = () => stopRestTimer();
 
 /* ---------- profiles ---------- */
 function sProfiles(){
@@ -737,7 +860,7 @@ function render(){
 function renderScreen(){
   ({profiles:sProfiles,start:sStart,progday:sProgDay,past:sPast,lib:sLibrary})[screen.type]();
 }
-const closeScreen = () => { screen=null; render(); window.scrollTo(0,0); };
+const closeScreen = () => { stopRestTimer(); screen=null; render(); window.scrollTo(0,0); };
 
 function firstRun(){
   document.getElementById('who').textContent='set up';
@@ -845,7 +968,7 @@ function sPast(){
 function lastPerformance(name){
   for(const s of db.sessions){
     const e=s.ex.find(x=>x.name===name);
-    if(e && e.sets.length) return {date:s.date, sets:e.sets};
+    if(e && e.sets && e.sets.length) return {date:s.date, sets:e.sets};
   }
   return null;
 }
@@ -912,6 +1035,7 @@ function drawDraft(){
     const prev = lastPerformance(ex.name);
     const slug = exSlug(ex.name);
     const isExpanded = !!ex.showDiag;
+    const isHistExpanded = !!ex.showHist;
 
     const card=document.createElement('div');
     card.className='card'+(complete?' done':'');
@@ -928,7 +1052,15 @@ function drawDraft(){
         <div class="ex-diagram">
           <img src="img/exercises/${slug}.svg" alt="${ex.name} diagram" onerror="this.style.display='none'">
         </div>` : ''}
-      ${prev?`<p class="note" style="margin:-2px 0 10px">Last time ${fmtDate(prev.date)}: ${prev.sets.map(s=>`${s.w}×${s.r}`).join(', ')}</p>`:''}
+      ${prev ? `
+        <div style="margin:-2px 0 10px">
+          <button type="button" class="quiet ex-history-toggle" style="padding:0;font-size:12px;color:var(--steel);cursor:pointer">⏱ Last session ${isHistExpanded ? '▾' : '▸'}</button>
+          ${isHistExpanded ? `
+            <div class="ex-history-drawer" style="margin-top:6px;padding:8px;background:var(--concrete);border-radius:var(--r);font-size:12px;color:var(--ink)">
+              <div style="font-weight:600;color:var(--steel);margin-bottom:4px">Last time (${fmtDate(prev.date)}):</div>
+              <div>${prev.sets.length} set${prev.sets.length > 1 ? 's' : ''} · ${prev.sets.map(s => `${s.w}${db.unit} × ${s.r}`).join(', ')}</div>
+            </div>` : ''}
+        </div>` : ''}
       <div class="controls">
         <div class="step" data-k="sets">
           <button data-d="-1" ${ex.sets.length<=1?'disabled':''} aria-label="One set fewer">−</button>
@@ -948,9 +1080,18 @@ function drawDraft(){
     const handle=card.querySelector('.drag-handle');
 
     card.querySelector('.exhead').onclick=(e)=>{
-      if(e.target.closest('.drag-handle')) return;
+      if(e.target.closest('.drag-handle') || e.target.closest('.ex-history-toggle')) return;
       ex.showDiag = !ex.showDiag; save(); drawDraft();
     };
+
+    const histToggle = card.querySelector('.ex-history-toggle');
+    if (histToggle) {
+      histToggle.onclick = (e) => {
+        e.stopPropagation();
+        ex.showHist = !ex.showHist;
+        save(); drawDraft();
+      };
+    }
 
     // Desktop HTML5 Drag & Drop
     handle.ondragstart=(e)=>{
@@ -1063,8 +1204,8 @@ function drawDraft(){
       rIn.oninput=e=>{s.r=e.target.value;save();};
       r.querySelector('.tick').onclick=()=>{
         s.done=!s.done; save();
-        if(s.done) startTimer(/squat|deadlift|bench|press|row/i.test(ex.name)?180:90);
-        else stopTimer();          // untick = mistake, kill the rest clock
+        if(s.done) startRestTimer(/squat|deadlift|bench|press|row/i.test(ex.name)?180:90, ex.name);
+        else stopRestTimer();          // untick = mistake, kill the rest clock
         drawDraft();
       };
       sets.appendChild(r);
@@ -1826,11 +1967,11 @@ function vPrograms(){
       <p class="note" style="margin-bottom:0">Data is protected against browser storage eviction and mirrored in IndexedDB for resilience and automatic recovery.</p>
     </div>
     <div class="card">
-      <h3>Backup</h3>
-      <p class="note" style="margin-bottom:10px">Your log lives only in this browser. Clearing site data or deleting the app erases it — export a copy now and then.</p>
-      <div class="row"><button class="ghost grow" id="exp">Export file</button>
-        <button class="ghost grow" id="imp">Import file</button></div>
-      <input type="file" id="file" accept="application/json" style="display:none">
+      <h3>Data Backup &amp; Portability</h3>
+      <p class="note" style="margin-bottom:10px">Your log lives on this device. Export a backup file to save your profiles and data or move to a new device.</p>
+      <div class="row"><button class="ghost grow" id="exp">Export backup</button>
+        <button class="ghost grow" id="imp">Restore backup</button></div>
+      <input type="file" id="restore-backup-file" accept=".json,application/json" style="display:none">
     </div>
     <div class="card">
       <h3>This profile</h3>
@@ -1866,27 +2007,83 @@ function vPrograms(){
   };
   document.getElementById('unit').onchange=e=>{db.unit=e.target.value;save();};
   document.getElementById('exp').onclick=()=>{
-    const name=profiles.find(p=>p.id===me).name;
-    const blob=new Blob([JSON.stringify({profile:name,exported:Date.now(),data:db},null,2)],{type:'application/json'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=`ferrodastiro-${name.toLowerCase()}-${new Date().toISOString().slice(0,10)}.json`;
-    a.click(); URL.revokeObjectURL(a.href);
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const exportData = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      profiles: profiles,
+      active: me,
+      data: {}
+    };
+    profiles.forEach(p => {
+      exportData.data[p.id] = readJSON(dkey(p.id), {});
+    });
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `ferrodastiro-backup-${dateStr}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
   };
-  document.getElementById('imp').onclick=()=>document.getElementById('file').click();
-  document.getElementById('file').onchange=async e=>{
-    const f=e.target.files[0]; if(!f) return;
-    try{
-      const parsed=JSON.parse(await f.text());
-      const incoming=parsed.data||parsed;
-      if(!Array.isArray(incoming.sessions)) throw new Error('shape');
-      if(confirm(`Replace this profile's log with ${incoming.sessions.length} imported sessions?`)){
-        db=Object.assign(BLANK(),incoming);
-        db.sessions.forEach(s=>{ if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9); });
-        save(); render();
+  const impBtn = document.getElementById('imp');
+  const fileInput = document.getElementById('restore-backup-file');
+  if (impBtn && fileInput) {
+    impBtn.onclick = () => fileInput.click();
+    fileInput.onchange = async e => {
+      const f = e.target.files[0]; if (!f) return;
+      try {
+        const text = await f.text();
+        const parsed = JSON.parse(text);
+        
+        let newProfiles = null;
+        let newActive = null;
+        let dataBlobs = {};
+
+        if (parsed.version === 1 && parsed.profiles && parsed.data) {
+          newProfiles = parsed.profiles;
+          newActive = parsed.active || newProfiles[0]?.id;
+          dataBlobs = parsed.data;
+        } else {
+          // Fallback legacy single-profile import
+          const incoming = parsed.data || parsed;
+          if (!Array.isArray(incoming.sessions)) throw new Error('Invalid format');
+          if (me) {
+            dataBlobs[me] = incoming;
+          }
+        }
+
+        if (newProfiles && Array.isArray(newProfiles)) {
+          profiles = newProfiles;
+          writeJSON(PKEY, profiles);
+          idbPut(PKEY, profiles);
+          if (newActive) {
+            localStorage.setItem(AKEY, newActive);
+            idbPut(AKEY, newActive);
+            me = newActive;
+          }
+          for (const key of Object.keys(dataBlobs)) {
+            writeJSON(dkey(key), dataBlobs[key]);
+            idbPut(dkey(key), dataBlobs[key]);
+          }
+          loadData();
+          render();
+          alert('Backup restored successfully!');
+        } else if (me && dataBlobs[me]) {
+          db = Object.assign(BLANK(), dataBlobs[me]);
+          db.sessions.forEach(s => { if (!s.id) s.id = 's' + Math.random().toString(36).slice(2, 9); });
+          save();
+          render();
+          alert('Profile restored successfully!');
+        } else {
+          throw new Error('Unrecognized backup format');
+        }
+      } catch (err) {
+        alert("That file isn't a valid FerroDaStiro backup.");
+      } finally {
+        fileInput.value = '';
       }
-    }catch(err){ alert("That file isn't a FerroDaStiro export."); }
-  };
+    };
+  }
   document.getElementById('del').onclick=()=>{
     const name=profiles.find(p=>p.id===me).name;
     if(!confirm(`Delete ${name} and all their sessions? This cannot be undone.`)) return;
@@ -2439,7 +2636,7 @@ window.storageStatus = storageStatus;
 
 /* ---------- boot ---------- */
 document.querySelectorAll('nav button').forEach(b=>
-  b.onclick=()=>{tab=b.dataset.tab;editing=null;screen=null;render();window.scrollTo(0,0);});
+  b.onclick=()=>{stopRestTimer();tab=b.dataset.tab;editing=null;screen=null;render();window.scrollTo(0,0);});
 
 // User interactions trigger persistent storage request
 window.addEventListener('click', ()=>{ requestPersistence(); }, {once:true});

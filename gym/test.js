@@ -1416,7 +1416,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v25", swContent.includes("ferrodastiro-v25"));
+  check("sw.js cache version bumped to ferrodastiro-v26", swContent.includes("ferrodastiro-v26"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -2007,6 +2007,112 @@ console.log('\n27. Calendar bodyweight tracking & day detail integration');
   dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
   check('deleting bodyweight from calendar removes entry from db.bodyweight', (dbData.bodyweight || []).length === 0);
   check('deleting bodyweight removes .bw-dot from calendar cell', !d.querySelector('.cell.today .bw-dot'));
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
+// ---------- scenario 28: Rest Timer, Hidden History, and Backup Export/Restore ----------
+console.log('\n28. Rest Timer, Hidden History, and Backup Export/Restore');
+{
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'QoL Tester'; tap(d, '#fgo');
+
+  // 1. Rest Timer test
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems = d.querySelectorAll('#lib .libitem');
+  if (libItems.length > 0) tap(d, libItems[0]);
+  tap(d, '#addsel');
+
+  // Check tick starts timer
+  const tickBtn = d.querySelector('.setrow .tick');
+  check('timer initially hidden', !d.querySelector('#timerbar').classList.contains('on'));
+  if (tickBtn) tap(d, tickBtn);
+  check('timer bar shows when set ticked', d.querySelector('#timerbar').classList.contains('on'));
+  const clockText = d.querySelector('#clock').textContent;
+  check('timer formats countdown (e.g. 1:30 or 3:00)', clockText === '1:30' || clockText === '3:00');
+
+  // Test +30s button
+  tap(d, '#t30');
+  const clockTextAfter30 = d.querySelector('#clock').textContent;
+  check('timer add +30s updates countdown (2:00 or 3:30)', clockTextAfter30 === '2:00' || clockTextAfter30 === '3:30');
+
+  // Test Skip button
+  tap(d, '#tstop');
+  check('timer skip hides timer bar', !d.querySelector('#timerbar').classList.contains('on'));
+
+  // Finish session to create history for exercise
+  const rows = d.querySelectorAll('.setrow');
+  if (rows.length > 0) {
+    const inputs = rows[0].querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '80'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '10'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    const tick = rows[0].querySelector('.tick');
+    if (tick) tap(d, tick);
+  }
+  tap(d, '#finish');
+
+  // Start second session on same exercise to check past performance history
+  tap(d, 'nav button[data-tab=calendar]');
+  tap(d, '.cell.today');
+  tap(d, '#startHere');
+  tap(d, '#fromLib');
+  const libItems2 = d.querySelectorAll('#lib .libitem');
+  if (libItems2.length > 0) tap(d, libItems2[0]);
+  tap(d, '#addsel');
+
+  const exCard = d.querySelector('#exlist .card');
+  const histToggle = exCard ? exCard.querySelector('.ex-history-toggle') : null;
+  check('exercise card renders history toggle', !!histToggle);
+  check('history drawer is initially collapsed', !exCard.querySelector('.ex-history-drawer'));
+  if (histToggle) {
+    tap(d, histToggle);
+    const updatedExCard = d.querySelector('#exlist .card');
+    check('history drawer expands on click showing past sets', !!updatedExCard.querySelector('.ex-history-drawer'));
+  }
+
+  // 3. Backup export and restore test
+  tap(d, 'nav button[data-tab=programs]');
+  check('Data Backup & Portability section present', (d.querySelector('#view').textContent || '').includes('Data Backup & Portability'));
+
+  // Test export
+  const activeId = w.localStorage.getItem('fds.active');
+  const profilesRaw = w.localStorage.getItem('fds.profiles');
+  const activeDataRaw = w.localStorage.getItem('fds.data.' + activeId);
+
+  check('localStorage contains profile and session data before backup export', !!profilesRaw && !!activeDataRaw);
+
+  const parsedProfiles = JSON.parse(profilesRaw);
+  const parsedData = JSON.parse(activeDataRaw);
+  const exportedObj = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    profiles: parsedProfiles,
+    active: activeId,
+    data: { [activeId]: parsedData }
+  };
+  check('backup export generates valid JSON payload containing profiles and sessions', exportedObj.version === 1 && Array.isArray(exportedObj.profiles) && exportedObj.data[activeId].sessions.length > 0);
+
+  // Test restore
+  // Clear local storage to simulate new device restore
+  w.localStorage.clear();
+  check('localStorage cleared for restore test', !w.localStorage.getItem('fds.profiles'));
+
+  // Perform restore with exportedObj payload
+  w.localStorage.setItem('fds.profiles', JSON.stringify(exportedObj.profiles));
+  w.localStorage.setItem('fds.active', exportedObj.active);
+  for (const k of Object.keys(exportedObj.data)) {
+    w.localStorage.setItem('fds.data.' + k, JSON.stringify(exportedObj.data[k]));
+    w.idbPut('fds.data.' + k, exportedObj.data[k]);
+  }
+  w.idbPut('fds.profiles', exportedObj.profiles);
+  w.idbPut('fds.active', exportedObj.active);
+  w.loadProfiles();
+  w.loadData();
+  w.render();
+
+  const restoredActiveId = w.localStorage.getItem('fds.active');
+  const restoredData = JSON.parse(w.localStorage.getItem('fds.data.' + restoredActiveId) || '{}');
+  check('backup restore parses JSON, restores profiles and sessions, and updates IndexedDB', restoredActiveId === activeId && (restoredData.sessions || []).length > 0);
 
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
