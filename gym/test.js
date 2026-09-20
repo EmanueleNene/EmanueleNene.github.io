@@ -1445,6 +1445,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     qIn.dispatchEvent(new w.Event('input', { bubbles: true }));
     const nqIn = d.querySelector('#q');
     check('search input element retains trailing space string', nqIn && nqIn.value === 'bench ');
+    check('search input element DOM identity preserved on input update', nqIn === qIn);
 
     // Clear search and select Plank (a timed exercise)
     nqIn.value = 'Plank';
