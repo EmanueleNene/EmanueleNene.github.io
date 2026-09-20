@@ -117,13 +117,15 @@
   .dow{font-size:11px;color:var(--steel);text-align:center;padding-bottom:2px}
   .cell{aspect-ratio:1/1;border:1px solid transparent;border-radius:var(--r);background:transparent;
     color:var(--ink);font-size:13px;font-weight:600;padding:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:1px;font-variant-numeric:tabular-nums;overflow:hidden}
+    align-items:center;justify-content:center;gap:1px;font-variant-numeric:tabular-nums;overflow:hidden;position:relative}
   .cell.blank{visibility:hidden}
   .cell.has{background:var(--rust);border-color:var(--rust);color:var(--paper)}
   .cell.today{border-color:var(--ink);border-width:2px}
   .cell.sel{outline:2px solid var(--slate);outline-offset:1px}
   .cell small{font-size:8.5px;font-weight:700;line-height:1.1;max-width:96%;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bw-dot{width:4px;height:4px;border-radius:50%;background:var(--slate);position:absolute;top:3px;right:3px}
+  .cell.has .bw-dot{background:var(--paper)}
 
   /* exercise library + editor */
   .chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
@@ -1150,16 +1152,6 @@ function renderBodyweightCard(){
       </svg>`;
   }
 
-  const historyHTML = bw.length ? `
-    <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
-      <h4 style="font-size:13px;margin:0 0 8px;color:var(--steel);font-weight:700">History</h4>
-      ${bw.slice().reverse().map(b => `
-        <div class="histline" style="align-items:center">
-          <div><b>${b.w} ${hesc(db.unit)}</b> <small>(${fmtDate(b.date)})</small></div>
-          <button class="quiet bw-del" data-id="${b.id}" title="Delete entry" style="padding:2px 6px">×</button>
-        </div>`).join('')}
-    </div>` : '';
-
   return `
     <div class="card" id="bw-card">
       <div class="exhead">
@@ -1173,7 +1165,6 @@ function renderBodyweightCard(){
         </div>
       </form>
       ${displayHTML}
-      ${historyHTML}
     </div>`;
 }
 
@@ -1205,15 +1196,6 @@ function bindBodyweightEvents(){
       }
     };
   }
-
-  document.querySelectorAll('.bw-del').forEach(btn => {
-    btn.onclick = () => {
-      const id = btn.dataset.id;
-      db.bodyweight = (db.bodyweight || []).filter(b => b.id !== id);
-      save();
-      vProgress();
-    };
-  });
 }
 
 function getExercisePeak1RM(name, sessions = db.sessions){
@@ -2252,9 +2234,13 @@ function sLibrary(){
 }
 
 /* --- Calendar --- */
+let calEditingBw = false;
 function vCalendar(){
   const byDay={};
   db.sessions.forEach(s=>{ const k=dayKey(s.date); (byDay[k]=byDay[k]||[]).push(s); });
+
+  const bwByDay={};
+  (db.bodyweight || []).forEach(b=>{ bwByDay[dayKey(b.date)] = b; });
 
   const y=calMonth.getFullYear(), m=calMonth.getMonth();
   const first=new Date(y,m,1), daysIn=new Date(y,m+1,0).getDate();
@@ -2277,29 +2263,48 @@ function vCalendar(){
     <div id="daydetail"></div>`;
 
   const grid=document.getElementById('grid');
-  document.getElementById('prev').onclick=()=>{calMonth=new Date(y,m-1,1);calSel=null;vCalendar();};
-  document.getElementById('next').onclick=()=>{calMonth=new Date(y,m+1,1);calSel=null;vCalendar();};
+  document.getElementById('prev').onclick=()=>{calMonth=new Date(y,m-1,1);calSel=null;calEditingBw=false;vCalendar();};
+  document.getElementById('next').onclick=()=>{calMonth=new Date(y,m+1,1);calSel=null;calEditingBw=false;vCalendar();};
   ['M','T','W','T','F','S','S'].forEach(d=>{
     const h=document.createElement('div'); h.className='dow'; h.textContent=d; grid.appendChild(h); });
   for(let i=0;i<lead;i++){ const b=document.createElement('div'); b.className='cell blank'; grid.appendChild(b); }
   for(let d=1;d<=daysIn;d++){
-    const k=dayKey(new Date(y,m,d)), ss=byDay[k];
+    const k=dayKey(new Date(y,m,d)), ss=byDay[k], bw=bwByDay[k];
     const c=document.createElement('button');
     c.className='cell'+(ss?' has':'')+(k===todayK?' today':'')+(k===calSel?' sel':'');
-    c.innerHTML=`<span>${d}</span>${ss?`<small>${ss[0].day}</small>`:''}`;
-    c.onclick=()=>{ calSel=k; vCalendar(); };
+    c.innerHTML=`<span>${d}</span>${ss?`<small>${hesc(ss[0].day)}</small>`:''}${bw?`<span class="bw-dot" title="${bw.w} ${hesc(db.unit)}"></span>`:''}`;
+    c.onclick=()=>{ calSel=k; calEditingBw=false; vCalendar(); };
     grid.appendChild(c);
   }
 
   const box=document.getElementById('daydetail');
   const selMs = calSel ? noon(new Date(calSel+'T12:00:00')) : null;
   const shown = calSel ? (byDay[calSel]||[]) : monthSessions;
+  const dayBw = calSel ? bwByDay[calSel] : null;
 
   let out='';
   if(calSel){
     const label=new Date(selMs).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
     const draftHere = db.draft && dayKey(db.draft.date)===calSel;
     const future = selMs > noon(new Date());
+
+    let bwHtml = '';
+    if(dayBw && !calEditingBw){
+      bwHtml = `<div class="histline" style="align-items:center;padding:8px 0 0;border-top:1px solid var(--line);margin-top:10px">
+        <span>Bodyweight: <b>${dayBw.w} ${hesc(db.unit)}</b></span>
+        <div class="row" style="gap:6px">
+          <button class="mini" id="cal-bw-edit">Edit</button>
+          <button class="mini" id="cal-bw-del">Delete</button>
+        </div>
+      </div>`;
+    }else{
+      bwHtml = `<div class="row" style="gap:8px;padding-top:10px;border-top:1px solid var(--line);margin-top:10px">
+        <input type="number" id="cal-bw-val" step="0.1" placeholder="Weight (${hesc(db.unit)})" value="${dayBw ? dayBw.w : ''}" style="flex:1">
+        <button id="cal-bw-save" style="padding:8px 12px;font-size:13px;white-space:nowrap">${dayBw ? 'Save weight' : 'Log weight'}</button>
+        ${calEditingBw ? `<button class="ghost" id="cal-bw-cancel" style="padding:8px 12px;font-size:13px">Cancel</button>` : ''}
+      </div>`;
+    }
+
     out += `<div class="card">
       <h3 style="margin-bottom:2px">${label}</h3>
       <p class="note" style="margin-bottom:12px">${
@@ -2309,6 +2314,7 @@ function vCalendar(){
         : 'Nothing logged.'}</p>
       <button class="${draftHere?'rust':'ghost'}" id="startHere" style="width:100%">${
         draftHere ? 'Continue this workout' : shown.length ? 'Log another workout' : 'Start a workout'}</button>
+      ${bwHtml}
     </div>`;
   }
   out += shown.map(s=>sessionCard(s)).join('');
@@ -2323,6 +2329,40 @@ function vCalendar(){
     if(db.draft && dayKey(db.draft.date)===calSel){ tab='train'; render(); }
     else openStart(selMs);
   };
+
+  const bwEditBtn = document.getElementById('cal-bw-edit');
+  if(bwEditBtn) bwEditBtn.onclick = ()=>{ calEditingBw = true; vCalendar(); };
+
+  const bwDelBtn = document.getElementById('cal-bw-del');
+  if(bwDelBtn) bwDelBtn.onclick = ()=>{
+    db.bodyweight = (db.bodyweight || []).filter(b => dayKey(b.date) !== calSel);
+    calEditingBw = false;
+    save();
+    vCalendar();
+  };
+
+  const bwCancelBtn = document.getElementById('cal-bw-cancel');
+  if(bwCancelBtn) bwCancelBtn.onclick = ()=>{ calEditingBw = false; vCalendar(); };
+
+  const bwSaveBtn = document.getElementById('cal-bw-save');
+  if(bwSaveBtn) bwSaveBtn.onclick = ()=>{
+    const valInput = document.getElementById('cal-bw-val');
+    const val = parseFloat(valInput ? valInput.value : '');
+    if(!val || val <= 0) return;
+    const entryDate = noon(new Date(calSel + 'T12:00:00'));
+    db.bodyweight = db.bodyweight || [];
+    const idx = db.bodyweight.findIndex(b => dayKey(b.date) === calSel);
+    if(idx >= 0){
+      db.bodyweight[idx].w = val;
+    }else{
+      db.bodyweight.push({ id: 'bw' + Math.random().toString(36).slice(2, 9), date: entryDate, w: val });
+    }
+    db.bodyweight.sort((a, b) => a.date - b.date);
+    calEditingBw = false;
+    save();
+    vCalendar();
+  };
+
   box.querySelectorAll('[data-edit]').forEach(b=>{
     b.onclick=()=>{
       const id=b.dataset.edit;
