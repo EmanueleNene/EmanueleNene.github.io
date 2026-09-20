@@ -346,7 +346,7 @@ const writeJSON=(k,v)=>{
   idbPut(k, v);
 };
 
-const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], exEdits:{}, sessions:[], bodyweight:[], draft:null});
+const BLANK = () => ({unit:'kg', programId:'ul', custom:{}, customEx:[], exEdits:{}, exNotes:{}, sessions:[], bodyweight:[], draft:null});
 
 const BUILTIN = {
   ul:{name:'Upper / Lower', note:'4 days · balanced strength', days:[
@@ -644,6 +644,7 @@ function loadProfiles(){
 }
 function loadData(){
   db = Object.assign(BLANK(), readJSON(dkey(me), {}));
+  db.exNotes = db.exNotes || {};
   db.bodyweight = db.bodyweight || [];
   db.sessions.forEach(s=>{ if(!s.id) s.id='s'+Math.random().toString(36).slice(2,9); });
 }
@@ -1044,7 +1045,8 @@ function drawDraft(){
       <div class="exhead" style="cursor:pointer" title="Tap to toggle diagram">
         <div style="display:flex;align-items:center;gap:6px">
           <button type="button" class="quiet drag-handle" aria-label="Drag to reorder ${ex.name}" draggable="true" style="cursor:grab;touch-action:none;padding:2px 6px;font-size:16px;color:var(--steel);">⋮⋮</button>
-          <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">👁️</button></h3>
+          <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">🖼️</button></h3>
+          <button type="button" class="quiet ex-menu-btn" aria-label="Options for ${hesc(ex.name)}" style="padding:2px 6px;font-size:16px;color:var(--steel);cursor:pointer">⋮</button>
         </div>
         <em>${finished} of ${ex.sets.length} ticked</em>
       </div>
@@ -1052,15 +1054,16 @@ function drawDraft(){
         <div class="ex-diagram">
           <img src="img/exercises/${slug}.svg" alt="${ex.name} diagram" onerror="this.style.display='none'">
         </div>` : ''}
-      ${prev ? `
-        <div style="margin:-2px 0 10px">
-          <button type="button" class="quiet ex-history-toggle" style="padding:0;font-size:12px;color:var(--steel);cursor:pointer">⏱ Last session ${isHistExpanded ? '▾' : '▸'}</button>
-          ${isHistExpanded ? `
-            <div class="ex-history-drawer" style="margin-top:6px;padding:8px;background:var(--concrete);border-radius:var(--r);font-size:12px;color:var(--ink)">
-              <div style="font-weight:600;color:var(--steel);margin-bottom:4px">Last time (${fmtDate(prev.date)}):</div>
-              <div>${prev.sets.length} set${prev.sets.length > 1 ? 's' : ''} · ${prev.sets.map(s => `${s.w}${db.unit} × ${s.r}`).join(', ')}</div>
-            </div>` : ''}
-        </div>` : ''}
+      ${ex.showMenu ? (() => {
+        const exNote = (db.exNotes && db.exNotes[ex.name]) || '';
+        const noteSection = exNote && !ex.editingNote
+          ? `<div class="ex-note-view" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px"><span>📝 <b>Note:</b> ${hesc(exNote)}</span><div class="row" style="gap:4px"><button type="button" class="mini ex-note-edit">Edit</button><button type="button" class="mini ghost ex-note-del">Delete</button></div></div>`
+          : `<div class="ex-note-form" style="display:flex;gap:6px;margin-bottom:6px"><input type="text" class="ex-note-input" placeholder="Machine pin, seat height, or form note..." value="${hesc(exNote)}" style="flex:1;font-size:12px;padding:4px 8px;"><button type="button" class="mini ex-note-save">Save</button><button type="button" class="mini ghost ex-note-cancel">Cancel</button></div>`;
+        const histSection = prev
+          ? `<div class="ex-menu-hist" style="padding-top:6px;border-top:1px solid var(--line)"><div style="font-weight:600;color:var(--steel);margin-bottom:2px">Last session (${fmtDate(prev.date)}):</div><div>${prev.sets.length} set${prev.sets.length > 1 ? 's' : ''} · ${prev.sets.map(s => `${s.w}${db.unit} × ${s.r}`).join(', ')}</div></div>`
+          : `<div class="ex-menu-hist" style="padding-top:6px;border-top:1px solid var(--line);color:var(--steel)">No previous sessions logged for this exercise.</div>`;
+        return `<div class="ex-menu-drawer" style="background:var(--concrete);padding:8px 10px;border-radius:var(--r);font-size:12px;margin-bottom:10px">${noteSection}${histSection}</div>`;
+      })() : ''}
       <div class="controls">
         <div class="step" data-k="sets">
           <button data-d="-1" ${ex.sets.length<=1?'disabled':''} aria-label="One set fewer">−</button>
@@ -1080,15 +1083,58 @@ function drawDraft(){
     const handle=card.querySelector('.drag-handle');
 
     card.querySelector('.exhead').onclick=(e)=>{
-      if(e.target.closest('.drag-handle') || e.target.closest('.ex-history-toggle')) return;
+      if(e.target.closest('.drag-handle') || e.target.closest('.ex-menu-btn')) return;
       ex.showDiag = !ex.showDiag; save(); drawDraft();
     };
 
-    const histToggle = card.querySelector('.ex-history-toggle');
-    if (histToggle) {
-      histToggle.onclick = (e) => {
+    const menuBtn = card.querySelector('.ex-menu-btn');
+    if (menuBtn) {
+      menuBtn.onclick = (e) => {
         e.stopPropagation();
-        ex.showHist = !ex.showHist;
+        ex.showMenu = !ex.showMenu;
+        save(); drawDraft();
+      };
+    }
+
+    const noteSave = card.querySelector('.ex-note-save');
+    if (noteSave) {
+      noteSave.onclick = (e) => {
+        e.stopPropagation();
+        const input = card.querySelector('.ex-note-input');
+        const val = input ? input.value.trim() : '';
+        db.exNotes = db.exNotes || {};
+        if (val) db.exNotes[ex.name] = val;
+        else delete db.exNotes[ex.name];
+        ex.editingNote = false;
+        save(); drawDraft();
+      };
+    }
+
+    const noteEdit = card.querySelector('.ex-note-edit');
+    if (noteEdit) {
+      noteEdit.onclick = (e) => {
+        e.stopPropagation();
+        ex.editingNote = true;
+        save(); drawDraft();
+      };
+    }
+
+    const noteDel = card.querySelector('.ex-note-del');
+    if (noteDel) {
+      noteDel.onclick = (e) => {
+        e.stopPropagation();
+        db.exNotes = db.exNotes || {};
+        delete db.exNotes[ex.name];
+        ex.editingNote = false;
+        save(); drawDraft();
+      };
+    }
+
+    const noteCancel = card.querySelector('.ex-note-cancel');
+    if (noteCancel) {
+      noteCancel.onclick = (e) => {
+        e.stopPropagation();
+        ex.editingNote = false;
         save(); drawDraft();
       };
     }
@@ -1563,42 +1609,62 @@ function renderMuscularBalanceCard(){
   }
 
   let summaryHtml = '';
-  const benchPeak1rm = getExercisePeak1RM('Bench press', db.sessions) || getExercisePeak1RM('Barbell Bench Press', db.sessions);
-  const rowPeak1rm = getExercisePeak1RM('Barbell row', db.sessions) || getExercisePeak1RM('Pendlay row', db.sessions);
-
-  let pushPullHtml = '';
-  if (benchPeak1rm > 0 || rowPeak1rm > 0) {
-    let ratioStr = 'N/A';
-    let pushPullNote = 'Log both Bench Press and Barbell Row to compare 1:1 push/pull strength.';
-    if (benchPeak1rm > 0 && rowPeak1rm > 0) {
-      const ratio = rowPeak1rm / benchPeak1rm;
-      ratioStr = `1:${ratio.toFixed(1)}`;
-      if (ratio >= 0.95 && ratio <= 1.05) {
-        pushPullNote = '1:1 optimal shoulder health balance';
-      } else if (ratio < 0.95) {
-        const defPct = Math.round((1 - ratio) * 100);
-        pushPullNote = `${defPct}% pull deficit · increase rowing strength for shoulder health`;
-      } else {
-        const defPct = Math.round((ratio - 1) * 100);
-        pushPullNote = `${defPct}% push deficit · increase bench press strength relative to row`;
-      }
-    } else if (benchPeak1rm > 0) {
-      ratioStr = `Bench: ${Math.round(benchPeak1rm)} ${unit}`;
-      pushPullNote = 'Log Barbell Row to assess 1:1 horizontal push/pull balance.';
-    } else {
-      ratioStr = `Row: ${Math.round(rowPeak1rm)} ${unit}`;
-      pushPullNote = 'Log Bench Press to assess 1:1 horizontal push/pull balance.';
+  let pushPeak1rm = 0;
+  const hPushCandidates = ['Bench press', 'Barbell bench press', 'Dumbbell bench press', 'Incline barbell press', 'Incline dumbbell press', 'Incline press', 'Push-up', 'Push-ups', 'Dip', 'Dips'];
+  for (const name of hPushCandidates) {
+    const raw = getExercisePeak1RM(name, db.sessions);
+    if (raw > 0) {
+      const coeff = (typeof getExCoeff === 'function' ? getExCoeff(name) : undefined) || 1.0;
+      const norm = raw / coeff;
+      if (norm > pushPeak1rm) pushPeak1rm = norm;
     }
-
-    pushPullHtml = `<div class="push-pull-diag" style="margin-top:10px;padding:8px 10px;background:var(--concrete);border-radius:var(--r)">
-      <small style="color:var(--steel);text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.04em">Horizontal Push/Pull Balance</small>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
-        <span style="font-size:13px;font-weight:600">Bench Press vs Barbell Row</span>
-        <span style="font-size:13px;font-weight:700;color:var(--ink)">${ratioStr}</span>
-      </div>
-      <p class="note" style="margin-top:3px">${pushPullNote}</p>
-    </div>`;
   }
+  if (!pushPeak1rm && balance && balance.data && balance.data.Chest && balance.data.Chest.norm1rm > 0) {
+    pushPeak1rm = balance.data.Chest.norm1rm;
+  }
+
+  let rowPeak1rm = 0;
+  const hPullCandidates = ['Barbell row', 'Pendlay row', 'T-bar row', 'Cable row', 'Dumbbell row', 'Single-arm dumbbell row', 'Bent over row'];
+  for (const name of hPullCandidates) {
+    const raw = getExercisePeak1RM(name, db.sessions);
+    if (raw > 0) {
+      const coeff = (typeof getExCoeff === 'function' ? getExCoeff(name) : undefined) || 0.60;
+      const norm = raw / (coeff / 0.60);
+      if (norm > rowPeak1rm) rowPeak1rm = norm;
+    }
+  }
+
+  let ratioStr = 'Ratio: —';
+  let pushPullNote = 'Log horizontal push (Bench press) and horizontal pull (Barbell row) to evaluate 1:1 balance.';
+
+  if (pushPeak1rm > 0 && rowPeak1rm > 0) {
+    const ratio = rowPeak1rm / pushPeak1rm;
+    ratioStr = `1:${ratio.toFixed(1)}`;
+    if (ratio >= 0.95 && ratio <= 1.05) {
+      pushPullNote = '1:1 optimal shoulder health balance';
+    } else if (ratio < 0.95) {
+      const defPct = Math.round((1 - ratio) * 100);
+      pushPullNote = `${defPct}% pull deficit · increase rowing strength for shoulder health`;
+    } else {
+      const defPct = Math.round((ratio - 1) * 100);
+      pushPullNote = `${defPct}% push deficit · increase bench press strength relative to row`;
+    }
+  } else if (pushPeak1rm > 0) {
+    ratioStr = `Bench: ${Math.round(pushPeak1rm)} ${unit}`;
+    pushPullNote = 'Log horizontal pull (Barbell row) to assess 1:1 horizontal push/pull balance.';
+  } else if (rowPeak1rm > 0) {
+    ratioStr = `Row: ${Math.round(rowPeak1rm)} ${unit}`;
+    pushPullNote = 'Log horizontal push (Bench press) to assess 1:1 horizontal push/pull balance.';
+  }
+
+  const pushPullHtml = `<div class="push-pull-diag" style="margin-top:10px;padding:8px 10px;background:var(--concrete);border-radius:var(--r)">
+    <small style="color:var(--steel);text-transform:uppercase;font-size:11px;font-weight:700;letter-spacing:.04em">Horizontal Push/Pull Balance</small>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">
+      <span style="font-size:13px;font-weight:600">Bench Press vs Barbell Row</span>
+      <span style="font-size:13px;font-weight:700;color:var(--ink)">${ratioStr}</span>
+    </div>
+    <p class="note" style="margin-top:3px">${pushPullNote}</p>
+  </div>`;
 
   if(balance.groupsWithDataCount < 2){
     summaryHtml = `<p class="note" style="text-align:center;margin:6px 0">Log workouts with at least 2 different muscle groups to see symmetry analytics.</p>${pushPullHtml}`;
@@ -2414,6 +2480,7 @@ function renderLibList(){
     const isCustom=!!(db.customEx||[]).find(c=>c.n===e.n);
     const mUnit=getExMeasurement(e);
     const unitStr=mUnit==='min'?' min':(mUnit==='sec'?' sec':'');
+    const hasNote = db.exNotes && db.exNotes[e.n];
     const row=document.createElement('div');
     row.className='libitem-row';
     row.style.borderBottom='1px solid var(--line)';
@@ -2421,11 +2488,11 @@ function renderLibList(){
       <div style="display:flex;align-items:center;gap:6px;width:100%;">
         <button class="libitem" aria-pressed="${on}" style="border-bottom:none;flex:1;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 2px;">
           <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" loading="lazy" width="40" height="20" onerror="this.style.display='none'" class="ex-thumb">
-          <span style="flex:1;min-width:0">${hesc(e.n)}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${hesc(e.g)} · ${hesc(e.s)}×${hesc(e.r)}${unitStr}</small></span>
+          <span style="flex:1;min-width:0">${hesc(e.n)}${hasNote ? ' 📝' : ''}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${hesc(e.g)} · ${hesc(e.s)}×${hesc(e.r)}${unitStr}</small></span>
           <span style="font-size:15px">${on?'✓':'+'}</span>
         </button>
         ${isCustom ? `<button class="quiet ex-edit" aria-label="Edit ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">✏️</button>` : ''}
-        <button class="quiet diag-toggle" aria-label="Toggle diagram for ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">👁️</button>
+        <button class="quiet diag-toggle" aria-label="Toggle diagram for ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
       </div>
       ${isExpanded ? `
         <div class="ex-diagram">
