@@ -1416,7 +1416,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v26", swContent.includes("ferrodastiro-v26"));
+  check("sw.js cache version bumped to ferrodastiro-v27", swContent.includes("ferrodastiro-v27"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -2060,14 +2060,15 @@ console.log('\n28. Rest Timer, Hidden History, and Backup Export/Restore');
   if (libItems2.length > 0) tap(d, libItems2[0]);
   tap(d, '#addsel');
 
+  // 2. 3-Dots menu history drawer test
   const exCard = d.querySelector('#exlist .card');
-  const histToggle = exCard ? exCard.querySelector('.ex-history-toggle') : null;
-  check('exercise card renders history toggle', !!histToggle);
-  check('history drawer is initially collapsed', !exCard.querySelector('.ex-history-drawer'));
-  if (histToggle) {
-    tap(d, histToggle);
+  const menuBtn = exCard ? exCard.querySelector('.ex-menu-btn') : null;
+  check('exercise card renders 3-dots menu button', !!menuBtn);
+  check('menu drawer is initially collapsed', !exCard.querySelector('.ex-menu-drawer'));
+  if (menuBtn) {
+    tap(d, menuBtn);
     const updatedExCard = d.querySelector('#exlist .card');
-    check('history drawer expands on click showing past sets', !!updatedExCard.querySelector('.ex-history-drawer'));
+    check('menu drawer expands on click showing past history', !!updatedExCard.querySelector('.ex-menu-drawer .ex-menu-hist'));
   }
 
   // 3. Backup export and restore test
@@ -2113,6 +2114,110 @@ console.log('\n28. Rest Timer, Hidden History, and Backup Export/Restore');
   const restoredActiveId = w.localStorage.getItem('fds.active');
   const restoredData = JSON.parse(w.localStorage.getItem('fds.data.' + restoredActiveId) || '{}');
   check('backup restore parses JSON, restores profiles and sessions, and updates IndexedDB', restoredActiveId === activeId && (restoredData.sessions || []).length > 0);
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+}
+
+// ---------- scenario 29: Per-exercise 3-dots menu & persistent machine notes ----------
+console.log('\n29. Per-exercise 3-dots menu & persistent machine notes');
+{
+  const { w, d, log } = boot();
+  d.querySelector('#fname').value = 'Notes Tester'; tap(d, '#fgo');
+
+  tap(d, '#startHere'); tap(d, '#fromLib');
+  const libItems = d.querySelectorAll('#lib .libitem');
+  if (libItems.length > 0) tap(d, libItems[0]);
+  tap(d, '#addsel');
+
+  const card = d.querySelector('#exlist .card');
+  const exName = w.eval('db.draft.ex[0].name');
+  const menuBtn = card ? card.querySelector('.ex-menu-btn') : null;
+  check('exercise card renders .ex-menu-btn (3-dots button)', !!menuBtn);
+  check('menu drawer is initially collapsed', !card.querySelector('.ex-menu-drawer'));
+
+  // Test diagram toggle emoji
+  const diagToggle = card ? card.querySelector('.diag-toggle') : null;
+  check('diagram toggle uses the original picture emoji 🖼️', diagToggle && diagToggle.textContent.trim() === '🖼️');
+
+  if (menuBtn) tap(d, menuBtn);
+
+  let drawer = d.querySelector('#exlist .card .ex-menu-drawer');
+  check('tapping .ex-menu-btn opens the drawer with note editor and past history', !!drawer && !!drawer.querySelector('.ex-note-form') && !!drawer.querySelector('.ex-menu-hist'));
+
+  // Test saving a machine note
+  const input = drawer ? drawer.querySelector('.ex-note-input') : null;
+  const saveBtn = drawer ? drawer.querySelector('.ex-note-save') : null;
+  if (input) {
+    input.value = 'Seat pin: 4, chest pad: 2';
+    input.dispatchEvent(new w.Event('input', { bubbles: true }));
+  }
+  if (saveBtn) tap(d, saveBtn);
+
+  let activeId = w.localStorage.getItem('fds.active');
+  let dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('saving a machine note updates db.exNotes and persists across workouts', dbData.exNotes && dbData.exNotes[exName] === 'Seat pin: 4, chest pad: 2');
+
+  // Verify Library indicator 📝
+  tap(d, '#addex');
+  const libHtml = d.querySelector('#lib')?.innerHTML || '';
+  check('Library displays 📝 indicator for exercise with note', libHtml.includes('📝'));
+  tap(d, '#cancel');
+
+  // Drawer remains open in view mode
+  drawer = d.querySelector('#exlist .card .ex-menu-drawer');
+  const noteView = drawer ? drawer.querySelector('.ex-note-view') : null;
+  check('note displays in ex-note-view mode', noteView && noteView.textContent.includes('Seat pin: 4, chest pad: 2'));
+
+  // Test Editing a note
+  const editBtn = noteView ? noteView.querySelector('.ex-note-edit') : null;
+  if (editBtn) tap(d, editBtn);
+  drawer = d.querySelector('#exlist .card .ex-menu-drawer');
+  const editInput = drawer ? drawer.querySelector('.ex-note-input') : null;
+  const editSaveBtn = drawer ? drawer.querySelector('.ex-note-save') : null;
+  check('editing note opens input prepopulated', editInput && editInput.value === 'Seat pin: 4, chest pad: 2');
+
+  if (editInput) {
+    editInput.value = 'Seat pin: 5, chest pad: 3';
+    editInput.dispatchEvent(new w.Event('input', { bubbles: true }));
+  }
+  if (editSaveBtn) tap(d, editSaveBtn);
+
+  dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('edited note saves successfully', dbData.exNotes && dbData.exNotes[exName] === 'Seat pin: 5, chest pad: 3');
+
+  // Test Deleting a note
+  drawer = d.querySelector('#exlist .card .ex-menu-drawer');
+  const delBtn = drawer ? drawer.querySelector('.ex-note-del') : null;
+  if (delBtn) tap(d, delBtn);
+
+  dbData = JSON.parse(w.localStorage.getItem('fds.data.' + activeId) || '{}');
+  check('deleting note removes key from db.exNotes', !dbData.exNotes[exName]);
+
+  // Backup JSON test with exNotes
+  dbData.exNotes[exName] = 'Backup test note';
+  w.localStorage.setItem('fds.data.' + activeId, JSON.stringify(dbData));
+  const exportedObj = {
+    version: 1,
+    profiles: JSON.parse(w.localStorage.getItem('fds.profiles')),
+    active: activeId,
+    data: { [activeId]: dbData }
+  };
+  check('JSON backup export/restore includes exNotes', JSON.stringify(exportedObj).includes('Backup test note'));
+
+  // Finish session to test Progress tab Push/Pull diagnostic visibility
+  const setRow = d.querySelector('#exlist .card .setrow');
+  if (setRow) {
+    const inputs = setRow.querySelectorAll('input');
+    if (inputs[0]) { inputs[0].value = '80'; inputs[0].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    if (inputs[1]) { inputs[1].value = '10'; inputs[1].dispatchEvent(new w.Event('input', { bubbles: true })); }
+    const tick = setRow.querySelector('.tick');
+    if (tick) tap(d, tick);
+  }
+  tap(d, '#finish');
+
+  tap(d, 'nav button[data-tab=progress]');
+  const pushPullDiag = d.querySelector('.push-pull-diag');
+  check('Horizontal Push/Pull Balance diagnostic is visible', !!pushPullDiag && pushPullDiag.textContent.includes('Horizontal Push/Pull Balance'));
 
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
