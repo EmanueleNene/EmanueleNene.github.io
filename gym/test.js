@@ -1411,7 +1411,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v24", swContent.includes("ferrodastiro-v24"));
+  check("sw.js cache version bumped to ferrodastiro-v25", swContent.includes("ferrodastiro-v25"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -1440,6 +1440,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
     qIn.dispatchEvent(new w.Event('input', { bubbles: true }));
     const nqIn = d.querySelector('#q');
     check('search input element retains trailing space string', nqIn && nqIn.value === 'bench ');
+    check('search input element DOM identity preserved on input update', nqIn === qIn);
 
     // Clear search and select Plank (a timed exercise)
     nqIn.value = 'Plank';

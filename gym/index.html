@@ -146,7 +146,7 @@
     padding:5px 9px;font-size:13px;font-weight:700;border-radius:var(--r)}
   .mg-bar-bg{background:var(--concrete);height:7px;border-radius:3px;overflow:hidden;margin-top:4px}
   .mg-bar-fill{background:var(--rust);height:100%;border-radius:3px}
-  .ex-thumb{width:36px;height:36px;object-fit:contain;border-radius:2px;background:var(--paper);flex-shrink:0}
+  .ex-thumb{width:40px;height:20px;object-fit:contain;border-radius:2px;background:var(--paper);flex-shrink:0}
   .ex-diagram{margin:8px 0;padding:8px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);text-align:center}
   .ex-diagram img{max-width:100%;height:auto;border-radius:2px;display:block;margin:0 auto}
   .diag-toggle{font-size:14px;cursor:pointer}
@@ -918,7 +918,7 @@ function drawDraft(){
       <div class="exhead" style="cursor:pointer" title="Tap to toggle diagram">
         <div style="display:flex;align-items:center;gap:6px">
           <button type="button" class="quiet drag-handle" aria-label="Drag to reorder ${ex.name}" draggable="true" style="cursor:grab;touch-action:none;padding:2px 6px;font-size:16px;color:var(--steel);">⋮⋮</button>
-          <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">🖼️</button></h3>
+          <h3>${ex.name} <button class="quiet diag-toggle" aria-label="Toggle diagram for ${ex.name}" style="padding:0 4px;font-size:14px;vertical-align:middle;">👁️</button></h3>
         </div>
         <em>${finished} of ${ex.sets.length} ticked</em>
       </div>
@@ -2184,17 +2184,50 @@ function sLibrary(){
   ['All',...GROUPS].forEach(g=>{
     const c=document.createElement('button'); c.className='chip'; c.textContent=g;
     c.setAttribute('aria-pressed',String(g===st.group));
-    c.onclick=()=>{ st.group=g; sLibrary(); };
+    c.onclick=()=>{
+      st.group=g;
+      chips.querySelectorAll('.chip').forEach(chip => {
+        chip.setAttribute('aria-pressed', String(chip.textContent === st.group));
+      });
+      renderLibList();
+    };
     chips.appendChild(c);
   });
 
+  document.getElementById('q').oninput=ev=>{
+    st.q=ev.target.value;
+    renderLibList();
+  };
+  document.getElementById('newex').onclick=()=>{ st.creating=true; st.editingEx=null; st.cxname=st.q?st.q:''; st.cxgroup=GROUPS[0]; st.cxm='reps'; st.cxsets=3; st.cxrepsv=10; sLibrary(); };
+  document.getElementById('cancel').onclick=closeScreen;
+  document.getElementById('addsel').onclick=()=>{
+    const chosen=st.picked.map(n=>allExercises().find(e=>e.n===n)).filter(Boolean);
+    const cb=st.onAdd; screen=null; cb(chosen);
+  };
+
+  renderLibList();
+}
+
+function renderLibList(){
+  const st=screen;
   const lib=document.getElementById('lib');
+  if(!lib) return;
+
+  const addsel=document.getElementById('addsel');
+  if(addsel){
+    addsel.disabled = !st.picked.length;
+    addsel.textContent = st.picked.length ? 'Add '+st.picked.length : 'Add';
+  }
+
+  const allEx=allExercises();
   const qTokens=(st.q||'').toLowerCase().trim().split(/\s+/).filter(Boolean);
   const list=allEx.filter(e=>(st.group==='All'||e.g===st.group) && (!qTokens.length||qTokens.every(t=>e.n.toLowerCase().includes(t))));
   if(!list.length){
     lib.innerHTML=`<div class="empty">Nothing matches that search.</div>`;
+    return;
   }
   st.showDiag = st.showDiag || {};
+  lib.innerHTML='';
   list.forEach(e=>{
     const on=st.picked.includes(e.n);
     const slug=exSlug(e.n);
@@ -2208,19 +2241,22 @@ function sLibrary(){
     row.innerHTML=`
       <div style="display:flex;align-items:center;gap:6px;width:100%;">
         <button class="libitem" aria-pressed="${on}" style="border-bottom:none;flex:1;display:flex;align-items:center;gap:10px;text-align:left;padding:10px 2px;">
-          <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" onerror="this.style.display='none'" class="ex-thumb">
+          <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" loading="lazy" width="40" height="20" onerror="this.style.display='none'" class="ex-thumb">
           <span style="flex:1;min-width:0">${hesc(e.n)}${isCustom?' <span style="font-size:10px;color:var(--steel);background:var(--line);border-radius:3px;padding:1px 5px;font-weight:600">custom</span>':''}<small style="color:var(--steel);font-size:12px;display:block;font-weight:400">${hesc(e.g)} · ${hesc(e.s)}×${hesc(e.r)}${unitStr}</small></span>
           <span style="font-size:15px">${on?'✓':'+'}</span>
         </button>
         ${isCustom ? `<button class="quiet ex-edit" aria-label="Edit ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">✏️</button>` : ''}
-        <button class="quiet diag-toggle" aria-label="Toggle diagram for ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">🖼️</button>
+        <button class="quiet diag-toggle" aria-label="Toggle diagram for ${hesc(e.n)}" style="padding:6px 8px;flex-shrink:0;font-size:14px;">👁️</button>
       </div>
       ${isExpanded ? `
         <div class="ex-diagram">
-          <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" onerror="this.style.display='none'">
+          <img src="img/exercises/${slug}.svg" alt="${hesc(e.n)} diagram" loading="lazy" width="40" height="20" onerror="this.style.display='none'">
         </div>` : ''}
     `;
-    row.querySelector('.libitem').onclick=()=>{ on ? st.picked.splice(st.picked.indexOf(e.n),1) : st.picked.push(e.n); sLibrary(); };
+    row.querySelector('.libitem').onclick=()=>{
+      on ? st.picked.splice(st.picked.indexOf(e.n),1) : st.picked.push(e.n);
+      renderLibList();
+    };
     const editBtn = row.querySelector('.ex-edit');
     if (editBtn) {
       editBtn.onclick=(ev)=>{
@@ -2236,19 +2272,12 @@ function sLibrary(){
         sLibrary();
       };
     }
-    row.querySelector('.diag-toggle').onclick=()=>{ st.showDiag[e.n] = !st.showDiag[e.n]; sLibrary(); };
+    row.querySelector('.diag-toggle').onclick=()=>{
+      st.showDiag[e.n] = !st.showDiag[e.n];
+      renderLibList();
+    };
     lib.appendChild(row);
   });
-
-  const q=document.getElementById('q');
-  q.oninput=ev=>{ st.q=ev.target.value; const pos=ev.target.selectionStart;
-    sLibrary(); const nq=document.getElementById('q'); if(nq){ nq.focus(); nq.setSelectionRange(pos,pos); } };
-  document.getElementById('newex').onclick=()=>{ st.creating=true; st.editingEx=null; st.cxname=st.q?st.q:''; st.cxgroup=GROUPS[0]; st.cxm='reps'; st.cxsets=3; st.cxrepsv=10; sLibrary(); };
-  document.getElementById('cancel').onclick=closeScreen;
-  document.getElementById('addsel').onclick=()=>{
-    const chosen=st.picked.map(n=>allExercises().find(e=>e.n===n)).filter(Boolean);
-    const cb=st.onAdd; screen=null; cb(chosen);
-  };
 }
 
 /* --- Calendar --- */
