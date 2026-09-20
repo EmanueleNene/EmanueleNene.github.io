@@ -1411,7 +1411,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v23", swContent.includes("ferrodastiro-v23"));
+  check("sw.js cache version bumped to ferrodastiro-v24", swContent.includes("ferrodastiro-v24"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -1649,6 +1649,35 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
 
     const radarResult = w.computeMuscularBalance(customSessions);
     check('Strict radar policy: unvetted exercise without coefficient is SKIPPED from radar balance (groupsWithDataCount === 0)', radarResult.groupsWithDataCount === 0);
+
+    // Verify Chest Press and Machine Lat Pulldown exclusion & separation checks
+    check('Machine chest press has no coeff in EXERCISES', exModule.EXERCISES.find(e => e.n === 'Machine chest press').coeff === undefined);
+    check('getExCoeff for Machine chest press returns undefined', w.getExCoeff('Machine chest press') === undefined);
+    check('getExCoeff for Incline machine chest press returns undefined', w.getExCoeff('Incline machine chest press') === undefined);
+
+    const chestPressSession = [{ id: 's_cp', date: Date.now(), day: 'Chest Day', program: 'Test', ex: [{ name: 'Machine chest press', sets: [{ w: 80, r: 10, done: true }] }] }];
+    const chestRadar = w.computeMuscularBalance(chestPressSession);
+    check('Session with only Machine chest press produces no Chest balance data', chestRadar.data.Chest.hasData === false && chestRadar.data.Chest.norm1rm === 0);
+
+    check('Machine lat pulldown exists in EXERCISES under group Back with 3 sets, 10 reps', exModule.EXERCISES.some(e => e.n === 'Machine lat pulldown' && e.g === 'Back' && e.s === 3 && e.r === 10));
+    check('Machine lat pulldown has no coeff in EXERCISES', exModule.EXERCISES.find(e => e.n === 'Machine lat pulldown').coeff === undefined);
+    check('getExCoeff for Machine lat pulldown returns undefined', w.getExCoeff('Machine lat pulldown') === undefined);
+    check('getExCoeff for Lat pulldown preserves cable benchmark 0.55', w.getExCoeff('Lat pulldown') === 0.55);
+
+    const latPressSession = [{ id: 's_mlp', date: Date.now(), day: 'Back Day', program: 'Test', ex: [{ name: 'Machine lat pulldown', sets: [{ w: 70, r: 10, done: true }] }] }];
+    const backRadar = w.computeMuscularBalance(latPressSession);
+    check('Session with only Machine lat pulldown produces no Back balance data', backRadar.data.Back.hasData === false && backRadar.data.Back.norm1rm === 0);
+
+    const mlpSvgPath = path.join(__dirname, 'img', 'exercises', 'machine-lat-pulldown.svg');
+    const mlpSvgExists = fs.existsSync(mlpSvgPath);
+    let mlpSvgValid = false;
+    if (mlpSvgExists) {
+      try {
+        const dom = new JSDOM(fs.readFileSync(mlpSvgPath, 'utf8'), { contentType: 'image/svg+xml' });
+        mlpSvgValid = !dom.window.document.querySelector('parsererror');
+      } catch (e) { mlpSvgValid = false; }
+    }
+    check('machine-lat-pulldown.svg exists and parses cleanly as valid XML', mlpSvgExists && mlpSvgValid);
 
     console.log('  errors:', log.length ? log.join(' | ') : 'none');
   }
