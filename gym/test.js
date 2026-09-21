@@ -2280,15 +2280,31 @@ console.log('\n29. Per-exercise 3-dots menu & persistent machine notes');
     check('Wake Lock gracefully degrades when navigator.wakeLock is unavailable', w.getWakeLockSentinel() === null);
   }
 
-  // 2. Standalone detection & Install Prompt card
+  // 2. Standalone detection & Install Prompt cards/banners
   {
+    // Fresh run: test firstRun() name screen install card
     const { w, d, log } = boot();
+    const firstRunCard = d.querySelector('#install-firstrun-card');
+    check('In-app install guide card present on firstRun setup screen when NOT standalone', !!firstRunCard && firstRunCard.textContent.includes('Add to Home Screen'));
+    check('firstRun install guide contains iOS Safari and Android instructions', firstRunCard && firstRunCard.textContent.includes('iOS Safari') && firstRunCard.textContent.includes('Add to Home Screen'));
+
+    // Create profile and land on Calendar page
     d.querySelector('#fname').value = 'PWA User'; tap(d, '#fgo');
 
+    // Test Calendar top install banner
+    const calBanner = d.querySelector('#install-banner');
+    check('Install banner present on Calendar landing tab when NOT standalone', !!calBanner && calBanner.textContent.includes('Add FerroDaStiro to Home Screen'));
+    check('Calendar banner contains dismiss ✕ button', !!d.querySelector('#dismiss-install'));
+
+    // Dismiss banner
+    tap(d, '#dismiss-install');
+    check('Dismissing banner sets fds.install_dismissed in localStorage', w.localStorage.getItem('fds.install_dismissed') === '1');
+    check('Banner is hidden on Calendar tab after dismissal', !d.querySelector('#install-banner'));
+
+    // Test Settings card in Programs tab (remains available even after banner dismissal)
     tap(d, 'nav button[data-tab=programs]');
     const installCard = d.querySelector('#install-card');
     check('In-app install guidance card present in Settings when NOT standalone', !!installCard && installCard.textContent.includes('Install FerroDaStiro'));
-    check('Install card contains iOS Safari and Android instructions', installCard && installCard.textContent.includes('iOS Safari') && installCard.textContent.includes('Add to Home Screen'));
 
     // Test Android beforeinstallprompt event capture & button click
     let promptInvoked = false;
@@ -2303,14 +2319,16 @@ console.log('\n29. Per-exercise 3-dots menu & persistent machine notes');
     if (installBtn) tap(d, installBtn);
     check('Install App button invokes prompt()', promptInvoked);
 
-    // Test standalone mode (card hidden)
+    // Test standalone mode (all install cards/banners hidden)
     Object.defineProperty(w.window, 'matchMedia', {
       value: (query) => ({ matches: query.includes('standalone'), addEventListener: () => {}, removeEventListener: () => {} }),
       configurable: true,
       writable: true
     });
     w.render();
-    check('Install card hidden when running in standalone mode', !d.querySelector('#install-card'));
+    check('Install card hidden in Settings when running in standalone mode', !d.querySelector('#install-card'));
+    tap(d, 'nav button[data-tab=calendar]');
+    check('Install banner hidden on Calendar tab when running in standalone mode', !d.querySelector('#install-banner'));
   }
 
   // 3. Web Manifest JSON validity & required keys

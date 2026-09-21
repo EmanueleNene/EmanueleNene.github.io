@@ -386,6 +386,57 @@ if (typeof window !== 'undefined') {
   });
 }
 
+function renderInstallGuide(mode) {
+  if (isStandalone()) return '';
+  if (mode === 'banner' && typeof localStorage !== 'undefined' && localStorage.getItem('fds.install_dismissed') === '1') return '';
+
+  const shareIconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>`;
+
+  if (mode === 'firstrun') {
+    return `<div class="card" id="install-firstrun-card" style="margin-top:14px;border:1px solid var(--line);background:var(--paper)">
+      <h3>Add to Home Screen</h3>
+      <p class="note" style="margin-bottom:10px;color:var(--steel)">Install FerroDaStiro on your phone before starting for full-screen offline access and permanent local storage.</p>
+      ${deferredInstallPrompt ? `
+        <button class="rust" id="pwa-firstrun-install-btn" style="width:100%">Install App</button>
+      ` : `
+        <div style="font-size:13px;line-height:1.5;color:var(--slate)">
+          <p style="margin:0 0 6px"><strong>iOS Safari:</strong> Tap the Share button (<span>${shareIconSvg}</span>) at the bottom of Safari, then tap <strong>Add to Home Screen</strong>.</p>
+          <p style="margin:0"><strong>Android / Chrome:</strong> Tap the browser menu (⋮) → <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
+        </div>
+      `}
+    </div>`;
+  }
+
+  if (mode === 'banner') {
+    return `<div class="card install-banner" id="install-banner" style="position:relative;margin-top:10px;margin-bottom:14px;border:1px solid var(--line);background:var(--paper)">
+      <button type="button" class="quiet dismiss-install" id="dismiss-install" aria-label="Dismiss install banner" style="position:absolute;top:8px;right:8px;padding:4px 8px;font-weight:bold;font-size:16px;color:var(--steel);cursor:pointer">✕</button>
+      <h3 style="margin-right:28px">Add FerroDaStiro to Home Screen</h3>
+      <p class="note" style="margin-bottom:10px;color:var(--steel)">Runs full-screen, works completely offline in the gym, and saves your data locally.</p>
+      ${deferredInstallPrompt ? `
+        <button class="rust" id="pwa-banner-install-btn" style="width:100%">Install App</button>
+      ` : `
+        <div style="font-size:13px;line-height:1.5;color:var(--slate)">
+          <p style="margin:0 0 6px"><strong>iOS Safari:</strong> Tap the Share icon (<span>${shareIconSvg}</span>) in Safari, then scroll down and tap <strong>Add to Home Screen</strong>.</p>
+          <p style="margin:0"><strong>Android / Chrome:</strong> Tap the browser menu (⋮) → <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
+        </div>
+      `}
+    </div>`;
+  }
+
+  return `<div class="card" id="install-card">
+    <h3>Install FerroDaStiro</h3>
+    <p class="note" style="margin-bottom:10px">Add FerroDaStiro to your home screen for full-screen offline access and maximum performance.</p>
+    ${deferredInstallPrompt ? `
+      <button class="rust" id="pwa-install-btn" style="width:100%">Install App</button>
+    ` : `
+      <div style="font-size:13px;line-height:1.5;color:var(--slate)">
+        <p style="margin:0 0 6px"><strong>iOS Safari:</strong> Tap the Share icon (<span>${shareIconSvg}</span>), then select <strong>Add to Home Screen</strong>.</p>
+        <p style="margin:0"><strong>Android / Chrome:</strong> Tap the menu (⋮) and select <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
+      </div>
+    `}
+  </div>`;
+}
+
 /* One-time carry-over from the old "ironlog.*" keys, for anyone
    who installed before the rename. Runs once, then never again. */
 (function migrate(){
@@ -931,10 +982,22 @@ function firstRun(){
     <div class="card" style="margin-top:14px">
       <div class="row"><input id="fname" placeholder="Your name" maxlength="18" class="grow">
       <button id="fgo">Start</button></div>
-    </div>`;
+    </div>
+    ${renderInstallGuide('firstrun')}`;
   const go=()=>{const n=document.getElementById('fname').value.trim()||'Me';addProfile(n);};
   document.getElementById('fgo').onclick=go;
   document.getElementById('fname').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  const firstRunInstallBtn = document.getElementById('pwa-firstrun-install-btn');
+  if(firstRunInstallBtn){
+    firstRunInstallBtn.onclick = async () => {
+      if(deferredInstallPrompt){
+        deferredInstallPrompt.prompt();
+        try { await deferredInstallPrompt.userChoice; } catch(e){}
+        deferredInstallPrompt = null;
+        render();
+      }
+    };
+  }
 }
 
 /* --- Train (shows whatever session is open) --- */
@@ -2087,19 +2150,7 @@ function vPrograms(){
       <select id="unit" style="width:auto">
         <option value="kg"${db.unit==='kg'?' selected':''}>kg</option>
         <option value="lb"${db.unit==='lb'?' selected':''}>lb</option></select></div>
-    ${!isStandalone() ? `
-    <div class="card" id="install-card">
-      <h3>Install FerroDaStiro</h3>
-      <p class="note" style="margin-bottom:10px">Add FerroDaStiro to your home screen for full-screen offline access and maximum performance.</p>
-      ${deferredInstallPrompt ? `
-        <button class="rust" id="pwa-install-btn" style="width:100%">Install App</button>
-      ` : `
-        <div style="font-size:13px;line-height:1.5;color:var(--slate)">
-          <p style="margin:0 0 6px"><strong>iOS Safari:</strong> Tap the Share icon (<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>), then select <strong>Add to Home Screen</strong>.</p>
-          <p style="margin:0"><strong>Android / Chrome:</strong> Tap the menu (⋮) and select <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
-        </div>
-      `}
-    </div>` : ''}
+    ${renderInstallGuide('card')}
     <div class="card">
       <h3>Storage & Durability</h3>
       <p style="font-weight:600;font-size:14px;margin-bottom:6px;color:var(--slate)">${persistMsg}</p>
@@ -2627,6 +2678,7 @@ function vCalendar(){
   const monthVol=monthSessions.reduce((a,s)=>a+s.ex.reduce((b,e)=>b+(isTimed(e.name)?0:e.sets.reduce((c,x)=>c+(+x.w||0)*(+x.r||0),0)),0),0);
 
   view().innerHTML=`
+    ${renderInstallGuide('banner')}
     <div class="monthbar">
       <button id="prev" aria-label="Previous month">‹</button>
       <b>${calMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</b>
@@ -2700,6 +2752,22 @@ function vCalendar(){
   /* One assignment, then wire everything. Writing to innerHTML a second
      time would re-parse the panel and throw away its click handler. */
   box.innerHTML=out;
+
+  const dismissInstallBtn = document.getElementById('dismiss-install');
+  if(dismissInstallBtn) dismissInstallBtn.onclick = ()=>{
+    localStorage.setItem('fds.install_dismissed', '1');
+    vCalendar();
+  };
+
+  const bannerInstallBtn = document.getElementById('pwa-banner-install-btn');
+  if(bannerInstallBtn) bannerInstallBtn.onclick = async ()=>{
+    if(deferredInstallPrompt){
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch(e){}
+      deferredInstallPrompt = null;
+      render();
+    }
+  };
 
   const startBtn=document.getElementById('startHere');
   if(startBtn) startBtn.onclick=()=>{
@@ -2785,6 +2853,7 @@ window.checkPersistence = checkPersistence;
 window.requestPersistence = requestPersistence;
 window.storageStatus = storageStatus;
 window.isStandalone = isStandalone;
+window.renderInstallGuide = renderInstallGuide;
 window.updateWakeLock = updateWakeLock;
 window.getWakeLockSentinel = () => wakeLockSentinel;
 window.getDeferredInstallPrompt = () => deferredInstallPrompt;
