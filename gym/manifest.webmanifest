@@ -2,6 +2,12 @@
   "name": "FerroDaStiro",
   "short_name": "FerroDaStiro",
   "description": "Private workout log. Data stays on your phone.",
+  "id": "/gym/",
+  "categories": [
+    "fitness",
+    "health",
+    "sports"
+  ],
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,8 +15,23 @@
   "background_color": "#DEDDD8",
   "theme_color": "#DEDDD8",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
