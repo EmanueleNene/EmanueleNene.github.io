@@ -1,0 +1,36 @@
+name: FerroDaStiro Tests
+
+on:
+  push:
+    branches:
+      - main
+      - gym
+    paths:
+      - 'gym/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+      - gym
+    paths:
+      - 'gym/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install test dependencies
+        run: npm install --no-package-lock --no-save jsdom
+
+      - name: Run test suite
+        run: node gym/test.js

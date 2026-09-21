@@ -105,6 +105,8 @@ node test.js
 Worth running after any edit. It catches the class of bug that looks fine on screen: a button that
 renders but whose click handler was thrown away.
 
+Tests are also run automatically via GitHub Actions (`.github/workflows/test.yml`) on pushes and pull requests affecting `gym/`.
+
 Programs live in the `BUILTIN` object near the top of the script. The shape is:
 
 ```js

@@ -59,7 +59,7 @@ node gym/test.js
 ```
 
 Checks across 21 scenarios driving the real UI and assets. Add a scenario for any bug you fix — this suite exists because
-visual inspection missed a dead button twice.
+visual inspection missed a dead button twice. Automated CI runs via `.github/workflows/test.yml` on pushes and pull requests affecting `gym/`.
 
 ## After any change to index.html or exercises.js
 
