@@ -7,6 +7,7 @@
 <meta name="description" content="Private workout log. Data stays on your phone.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#DEDDD8">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="FerroDaStiro">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -19,7 +20,7 @@
     --steel:#6E7276; --rust:#A33B28; --slate:#33505C; --line:#C3C2BC; --r:3px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;padding:0;overscroll-behavior-y:contain}
+  html,body{margin:0;padding:0;background:var(--concrete);overscroll-behavior-y:contain}
   body{background:var(--concrete);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
     font-size:16px;line-height:1.45;padding:0 0 92px;-webkit-font-smoothing:antialiased}
@@ -325,6 +326,64 @@ async function requestPersistence(){
     }
   }catch(e){}
   return storageStatus.persisted;
+}
+
+/* Screen Wake Lock API management */
+let wakeLockSentinel = null;
+
+async function updateWakeLock(){
+  const isWorkoutActive = (tab === 'train' && db && !!db.draft);
+  if (isWorkoutActive) {
+    if (!wakeLockSentinel && typeof navigator !== 'undefined' && 'wakeLock' in navigator && navigator.wakeLock) {
+      try {
+        wakeLockSentinel = await navigator.wakeLock.request('screen');
+        if (wakeLockSentinel) {
+          wakeLockSentinel.addEventListener('release', () => {
+            wakeLockSentinel = null;
+          });
+        }
+      } catch(e) {
+        wakeLockSentinel = null;
+      }
+    }
+  } else {
+    if (wakeLockSentinel) {
+      try {
+        await wakeLockSentinel.release();
+      } catch(e) {}
+      wakeLockSentinel = null;
+    }
+  }
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible') {
+      await updateWakeLock();
+    }
+  });
+}
+
+/* Standalone detection & PWA install prompt handler */
+function isStandalone() {
+  try {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  } catch(e) {
+    return false;
+  }
+}
+
+let deferredInstallPrompt = null;
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    render();
+  });
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    render();
+  });
 }
 
 /* One-time carry-over from the old "ironlog.*" keys, for anyone
@@ -856,6 +915,7 @@ function render(){
     if(tab==='programs' && editing){ vEditor(); return; }
     ({calendar:vCalendar,train:vTrain,progress:vProgress,programs:vPrograms})[tab]();
   }catch(e){ showErr(e.message); throw e; }
+  finally{ updateWakeLock(); }
 }
 
 function renderScreen(){
@@ -2027,6 +2087,19 @@ function vPrograms(){
       <select id="unit" style="width:auto">
         <option value="kg"${db.unit==='kg'?' selected':''}>kg</option>
         <option value="lb"${db.unit==='lb'?' selected':''}>lb</option></select></div>
+    ${!isStandalone() ? `
+    <div class="card" id="install-card">
+      <h3>Install FerroDaStiro</h3>
+      <p class="note" style="margin-bottom:10px">Add FerroDaStiro to your home screen for full-screen offline access and maximum performance.</p>
+      ${deferredInstallPrompt ? `
+        <button class="rust" id="pwa-install-btn" style="width:100%">Install App</button>
+      ` : `
+        <div style="font-size:13px;line-height:1.5;color:var(--slate)">
+          <p style="margin:0 0 6px"><strong>iOS Safari:</strong> Tap the Share icon (<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>), then select <strong>Add to Home Screen</strong>.</p>
+          <p style="margin:0"><strong>Android / Chrome:</strong> Tap the menu (⋮) and select <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
+        </div>
+      `}
+    </div>` : ''}
     <div class="card">
       <h3>Storage & Durability</h3>
       <p style="font-weight:600;font-size:14px;margin-bottom:6px;color:var(--slate)">${persistMsg}</p>
@@ -2071,6 +2144,17 @@ function vPrograms(){
   document.getElementById('newprog').onclick=()=>{
     editing={id:'c'+Date.now().toString(36),name:'',note:'',days:[{name:'Day 1',ex:[]}]}; render();
   };
+  const installBtn = document.getElementById('pwa-install-btn');
+  if(installBtn){
+    installBtn.onclick = async () => {
+      if(deferredInstallPrompt){
+        deferredInstallPrompt.prompt();
+        try { await deferredInstallPrompt.userChoice; } catch(e){}
+        deferredInstallPrompt = null;
+        render();
+      }
+    };
+  }
   document.getElementById('unit').onchange=e=>{db.unit=e.target.value;save();};
   document.getElementById('exp').onclick=()=>{
     const dateStr = new Date().toISOString().slice(0, 10);
@@ -2700,6 +2784,11 @@ window.autoResurrect = autoResurrect;
 window.checkPersistence = checkPersistence;
 window.requestPersistence = requestPersistence;
 window.storageStatus = storageStatus;
+window.isStandalone = isStandalone;
+window.updateWakeLock = updateWakeLock;
+window.getWakeLockSentinel = () => wakeLockSentinel;
+window.getDeferredInstallPrompt = () => deferredInstallPrompt;
+window.setDeferredInstallPrompt = (p) => { deferredInstallPrompt = p; render(); };
 
 /* ---------- boot ---------- */
 document.querySelectorAll('nav button').forEach(b=>

@@ -112,10 +112,14 @@ function boot(options = {}) {
         window.indexedDB = options.mockIdb;
       }
       if (options.persistState !== undefined) {
-        window.navigator.storage = {
-          persisted: async () => options.persistState,
-          persist: async () => options.persistState
-        };
+        Object.defineProperty(window.navigator, 'storage', {
+          value: {
+            persisted: async () => options.persistState,
+            persist: async () => options.persistState
+          },
+          configurable: true,
+          writable: true
+        });
       }
     }
   });
@@ -1416,7 +1420,7 @@ console.log('\n' + (fails ? fails + ' FAILING CHECK(S)' : 'ALL CHECKS PASSED'));
   }
   const swContent = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
   check("Offline cache in sw.js includes 'exercises.js'", swContent.includes("'exercises.js'"));
-  check("sw.js cache version bumped to ferrodastiro-v28", swContent.includes("ferrodastiro-v28"));
+  check("sw.js cache version bumped to ferrodastiro-v29", swContent.includes("ferrodastiro-v29"));
 
   // ---------- scenario 22: library search space handling & timed exercise zero volume ----------
   console.log('\n22. Library search space handling & timed exercise zero volume');
@@ -2226,6 +2230,112 @@ console.log('\n29. Per-exercise 3-dots menu & persistent machine notes');
 
   console.log('  errors:', log.length ? log.join(' | ') : 'none');
 }
+
+// ---------- scenario 30: PWA Enhancements — Screen Wake Lock, Install Prompt & Manifest Polish ----------
+(async () => {
+  console.log('\n30. PWA Enhancements: Screen Wake Lock, In-App Install Prompt & Manifest Polish');
+  
+  // 1. Wake Lock API integration test
+  {
+    let wakeRequested = false;
+    let wakeReleased = false;
+    const mockSentinel = {
+      released: false,
+      release: async () => { mockSentinel.released = true; wakeReleased = true; },
+      addEventListener: (evt, fn) => {}
+    };
+
+    const { w, d, log } = boot();
+    Object.defineProperty(w.navigator, 'wakeLock', {
+      value: {
+        request: async (type) => {
+          if (type === 'screen') {
+            wakeRequested = true;
+            return mockSentinel;
+          }
+          throw new Error('Invalid type');
+        }
+      },
+      configurable: true,
+      writable: true
+    });
+
+    d.querySelector('#fname').value = 'WakeLock User'; tap(d, '#fgo');
+    tap(d, '#startHere'); tap(d, '#fromLib');
+    const libItems = d.querySelectorAll('#lib .libitem');
+    if (libItems.length > 0) tap(d, libItems[0]);
+    tap(d, '#addsel');
+
+    await new Promise(r => setTimeout(r, 20));
+    check('Wake Lock requested when active workout opened on Train tab', wakeRequested && w.getWakeLockSentinel() === mockSentinel);
+
+    // Switch to calendar tab (navigate away from active workout)
+    tap(d, 'nav button[data-tab=calendar]');
+    await new Promise(r => setTimeout(r, 20));
+    check('Wake Lock released when navigating away from active workout', wakeReleased && w.getWakeLockSentinel() === null);
+
+    // Test graceful degradation when navigator.wakeLock is undefined
+    Object.defineProperty(w.navigator, 'wakeLock', { value: undefined, configurable: true, writable: true });
+    tap(d, 'nav button[data-tab=train]');
+    check('Wake Lock gracefully degrades when navigator.wakeLock is unavailable', w.getWakeLockSentinel() === null);
+  }
+
+  // 2. Standalone detection & Install Prompt card
+  {
+    const { w, d, log } = boot();
+    d.querySelector('#fname').value = 'PWA User'; tap(d, '#fgo');
+
+    tap(d, 'nav button[data-tab=programs]');
+    const installCard = d.querySelector('#install-card');
+    check('In-app install guidance card present in Settings when NOT standalone', !!installCard && installCard.textContent.includes('Install FerroDaStiro'));
+    check('Install card contains iOS Safari and Android instructions', installCard && installCard.textContent.includes('iOS Safari') && installCard.textContent.includes('Add to Home Screen'));
+
+    // Test Android beforeinstallprompt event capture & button click
+    let promptInvoked = false;
+    const mockPromptEvent = {
+      preventDefault: () => {},
+      prompt: () => { promptInvoked = true; },
+      userChoice: Promise.resolve({ outcome: 'accepted' })
+    };
+    w.setDeferredInstallPrompt(mockPromptEvent);
+    const installBtn = d.querySelector('#pwa-install-btn');
+    check('Install App button rendered when deferredInstallPrompt is set', !!installBtn);
+    if (installBtn) tap(d, installBtn);
+    check('Install App button invokes prompt()', promptInvoked);
+
+    // Test standalone mode (card hidden)
+    Object.defineProperty(w.window, 'matchMedia', {
+      value: (query) => ({ matches: query.includes('standalone'), addEventListener: () => {}, removeEventListener: () => {} }),
+      configurable: true,
+      writable: true
+    });
+    w.render();
+    check('Install card hidden when running in standalone mode', !d.querySelector('#install-card'));
+  }
+
+  // 3. Web Manifest JSON validity & required keys
+  {
+    const manifestPath = path.join(__dirname, 'manifest.webmanifest');
+    const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
+    let manifest;
+    try { manifest = JSON.parse(manifestRaw); } catch(e) {}
+
+    check('manifest.webmanifest parses cleanly as valid JSON', !!manifest);
+    check('manifest.webmanifest contains id "/gym/" (or "./")', manifest && (manifest.id === '/gym/' || manifest.id === './'));
+    check('manifest.webmanifest contains categories ["fitness", "health", "sports"]', manifest && Array.isArray(manifest.categories) && manifest.categories.includes('fitness') && manifest.categories.includes('health') && manifest.categories.includes('sports'));
+    check('manifest.webmanifest specifies display: standalone and orientation: portrait', manifest && manifest.display === 'standalone' && manifest.orientation === 'portrait');
+  }
+
+  // 4. Service worker SVG pre-caching
+  {
+    const swPath = path.join(__dirname, 'sw.js');
+    const swRaw = fs.readFileSync(swPath, 'utf8');
+    check('sw.js cache version is ferrodastiro-v29', swRaw.includes('ferrodastiro-v29'));
+    check('sw.js includes exercise SVG assets precached for offline use', swRaw.includes('img/exercises/') && swRaw.includes('bench-press.svg'));
+  }
+
+  console.log('  errors:', log.length ? log.join(' | ') : 'none');
+})();
 
 if (fails > 0) process.exitCode = 1;
 })();
