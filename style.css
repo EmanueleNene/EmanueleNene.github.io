@@ -348,8 +348,7 @@ h3 {
     color: #141714;
 }
 
-[data-theme="dark"] .btn-primary:hover,
-[data-theme="dark"] a[href="mailto:emadal@kth.se"].btn-primary:hover::before {
+[data-theme="dark"] .btn-primary:hover {
     box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.55);
 }
 
@@ -370,19 +369,24 @@ h3 {
     border-color: var(--text-secondary);
 }
 
-/* Rhomboid Email Me Buttons */
+/* Email Me (navbar + hero): slanted outline. On hover a slanted fill wipes in
+   from the left, the label flips colour as it passes, and an arrow slides in. */
 a[href="mailto:emadal@kth.se"].btn-primary,
 a[href="mailto:emadal@kth.se"].btn-secondary {
     position: relative;
+    z-index: 1;
+    color: var(--primary-ink);
     background-color: transparent !important;
     border-color: transparent !important;
     box-shadow: none !important;
-    z-index: 1;
-    padding: 0.875rem 2.25rem !important; /* Slightly increased horizontal padding for skew clearance */
+    padding: 0.875rem 2.25rem !important; /* room for the skew */
+    /* label flips colour as the fill crosses it (both ways), not before */
+    transition: color 0.18s ease 0.14s, transform 0.25s var(--ease-out);
 }
 
 a[href="mailto:emadal@kth.se"].btn-primary:hover,
 a[href="mailto:emadal@kth.se"].btn-secondary:hover {
+    color: var(--on-primary-ink);
     background-color: transparent !important;
     border-color: transparent !important;
     box-shadow: none !important;
@@ -392,36 +396,44 @@ a[href="mailto:emadal@kth.se"].btn-primary::before,
 a[href="mailto:emadal@kth.se"].btn-secondary::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: -1;
+    border: 1px solid var(--primary-ink);
+    border-radius: 4px;
     transform: skewX(var(--btn-skew-angle));
-    transition: all var(--transition-fast);
+    /* wipe layer over a faint tint; background-size repaints without layout */
+    background:
+        linear-gradient(var(--primary-ink), var(--primary-ink)) no-repeat left / 0% 100%,
+        color-mix(in srgb, var(--primary-ink) 9%, transparent);
+    transition: background-size 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Primary Rhomboid Button (Navbar & elsewhere) */
-a[href="mailto:emadal@kth.se"].btn-primary::before {
-    background-color: var(--primary-ink);
-    border-radius: 4px;
-}
-
-a[href="mailto:emadal@kth.se"].btn-primary:hover::before {
-    background-color: var(--primary-ink-hover);
-    box-shadow: 0 6px 16px -4px rgba(79, 116, 76, 0.45);
-}
-
-/* Secondary Rhomboid Button (Hero Section) */
-a[href="mailto:emadal@kth.se"].btn-secondary::before {
-    background-color: transparent;
-    border: 1px solid var(--border-light);
-    border-radius: 4px;
-}
-
+a[href="mailto:emadal@kth.se"].btn-primary:hover::before,
 a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
-    background-color: var(--bg-surface);
-    border-color: var(--text-secondary);
+    background-size: 100% 100%;
+}
+
+a[href="mailto:emadal@kth.se"].btn-primary::after,
+a[href="mailto:emadal@kth.se"].btn-secondary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0.8rem;
+    width: 0.8em;
+    height: 0.8em;
+    margin-top: -0.4em;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E") center / contain no-repeat;
+    opacity: 0;
+    transform: translate(-6px, 4px);
+    transition: opacity 0.25s ease, transform 0.4s var(--ease-out);
+}
+
+a[href="mailto:emadal@kth.se"].btn-primary:hover::after,
+a[href="mailto:emadal@kth.se"].btn-secondary:hover::after {
+    opacity: 1;
+    transform: none;
 }
 
 /* Navbar */
@@ -480,7 +492,7 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
     color: var(--text-primary);
 }
 
-/* Email Me in the bar: outlined, so it doesn't outshout the page's own CTA */
+/* Email Me in the bar: smaller than the hero's, and beats the generic nav-link colours */
 .nav-links a.btn-primary {
     color: var(--primary-ink);
     font-size: 0.9rem;
@@ -491,17 +503,7 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
 }
 
 .nav-links a[href="mailto:emadal@kth.se"].btn-primary {
-    padding: 0.55rem 1.6rem !important;
-}
-
-.nav-links a[href="mailto:emadal@kth.se"].btn-primary::before {
-    background-color: transparent;
-    border: 1px solid var(--primary-ink);
-}
-
-.nav-links a[href="mailto:emadal@kth.se"].btn-primary:hover::before {
-    background-color: var(--primary-ink);
-    box-shadow: none;
+    padding: 0.55rem 1.9rem 0.55rem 1.6rem !important;
 }
 
 .nav-links a:not(.btn-primary) {
@@ -2145,6 +2147,12 @@ footer p {
     .sticky-scroll-img-wrapper img,
     .sticky-scroll-img-wrapper.active img {
         transform: none;
+        transition: none;
+    }
+
+    /* Email Me: state still changes on hover, just without the sweep */
+    a[href="mailto:emadal@kth.se"]::before,
+    a[href="mailto:emadal@kth.se"]::after {
         transition: none;
     }
 
