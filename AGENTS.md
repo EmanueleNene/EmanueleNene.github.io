@@ -16,7 +16,7 @@ This is a personal portfolio website for Emanuele D'Allestro, a PhD Researcher a
 - `projects/`: Detailed case studies and publication summaries for research projects.
 - `values/`: Pages exploring personal philosophies (e.g., Wabi-sabi, Kaizen, Ikigai).
 - `events/`: Documentation for events like UNLEASH.
-- `gym/`: FerroDaStiro, a standalone installable PWA workout tracker, hosted at `/gym/` and self-contained (own `index.html`, `exercises.js`, `sw.js`, `manifest.webmanifest`, `CLAUDE.md`, `README.md`, `test.js`, `img/`).
+- FerroDaStiro (workout PWA) is no longer in this repo: it is deployed at `https://ferrodastiro.vercel.app`, which the homepage and `projects/projects.html` link to.
 - `CUSTOMIZATION.md`: Guide for updating text, colors, and images.
 - `DEPLOY_INSTRUCTIONS.md`: Step-by-step guide for GitHub Pages deployment.
 
