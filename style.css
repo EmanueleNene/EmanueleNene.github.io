@@ -25,6 +25,7 @@
     /* Sage dark enough for small text and white-on-fill buttons (>=4.5:1) */
     --primary-ink: #4f744c;
     --primary-ink-hover: #42633f;
+    --on-primary-ink: #ffffff;
     --secondary: #c4a48e;
     /* Pastel Terracotta/Tan */
 
@@ -32,7 +33,6 @@
     --border-light: #d9d7cc;
     --bg-offset: #f0efe5;
 
-    --navbar-bg: rgba(253, 253, 251, 0.9);
     --navbar-bg-scrolled: rgba(253, 253, 251, 0.98);
     --card-shadow: rgba(0, 0, 0, 0.05);
 
@@ -66,13 +66,13 @@
     --primary-hover: #a2c79f;
     --primary-ink: #a2c79f;
     --primary-ink-hover: #bdd8ba;
+    --on-primary-ink: #141714;
     --secondary: #d4b59f;
 
     --border: #2b302c;
     --border-light: #363e37;
     --bg-offset: #181b18;
 
-    --navbar-bg: rgba(20, 23, 20, 0.88);
     --navbar-bg-scrolled: rgba(20, 23, 20, 0.98);
     --card-shadow: rgba(0, 0, 0, 0.4);
 }
@@ -99,10 +99,6 @@
 [data-theme="dark"] .nav-links a:hover,
 [data-theme="dark"] .nav-links a.active {
     color: #ffffff;
-}
-
-[data-theme="dark"] .nav-links a.btn-primary {
-    color: #141714;
 }
 
 /* Reset & Base */
@@ -434,11 +430,10 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: var(--navbar-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Part of the page at the top; frosted bar only once content scrolls under it */
+    background-color: transparent;
     z-index: 1000;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid transparent;
     padding: 1rem 0;
     transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.45s var(--ease-out);
 }
@@ -449,8 +444,11 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
 }
 
 .navbar.scrolled {
-    box-shadow: 0 10px 30px -10px var(--card-shadow);
     background-color: var(--navbar-bg-scrolled);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom-color: var(--border);
+    box-shadow: 0 10px 30px -10px var(--card-shadow);
 }
 
 .nav-container {
@@ -482,9 +480,28 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
     color: var(--text-primary);
 }
 
-.nav-links a.btn-primary,
+/* Email Me in the bar: outlined, so it doesn't outshout the page's own CTA */
+.nav-links a.btn-primary {
+    color: var(--primary-ink);
+    font-size: 0.9rem;
+}
+
 .nav-links a.btn-primary:hover {
-    color: #ffffff;
+    color: var(--on-primary-ink);
+}
+
+.nav-links a[href="mailto:emadal@kth.se"].btn-primary {
+    padding: 0.55rem 1.6rem !important;
+}
+
+.nav-links a[href="mailto:emadal@kth.se"].btn-primary::before {
+    background-color: transparent;
+    border: 1px solid var(--primary-ink);
+}
+
+.nav-links a[href="mailto:emadal@kth.se"].btn-primary:hover::before {
+    background-color: var(--primary-ink);
+    box-shadow: none;
 }
 
 .nav-links a:not(.btn-primary) {
@@ -1263,7 +1280,9 @@ footer p {
     cursor: pointer;
     background: none;
     border: none;
-    padding: 0.25rem;
+    /* 44px tap target; negative margin keeps the icon aligned with the edge */
+    padding: 0.625rem;
+    margin-right: -0.625rem;
     color: inherit;
     line-height: 0;
 }
@@ -1281,10 +1300,39 @@ footer p {
         width: 100%;
         background-color: var(--bg-body);
         flex-direction: column;
-        padding: 2rem;
-        gap: 1.5rem;
+        align-items: stretch;
+        padding: 0.25rem 1.25rem 1.5rem;
+        gap: 0;
         border-bottom: 1px solid var(--border);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Full-width rows: easy thumb targets, current page shown by colour */
+    .nav-links a:not(.btn-primary) {
+        display: flex;
+        align-items: center;
+        min-height: 3.25rem;
+        font-size: 1.1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .nav-links a:not(.btn-primary)::after {
+        display: none;
+    }
+
+    .nav-links a.active:not(.btn-primary) {
+        color: var(--primary-ink);
+    }
+
+    .nav-links li:last-child {
+        padding-top: 1.25rem;
+    }
+
+    /* Inset by the slant's overhang so the outline stays within the row edges */
+    .nav-links a.btn-primary {
+        display: flex;
+        width: calc(100% - 10px);
+        margin: 0 auto;
     }
 
     .nav-links.active {

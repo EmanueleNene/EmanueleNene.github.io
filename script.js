@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let lastY = window.scrollY;
         window.addEventListener('scroll', () => {
             const y = window.scrollY;
-            navbar.classList.toggle('scrolled', y > 50);
+            navbar.classList.toggle('scrolled', y > 8);
 
             const menuOpen = document.querySelector('.nav-links.active');
             if (y > 300 && y > lastY + 6 && !menuOpen) {
@@ -155,6 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 setMenu(false);
                 hamburger.focus();
             }
+        });
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && !e.target.closest('.navbar')) setMenu(false);
         });
     }
 
