@@ -83,9 +83,9 @@
                         <span class="theme-switch-thumb"></span>
                     </span>
                 </button>
-                <div class="hamburger">
-                    <i class="ph ph-list"></i>
-                </div>
+                <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false">
+                    <i class="ph ph-list" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -97,10 +97,12 @@
             <div class="hero-content">
                 <span class="badgewrapper"><span class="badge">PhD Student at KTH Royal Institute of
                         Technology</span></span>
-                <h1>Developing<br>
-                    <span class="text-morph" id="hero-morph"
-                        data-words="paper products, substrates, sensors, cardboards, vertical farm plugs">paper products</span><br>
-                    that matter.</h1>
+                <h1>
+                    <span class="hero-line">Developing</span>
+                    <span class="hero-line"><span class="text-morph" id="hero-morph"
+                        data-words="paper products, substrates, sensors, cardboards, vertical farm plugs">paper products</span></span>
+                    <span class="hero-line">that matter.</span>
+                </h1>
                 <p class="hero-subtitle">I'm a creative researcher who loves to expand his
                     knowledge.</p>
                 <div class="hero-buttons">
@@ -156,7 +158,7 @@
                     <!-- Project 1 -->
                     <article class="sticky-scroll-item active" data-index="0">
                         <div class="mobile-project-img">
-                            <img src="images/radiculae.jpg" alt="Radiculae">
+                            <img src="images/radiculae.jpg" alt="Radiculae" loading="lazy" decoding="async">
                         </div>
                         <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Startup</span>
                         <h3>Radiculae</h3>
@@ -167,7 +169,7 @@
                     <!-- Project 2 -->
                     <article class="sticky-scroll-item" data-index="1">
                         <div class="mobile-project-img">
-                            <img src="images/structural_curl.jpg" alt="Structural Curl">
+                            <img src="images/structural_curl.jpg" alt="Structural Curl" loading="lazy" decoding="async">
                         </div>
                         <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Paper Mechanics</span>
                         <h3>Structural curl and the relative importance of the structural parameters</h3>
@@ -178,7 +180,7 @@
                     <!-- Project 3 -->
                     <article class="sticky-scroll-item" data-index="2">
                         <div class="mobile-project-img">
-                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity">
+                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity" loading="lazy" decoding="async">
                         </div>
                         <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2024 • Publication</span>
                         <h3>Crystal Plasticity</h3>
@@ -189,7 +191,7 @@
                     <!-- Project 4 -->
                     <article class="sticky-scroll-item" data-index="3">
                         <div class="mobile-project-img">
-                            <img src="images/ferrodastiro.png" alt="FerroDaStiro">
+                            <img src="images/ferrodastiro.png" alt="FerroDaStiro" loading="lazy" decoding="async">
                         </div>
                         <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Web App</span>
                         <h3>FerroDaStiro</h3>
@@ -201,16 +203,16 @@
                 <div class="sticky-scroll-sticky-col">
                     <div class="sticky-scroll-card">
                         <div class="sticky-scroll-img-wrapper active" data-index="0">
-                            <img src="images/radiculae.jpg" alt="Radiculae">
+                            <img src="images/radiculae.jpg" alt="Radiculae" loading="lazy" decoding="async">
                         </div>
                         <div class="sticky-scroll-img-wrapper" data-index="1">
-                            <img src="images/structural_curl.jpg" alt="Structural Curl">
+                            <img src="images/structural_curl.jpg" alt="Structural Curl" loading="lazy" decoding="async">
                         </div>
                         <div class="sticky-scroll-img-wrapper" data-index="2">
-                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity">
+                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity" loading="lazy" decoding="async">
                         </div>
                         <div class="sticky-scroll-img-wrapper" data-index="3">
-                            <img src="images/ferrodastiro.png" alt="FerroDaStiro">
+                            <img src="images/ferrodastiro.png" alt="FerroDaStiro" loading="lazy" decoding="async">
                         </div>
                     </div>
                 </div>
@@ -379,10 +381,10 @@
             </div>
 
             <div class="footer-contact">
-                <div class="info-item">
-                    <i class="ph ph-envelope-simple"></i>
+                <a href="mailto:emadal@kth.se" class="info-item">
+                    <i class="ph ph-envelope-simple" aria-hidden="true"></i>
                     <span>emadal@kth.se</span>
-                </div>
+                </a>
                 <div class="info-item">
                     <i class="ph ph-map-pin"></i>
                     <span>Stockholm, Sweden</span>
@@ -390,9 +392,9 @@
             </div>
 
             <div class="social-links">
-                <a href="https://github.com/EmanueleNene" target="_blank"><i class="ph ph-github-logo"></i></a>
-                <a href="https://www.linkedin.com/in/emanuele-d-allestro-68a9601a7/" target="_blank"><i
-                        class="ph ph-linkedin-logo"></i></a>
+                <a href="https://github.com/EmanueleNene" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="ph ph-github-logo" aria-hidden="true"></i></a>
+                <a href="https://www.linkedin.com/in/emanuele-d-allestro-68a9601a7/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i
+                        class="ph ph-linkedin-logo" aria-hidden="true"></i></a>
             </div>
         </div>
     </footer>

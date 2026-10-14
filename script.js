@@ -10,6 +10,8 @@
     document.documentElement.setAttribute('data-theme', theme);
 })();
 
+const REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 document.addEventListener('DOMContentLoaded', () => {
     // 0. Night Mode Theme Toggle
     initThemeToggle();
@@ -48,11 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
         rootMargin: '0px 0px -100px 0px'
     };
 
+    const REVEAL_CLASSES = ['reveal', 'reveal-up', 'reveal-left', 'reveal-right', 'reveal-scale', 'visible',
+        'stagger-1', 'stagger-2', 'stagger-3', 'stagger-4'];
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+                const el = entry.target;
+                el.classList.add('visible');
+                observer.unobserve(el);
+                // Once arrived, hand the element back to its own hover transitions
+                window.setTimeout(() => el.classList.remove(...REVEAL_CLASSES), 1300);
             }
         });
     }, observerOptions);
@@ -66,6 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleParallax = () => {
         const scrolled = window.pageYOffset;
+        // Hero is already faded out past this point; nothing left to move
+        if (scrolled > window.innerHeight) return;
 
         parallaxItems.forEach(item => {
             const speed = item.dataset.speed || 0.1;
@@ -83,9 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.addEventListener('scroll', () => {
-        requestAnimationFrame(handleParallax);
-    });
+    if (!REDUCED_MOTION) {
+        window.addEventListener('scroll', () => {
+            requestAnimationFrame(handleParallax);
+        }, { passive: true });
+    }
 
     // 4. Navbar background scroll effect
     const navbar = document.querySelector('.navbar');
@@ -104,23 +116,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelector('.nav-links');
 
     if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            const icon = hamburger.querySelector('i');
-            if (icon.classList.contains('ph-list')) {
-                icon.classList.replace('ph-list', 'ph-x');
-            } else {
-                icon.classList.replace('ph-x', 'ph-list');
-            }
-        });
-
-        // Close menu when a link is clicked
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                const icon = hamburger.querySelector('i');
-                if (icon) icon.classList.replace('ph-x', 'ph-list');
+        // Subpages still use a <div>; make it keyboard-operable like a button
+        if (hamburger.tagName !== 'BUTTON') {
+            hamburger.setAttribute('role', 'button');
+            hamburger.setAttribute('tabindex', '0');
+            hamburger.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    hamburger.click();
+                }
             });
+        }
+
+        const setMenu = (open) => {
+            navLinks.classList.toggle('active', open);
+            hamburger.setAttribute('aria-expanded', String(open));
+            hamburger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+            const icon = hamburger.querySelector('i');
+            if (icon) icon.classList.replace(open ? 'ph-list' : 'ph-x', open ? 'ph-x' : 'ph-list');
+        };
+        setMenu(false);
+
+        hamburger.addEventListener('click', () => setMenu(!navLinks.classList.contains('active')));
+
+        // Close menu when a link is clicked or Escape is pressed
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => setMenu(false));
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                setMenu(false);
+                hamburger.focus();
+            }
         });
     }
 
@@ -180,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 10. Hero Parallax for Values Section (Aceternity UI style)
     function initHeroParallax() {
         const container = document.getElementById('heroParallax');
-        if (!container) return;
+        if (!container || REDUCED_MOTION) return;
 
         const rowsLeft = container.querySelectorAll('.row-left');
         const rowsRight = container.querySelectorAll('.row-right');
@@ -231,8 +258,18 @@ function initTextMorph() {
         .filter(Boolean);
     if (!words.length) return;
 
-    const morph = 1;   // seconds — crossfade duration
-    const hold = 1.5;  // seconds — time a word stays fully visible
+    const longest = words.reduce((a, b) => (b.length > a.length ? b : a), '');
+
+    if (REDUCED_MOTION) {
+        el.innerHTML =
+            `<span class="text-morph-anchor" aria-hidden="true">${longest}</span>` +
+            `<span class="text-morph-word" style="opacity: 1;">${words[0]}</span>`;
+        return;
+    }
+
+    const morph = 0.7; // seconds — crossfade duration
+    const hold = 1.8;  // seconds — time a word stays fully visible
+    const start = 0.25; // seconds — let the headline lines land first
     const slot = morph + hold;
     const cycle = slot * words.length;
     const pct = s => Math.min(100, (s / cycle) * 100).toFixed(4);
@@ -243,22 +280,30 @@ function initTextMorph() {
     const style = document.createElement('style');
     style.textContent = `
         @keyframes heroTextMorph {
-            0% { opacity: 0; filter: blur(14px); transform: scale(0.85); }
-            ${mIn}% { opacity: 1; filter: blur(0px); transform: scale(1); }
-            ${mHold}% { opacity: 1; filter: blur(0px); transform: scale(1); }
-            ${mOut}%, 100% { opacity: 0; filter: blur(14px); transform: scale(1.1); }
+            0% { opacity: 0; filter: blur(8px); transform: translateY(0.18em) scale(0.96); }
+            ${mIn}% { opacity: 1; filter: blur(0px); transform: none; }
+            ${mHold}% { opacity: 1; filter: blur(0px); transform: none; }
+            ${mOut}%, 100% { opacity: 0; filter: blur(8px); transform: translateY(-0.18em) scale(1.02); }
         }
     `;
     document.head.appendChild(style);
 
-    const longest = words.reduce((a, b) => (b.length > a.length ? b : a), '');
-
+    // Screen readers get one stable phrase instead of five overlapping words
     el.innerHTML =
+        `<span class="sr-only">${words.join(', ')}</span>` +
         `<span class="text-morph-anchor" aria-hidden="true">${longest}</span>` +
         words.map((word, i) => {
-            const delay = (slot * i).toFixed(3);
-            return `<span class="text-morph-word" style="animation: heroTextMorph ${cycle}s ${delay}s infinite ease-in-out;">${word}</span>`;
+            const delay = (start + slot * i).toFixed(3);
+            return `<span class="text-morph-word" aria-hidden="true" style="animation: heroTextMorph ${cycle}s ${delay}s infinite var(--ease-out);">${word}</span>`;
         }).join('');
+
+    // Pause the loop while the hero is scrolled away
+    const hero = el.closest('.hero');
+    if (hero && 'IntersectionObserver' in window) {
+        new IntersectionObserver(([entry]) => {
+            hero.classList.toggle('is-offscreen', !entry.isIntersecting);
+        }).observe(hero);
+    }
 }
 
 /* Hero image coverflow — 3D stack of project photos, click to bring a card
@@ -301,6 +346,12 @@ function initCoverflow() {
         card.className = 'coverflow-card';
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', slide.alt || '');
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleClick(i);
+            }
+        });
 
         const img = document.createElement('img');
         img.src = slide.src;
@@ -336,7 +387,10 @@ function initCoverflow() {
         return { cardWidth, cardHeight };
     }
 
-    function render() {
+    // mode: 'stacked' = all cards piled face-down at centre (pre-deal),
+    //       'deal'    = fan out from the pile, nearest cards first,
+    //       otherwise = normal coverflow move.
+    function render(mode) {
         const { cardWidth, cardHeight } = sizeFor();
         stage.style.width = `${cardWidth}px`;
         stage.style.height = `${cardHeight}px`;
@@ -357,20 +411,46 @@ function initCoverflow() {
 
             card.style.width = `${cardWidth}px`;
             card.style.height = `${cardHeight}px`;
-            card.style.transition = `transform ${dur}s ${ease}, opacity ${dur}s ${ease}`;
+
+            if (mode === 'stacked') {
+                card.style.transition = 'none';
+                card.style.transform =
+                    `translate(-50%, -50%) translateY(40px) rotateZ(${(i % 2 ? 1 : -1) * (2 + i)}deg) scale(0.86)`;
+                card.style.opacity = '0';
+                return;
+            }
+
+            const t = mode === 'deal' ? 1.1 : dur;
+            const delay = mode === 'deal' ? (0.45 + ax * 0.12).toFixed(2) : 0;
+            card.style.transition = `transform ${t}s ${ease} ${delay}s, opacity ${t * 0.6}s ${ease} ${delay}s`;
             card.style.transform =
                 `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`;
             card.style.opacity = visible ? '1' : '0';
             card.style.pointerEvents = visible ? 'auto' : 'none';
             card.style.cursor = isActive ? 'default' : 'pointer';
+            card.tabIndex = visible ? 0 : -1;
 
-            dimEl.style.transition = `opacity ${dur}s ${ease}`;
+            dimEl.style.transition = `opacity ${t}s ${ease} ${delay}s`;
             dimEl.style.opacity = isActive ? '0' : String(DIM);
         });
     }
 
-    window.addEventListener('resize', render);
-    render();
+    window.addEventListener('resize', () => render());
+
+    if (REDUCED_MOTION) {
+        render();
+    } else {
+        render('stacked');
+        stage.getBoundingClientRect(); // commit the stacked pose before dealing
+        requestAnimationFrame(() => render('deal'));
+        locked = true;
+        window.setTimeout(() => { locked = false; }, 1800);
+    }
+
+    root.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+    });
 
     function step(dir) {
         if (locked) return;
@@ -391,14 +471,26 @@ function initCoverflow() {
         step(dx < 0 ? 1 : -1);
     }, { passive: true });
 
-    if (root.dataset.autoplay === 'true' && n > 1) {
+    if (root.dataset.autoplay === 'true' && n > 1 && !REDUCED_MOTION) {
         const dir = root.dataset.autoplayDir === 'leftToRight' ? -1 : 1;
+        // Autoplay yields to the visitor: hover, keyboard focus, off screen, hidden tab
+        let hovered = false;
+        let focused = false;
+        let onScreen = true;
+        root.addEventListener('mouseenter', () => { hovered = true; });
+        root.addEventListener('mouseleave', () => { hovered = false; });
+        root.addEventListener('focusin', () => { focused = true; });
+        root.addEventListener('focusout', () => { focused = false; });
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; }).observe(root);
+        }
+
         window.setInterval(() => {
-            if (locked) return;
+            if (locked || hovered || focused || !onScreen || document.hidden) return;
             lock();
             active = ((active + dir) % n + n) % n;
             render();
-        }, 2600);
+        }, 3200);
     }
 }
 
@@ -466,7 +558,7 @@ function initCardHoverEffect() {
     const cards = grid.querySelectorAll('.hover-effect-card');
 
     cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
+        const movePill = () => {
             const gridRect = grid.getBoundingClientRect();
             const cardRect = card.getBoundingClientRect();
 
@@ -480,11 +572,16 @@ function initCardHoverEffect() {
             pill.style.width = `${width}px`;
             pill.style.height = `${height}px`;
             pill.style.opacity = '1';
-        });
+        };
+        card.addEventListener('mouseenter', movePill);
+        card.addEventListener('focus', movePill);
     });
 
     grid.addEventListener('mouseleave', () => {
         pill.style.opacity = '0';
+    });
+    grid.addEventListener('focusout', (e) => {
+        if (!grid.contains(e.relatedTarget)) pill.style.opacity = '0';
     });
 }
 
