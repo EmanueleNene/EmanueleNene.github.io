@@ -170,6 +170,13 @@ body {
     animation: 420ms var(--ease-out) both vt-fade-in;
 }
 
+/* Theme switch: script.js drives a circular clip on the new snapshot */
+.theme-vt::view-transition-old(root),
+.theme-vt::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
 @keyframes vt-fade-out {
     to { opacity: 0; }
 }
@@ -441,7 +448,12 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
     z-index: 1000;
     border-bottom: 1px solid var(--border);
     padding: 1rem 0;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.45s var(--ease-out);
+}
+
+.navbar.nav-hidden:not(:has(:focus-visible)) {
+    transform: translateY(-100%);
+    box-shadow: none;
 }
 
 .navbar.scrolled {
@@ -783,14 +795,12 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
         background: transparent;
         transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease, background-color 0.4s ease, border-color 0.4s ease;
         opacity: 0.35;
-        filter: blur(0.5px);
         transform: scale(0.96);
         border: 1px solid transparent;
     }
 
     .sticky-scroll-item.active {
         opacity: 1;
-        filter: blur(0);
         transform: scale(1);
         background: var(--bg-surface);
         border-color: var(--border);
@@ -837,6 +847,7 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
         border: 1px solid var(--border);
         box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
         background: var(--bg-surface);
+        cursor: pointer;
     }
 
     /* Incoming image unrolls upward over the outgoing one, which is
@@ -992,10 +1003,8 @@ a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
     border: 1px solid rgba(193, 154, 107, 0.28);
     pointer-events: none;
     opacity: 0;
-    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-                width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-                height 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-                opacity 0.2s ease;
+    /* Size snaps (cards share a row height); only position glides */
+    transition: transform 0.35s var(--ease-out), opacity 0.2s ease;
     z-index: 0;
 }
 

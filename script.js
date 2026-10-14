@@ -102,13 +102,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Navbar background scroll effect
     const navbar = document.querySelector('.navbar');
     if (navbar) {
+        // Nav steps aside while reading downward, returns on any upward scroll
+        let lastY = window.scrollY;
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
+            const y = window.scrollY;
+            navbar.classList.toggle('scrolled', y > 50);
+
+            const menuOpen = document.querySelector('.nav-links.active');
+            if (y > 300 && y > lastY + 6 && !menuOpen) {
+                navbar.classList.add('nav-hidden');
+            } else if (y < lastY - 6 || y <= 300) {
+                navbar.classList.remove('nav-hidden');
             }
-        });
+            if (Math.abs(y - lastY) > 6) lastY = y;
+        }, { passive: true });
     }
 
     // 5. Mobile Menu Toggle
@@ -502,11 +509,35 @@ function initStickyScroll() {
 
     if (!items.length || !images.length || !container) return;
 
+    let activeIndex = 0;
+
+    const setActive = (index) => {
+        activeIndex = index;
+        items.forEach((item, i) => item.classList.toggle('active', i === index));
+        images.forEach((img, i) => img.classList.toggle('active', i === index));
+    };
+
+    // Keyboard: tabbing to a project's link brings its image forward
+    items.forEach((item, index) => {
+        item.addEventListener('focusin', () => {
+            if (window.innerWidth >= 850) setActive(index);
+        });
+    });
+
+    // The big image opens whichever project is active
+    const card = container.querySelector('.sticky-scroll-card');
+    if (card) {
+        card.addEventListener('click', () => {
+            const link = items[activeIndex] && items[activeIndex].querySelector('a');
+            if (link) link.click();
+        });
+    }
+
     const handleScroll = () => {
         if (window.innerWidth < 850) return;
 
         const viewportHeight = window.innerHeight;
-        let activeIndex = 0;
+        let nearest = 0;
         let minDistance = Infinity;
 
         items.forEach((item, index) => {
@@ -517,25 +548,11 @@ function initStickyScroll() {
 
             if (distance < minDistance) {
                 minDistance = distance;
-                activeIndex = index;
+                nearest = index;
             }
         });
 
-        items.forEach((item, index) => {
-            if (index === activeIndex) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-
-        images.forEach((img, index) => {
-            if (index === activeIndex) {
-                img.classList.add('active');
-            } else {
-                img.classList.remove('active');
-            }
-        });
+        if (nearest !== activeIndex) setActive(nearest);
     };
 
     window.addEventListener('scroll', () => {
@@ -642,9 +659,32 @@ function initThemeToggle() {
         toggleBtn.addEventListener('click', () => {
             const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
             const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateToggleState(toggleBtn, newTheme);
+            const swap = () => {
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateToggleState(toggleBtn, newTheme);
+            };
+
+            if (!document.startViewTransition || REDUCED_MOTION) {
+                swap();
+                return;
+            }
+
+            // New theme spreads as a circle from the switch itself
+            const r = toggleBtn.getBoundingClientRect();
+            const x = r.left + r.width / 2;
+            const y = r.top + r.height / 2;
+            const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+            const root = document.documentElement;
+            root.classList.add('theme-vt');
+            const vt = document.startViewTransition(swap);
+            vt.ready.then(() => {
+                root.animate(
+                    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+                    { duration: 650, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', pseudoElement: '::view-transition-new(root)' }
+                );
+            });
+            vt.finished.finally(() => root.classList.remove('theme-vt'));
         });
     }
 
