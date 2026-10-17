@@ -351,6 +351,7 @@ h3 {
 
 .hero-buttons {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 1rem;
 }
@@ -366,10 +367,10 @@ h3 {
     border-color: var(--text-secondary);
 }
 
-/* Email Me (navbar + hero): outlined pill. On hover a dome of colour rises from
-   the bottom edge, the label flips colour as it passes, and an arrow slides in. */
-a[href="mailto:emadal@kth.se"].btn-primary,
-a[href="mailto:emadal@kth.se"].btn-secondary {
+/* Email Me in the navbar: outlined pill. On hover a dome of colour rises from
+   the bottom edge, the label flips colour as it passes, and an arrow slides in.
+   The hero's Email Me has its own rules under .hero-buttons (below). */
+a[href="mailto:emadal@kth.se"].btn-primary {
     position: relative;
     z-index: 1;
     color: var(--primary-ink);
@@ -382,20 +383,17 @@ a[href="mailto:emadal@kth.se"].btn-secondary {
     transition: color 0.14s ease 0.12s, transform 0.25s var(--ease-out);
 }
 
-a[href="mailto:emadal@kth.se"].btn-primary:hover,
-a[href="mailto:emadal@kth.se"].btn-secondary:hover {
+a[href="mailto:emadal@kth.se"].btn-primary:hover {
     color: var(--on-primary-ink);
     transform: none; /* the generic .btn-primary lift would fight the dome */
 }
 
-a[href="mailto:emadal@kth.se"].btn-primary:active,
-a[href="mailto:emadal@kth.se"].btn-secondary:active {
+a[href="mailto:emadal@kth.se"].btn-primary:active {
     transform: scale(0.97);
     transition-duration: 0.1s;
 }
 
-a[href="mailto:emadal@kth.se"].btn-primary::before,
-a[href="mailto:emadal@kth.se"].btn-secondary::before {
+a[href="mailto:emadal@kth.se"].btn-primary::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -407,13 +405,11 @@ a[href="mailto:emadal@kth.se"].btn-secondary::before {
     transition: clip-path 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-a[href="mailto:emadal@kth.se"].btn-primary:hover::before,
-a[href="mailto:emadal@kth.se"].btn-secondary:hover::before {
+a[href="mailto:emadal@kth.se"].btn-primary:hover::before {
     clip-path: ellipse(140% 190% at 50% 100%);
 }
 
-a[href="mailto:emadal@kth.se"].btn-primary::after,
-a[href="mailto:emadal@kth.se"].btn-secondary::after {
+a[href="mailto:emadal@kth.se"].btn-primary::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -429,10 +425,170 @@ a[href="mailto:emadal@kth.se"].btn-secondary::after {
     transition: opacity 0.25s ease, transform 0.4s var(--ease-out);
 }
 
-a[href="mailto:emadal@kth.se"].btn-primary:hover::after,
-a[href="mailto:emadal@kth.se"].btn-secondary:hover::after {
+a[href="mailto:emadal@kth.se"].btn-primary:hover::after {
     opacity: 1;
     transform: none;
+}
+
+/* Hero CTA pair: "View Work" (filled) and "Email Me" (outlined) read as one pair:
+   the same pill, height and type, and one hover language. The fill rises from the
+   bottom edge and the arrow slides in along its own direction. Hover-only motion is
+   gated to hover-capable pointers, so a tap on touch leaves no sticky state; keyboard
+   focus shows the same state. Scoped to .hero-buttons because .btn-primary also
+   styles the 404, DiVA and PDF links. */
+.hero-buttons > .btn-primary,
+.hero-buttons > .btn-secondary {
+    position: relative;
+    z-index: 1;
+    min-width: 10rem;
+    height: 3.5rem;
+    padding: 0 2.25rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    box-shadow: none;
+}
+
+/* Narrow phones: a little less padding so both pills stay equal and side by side
+   down to 360px. Below that the pair stacks, centred, via .hero-buttons' wrap. */
+@media (max-width: 480px) {
+    .hero-buttons > .btn-primary,
+    .hero-buttons > .btn-secondary {
+        min-width: 9.5rem;
+        padding: 0 1.75rem;
+    }
+}
+
+/* View Work: filled. Its 1px border matches the fill, so both pills are 56px tall. */
+.hero-buttons > .btn-primary {
+    background-color: var(--primary-ink);
+    border: 1px solid var(--primary-ink);
+    color: var(--on-primary-ink);
+    transition: transform 0.25s var(--ease-out);
+}
+
+/* Email Me: outlined, with the same tint and border as the navbar pill. */
+.hero-buttons > .btn-secondary {
+    color: var(--primary-ink);
+    background-color: color-mix(in srgb, var(--primary-ink) 9%, transparent);
+    border: 1px solid var(--primary-ink);
+    transition: color 0.14s ease 0.12s, transform 0.25s var(--ease-out);
+}
+
+/* The resting look is also the ungated hover state, so a sticky touch hover cannot
+   lift the pill or leave a fill behind. The engaged look is re-applied below, gated. */
+.hero-buttons > .btn-primary:hover {
+    background-color: var(--primary-ink);
+    box-shadow: none;
+    transform: none;
+}
+
+.hero-buttons > .btn-secondary:hover {
+    background-color: color-mix(in srgb, var(--primary-ink) 9%, transparent);
+    border-color: var(--primary-ink);
+    transform: none;
+}
+
+/* Press: ungated, because :active is a real press on touch too. */
+.hero-buttons > .btn-primary:active,
+.hero-buttons > .btn-secondary:active {
+    transform: scale(0.97);
+    transition-duration: 0.1s;
+}
+
+/* The fill is a flat line on the bottom edge that grows into a dome covering the pill.
+   View Work's dome is the deeper green; Email Me's is its own ink. */
+.hero-buttons > .btn-primary::before,
+.hero-buttons > .btn-secondary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    clip-path: ellipse(75% 0% at 50% 100%);
+    transition: clip-path 0.25s var(--ease-out);
+}
+
+.hero-buttons > .btn-primary::before {
+    background: var(--primary-ink-hover);
+}
+
+.hero-buttons > .btn-secondary::before {
+    background: var(--primary-ink);
+}
+
+/* The arrow sits in the right padding, so the label never moves. */
+.hero-buttons > .btn-primary::after,
+.hero-buttons > .btn-secondary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0.8rem;
+    width: 0.8em;
+    height: 0.8em;
+    margin-top: -0.4em;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.3s var(--ease-out);
+}
+
+/* View Work's arrow points down (it scrolls) and drops in from above. */
+.hero-buttons > .btn-primary::after {
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v13M6.5 12.5 12 18l5.5-5.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v13M6.5 12.5 12 18l5.5-5.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    transform: translateY(-4px);
+}
+
+/* Email Me's arrow points up-right (it leaves the page) and slides in from down-left. */
+.hero-buttons > .btn-secondary::after {
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E") center / contain no-repeat;
+    transform: translate(-6px, 4px);
+}
+
+/* Engaged state for pointer hover. Gated: touch taps never trigger it. */
+@media (hover: hover) and (pointer: fine) {
+    .hero-buttons > .btn-primary:hover::before,
+    .hero-buttons > .btn-secondary:hover::before {
+        clip-path: ellipse(140% 190% at 50% 100%);
+        opacity: 1;
+    }
+
+    .hero-buttons > .btn-primary:hover::after,
+    .hero-buttons > .btn-secondary:hover::after {
+        opacity: 1;
+        transform: none;
+    }
+
+    .hero-buttons > .btn-secondary:hover {
+        color: var(--on-primary-ink);
+    }
+}
+
+/* Engaged state for keyboard focus (not gated). The ring uses --primary-ink, which
+   clears 3:1 on the cream background; the global --primary ring does not. */
+.hero-buttons > .btn-primary:focus-visible,
+.hero-buttons > .btn-secondary:focus-visible {
+    outline-color: var(--primary-ink);
+    outline-offset: 4px;
+}
+
+.hero-buttons > .btn-primary:focus-visible::before,
+.hero-buttons > .btn-secondary:focus-visible::before {
+    clip-path: ellipse(140% 190% at 50% 100%);
+    opacity: 1;
+}
+
+.hero-buttons > .btn-primary:focus-visible::after,
+.hero-buttons > .btn-secondary:focus-visible::after {
+    opacity: 1;
+    transform: none;
+}
+
+.hero-buttons > .btn-secondary:focus-visible {
+    color: var(--on-primary-ink);
 }
 
 /* Navbar */
@@ -2151,6 +2307,21 @@ footer p {
     a[href="mailto:emadal@kth.se"]::before,
     a[href="mailto:emadal@kth.se"]::after {
         transition: none;
+    }
+
+    /* Hero CTAs: no press scale and no arrow slide. The dome does not grow; it fades in. */
+    .hero-buttons > .btn-primary:active,
+    .hero-buttons > .btn-secondary:active,
+    .hero-buttons > .btn-primary::after,
+    .hero-buttons > .btn-secondary::after {
+        transform: none;
+    }
+
+    .hero-buttons > .btn-primary::before,
+    .hero-buttons > .btn-secondary::before {
+        clip-path: ellipse(140% 190% at 50% 100%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
     }
 
     .sticky-scroll-item {
