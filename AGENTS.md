@@ -32,6 +32,7 @@ The site is hosted on **GitHub Pages**. To deploy:
 - **Colors**: Modify `:root` variables in `style.css` to change the theme.
 - **Content**: Update text directly in the relevant `.html` files.
 - **Images**: Add new images to `images/` and update the `src` attribute in HTML.
+- **Buttons**: `.btn-primary` also styles the 404, DiVA and PDF links, and the navbar Email Me is `a[href="mailto:emadal@kth.se"].btn-primary` on every page. Scope hero CTA changes to `.hero-buttons`, or check those consumers.
 
 ## Key Technologies
 - **HTML5**: Semantic structure.
