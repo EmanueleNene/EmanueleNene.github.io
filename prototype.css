@@ -421,7 +421,7 @@ html.proto .btn-secondary:not([href^="mailto"]):active {
 
 /* ------------------------------------------------------------
    Header: a floating island at the top centre. A compact dark pill
-   with the name, the section links, a Topics popover and Email Me.
+   with the name, a Topics popover and Email Me.
    It is see-through around the edges (pointer events pass through),
    shrinks and gains a shadow on scroll, and script.js still hides it
    on scroll down.
@@ -526,15 +526,6 @@ html.proto .nav-links {
     align-items: center;
     gap: 0.9rem;
     list-style: none;
-}
-
-/* Desktop island: only the name, Topics and Email Me. The section links
-   stay in the Topics panel and in the mobile sheet. */
-@media (min-width: 769px) {
-    html.proto .nav-links > li.nav-section,
-    html.proto .nav-actions {
-        display: none;
-    }
 }
 
 html.proto .nav-links li {
@@ -735,35 +726,8 @@ html.proto .topics-list a:focus-visible span {
     color: var(--ds-on-accent);
 }
 
-html.proto .hamburger {
-    display: none;
-    place-items: center;
-    width: 2.9rem;
-    height: 2.9rem;
-    border: 0;
-    border-radius: 999px;
-    background-color: var(--ds-accent);
-    color: var(--ds-on-accent);
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: translate 0.4s var(--ds-spring);
-}
-
-html.proto .hamburger:hover {
-    translate: 0 -2px;
-}
-
-html.proto .hamburger i {
-    transition: transform 0.7s var(--ds-spring);
-}
-
-html.proto .hamburger[aria-expanded="true"] i {
-    transform: rotate(180deg);
-}
-
 html.proto .nav-links a:focus-visible,
 html.proto .topics-toggle:focus-visible,
-html.proto .hamburger:focus-visible,
 html.proto .logo:focus-visible {
     outline: 3px solid var(--ds-accent);
     outline-offset: 4px;
@@ -784,24 +748,10 @@ html.proto .ds-progress {
 }
 
 /* ------------------------------------------------------------
-   Mobile: the island collapses to the name and the menu button. The
-   menu is a full-screen dark sheet (circular wipe from the button)
-   holding every link and the Topics list, which opens inline.
+   Mobile: the island keeps the desktop parts (name, Topics, Email Me).
+   Topics opens its popover under the island, as on desktop, sized to
+   the island so it fits at 320px and scrolls when it is taller.
    ------------------------------------------------------------ */
-@keyframes ds-nav-item {
-    from {
-        opacity: 0;
-        transform: translateY(70px);
-    }
-}
-
-@keyframes ds-topics-in {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-}
-
 @media (max-width: 768px) {
     html.proto .section {
         padding: 4.5rem 0;
@@ -815,10 +765,12 @@ html.proto .ds-progress {
         top: 0.75rem;
     }
 
+    /* The popover is positioned against the island, so it spans the island's width */
     html.proto .nav-container {
+        position: relative;
         width: calc(100vw - 1.5rem);
         max-width: none;
-        justify-content: space-between;
+        gap: 0.5rem;
         padding: 0.4rem 0.4rem 0.4rem 1rem;
     }
 
@@ -827,45 +779,20 @@ html.proto .ds-progress {
     }
 
     html.proto .logo {
-        position: relative;
-        z-index: 1001;
         font-size: 1.15rem;
     }
 
-    html.proto .nav-actions {
-        position: relative;
-        z-index: 1001;
-        display: flex;
-    }
-
-    html.proto .hamburger {
-        display: grid;
-    }
-
-    /* The sheet: fixed, full screen, opened by a circular wipe from the button */
+    /* The island is one row. These undo the old full-width menu rules in style.css */
     html.proto .nav-links {
-        position: fixed;
-        inset: 0;
-        z-index: 999;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-        gap: 0.5rem;
-        padding: 6.5rem 1.5rem 3rem;
-        overflow-y: auto;
-        background-color: var(--ds-bar);
-        border: 0;
-        border-radius: 0;
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+        gap: 0.4rem;
+        padding: 0;
+        border-bottom: 0;
         box-shadow: none;
-        clip-path: circle(0px at calc(100% - 2rem) 2.6rem);
-        visibility: hidden;
-        transition: clip-path 0.75s var(--ds-ease), visibility 0s linear 0.75s;
-    }
-
-    html.proto .nav-links.active {
-        clip-path: circle(150% at calc(100% - 2rem) 2.6rem);
-        visibility: visible;
-        transition: clip-path 0.85s var(--ds-ease), visibility 0s;
+        background: none;
     }
 
     html.proto .nav-links li {
@@ -873,96 +800,65 @@ html.proto .ds-progress {
     }
 
     html.proto .nav-links li:last-child {
-        padding-top: 1.25rem;
+        padding-top: 0;
     }
 
-    html.proto .nav-links > li > a:not(.btn-primary),
+    /* 44px tall tap targets */
     html.proto .topics-toggle {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        padding: 0.2rem 0;
-        border-radius: 0;
-        background: none;
-        overflow: visible;
-        font-family: var(--ds-display);
-        font-size: clamp(2.2rem, 10vw, 3.4rem);
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        line-height: 1.05;
-        color: var(--ds-bar-ink);
-    }
-
-    html.proto .nav-links > li > a:not(.btn-primary)::before,
-    html.proto .topics-toggle::before {
-        display: none;
-    }
-
-    html.proto .nav-links > li > a:not(.btn-primary):hover,
-    html.proto .nav-links > li > a:not(.btn-primary).active,
-    html.proto .topics-toggle:hover,
-    html.proto .topics-toggle[aria-expanded="true"] {
-        color: var(--ds-accent);
-        translate: 0 0;
-    }
-
-    html.proto .topics-toggle i {
-        font-size: 1.6rem;
+        min-height: 2.75rem;
+        padding: 0.5rem 0.7rem;
+        font-size: 0.9rem;
+        white-space: nowrap;
     }
 
     html.proto .topics-panel {
-        position: static;
-        display: none;
-        width: 100%;
-        padding: 0.25rem 0 0.5rem;
-        border-radius: 0;
-        background: none;
-        box-shadow: none;
-        opacity: 1;
-        visibility: visible;
-        translate: none;
-        scale: none;
-        transition: none;
-    }
-
-    html.proto .topics-panel.is-open {
-        display: block;
-        animation: ds-topics-in 0.5s var(--ds-spring) backwards;
+        left: 0;
+        right: 0;
+        width: auto;
+        top: calc(100% + 0.6rem);
+        max-height: calc(100vh - 6rem);
+        max-height: calc(100dvh - 6rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 0.6rem;
+        border-radius: 1.25rem;
     }
 
     html.proto .topics-head {
-        display: none;
+        padding: 0.25rem 0.4rem 0.6rem;
     }
 
     html.proto .topics-list {
         grid-template-columns: 1fr;
-        gap: 0.5rem;
+        gap: 0.4rem;
     }
 
-    html.proto .topics-list strong {
-        font-size: 1.4rem;
+    html.proto .topics-list a {
+        border-bottom: 0;
     }
 
     html.proto .nav-links a[href="mailto:emadal@kth.se"].btn-primary {
-        display: flex;
-        width: 100%;
-        justify-content: center;
-        margin-top: 1rem;
-        padding: 1.1rem 2rem !important;
-        font-size: 1.2rem;
+        width: auto;
+        min-height: 2.75rem;
+        padding: 0.5rem 1rem !important;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+}
+
+/* 320px: the name, Topics and Email Me still share one row */
+@media (max-width: 360px) {
+    html.proto .logo {
+        font-size: 1rem;
     }
 
-    html.proto .nav-links.active li {
-        animation: ds-nav-item 0.8s var(--ds-spring) backwards;
+    html.proto .topics-toggle {
+        padding: 0.5rem;
     }
 
-    html.proto .nav-links.active li:nth-child(1) { animation-delay: 0.1s; }
-    html.proto .nav-links.active li:nth-child(2) { animation-delay: 0.16s; }
-    html.proto .nav-links.active li:nth-child(3) { animation-delay: 0.22s; }
-    html.proto .nav-links.active li:nth-child(4) { animation-delay: 0.28s; }
-    html.proto .nav-links.active li:nth-child(5) { animation-delay: 0.34s; }
-    html.proto .nav-links.active li:nth-child(6) { animation-delay: 0.4s; }
-    html.proto .nav-links.active li:nth-child(7) { animation-delay: 0.46s; }
+    html.proto .nav-links a[href="mailto:emadal@kth.se"].btn-primary {
+        padding: 0.5rem 0.75rem !important;
+    }
 }
 
 /* No JavaScript: nothing adds .visible, so show content as-is */
@@ -989,7 +885,6 @@ html.proto .ds-progress {
     html.proto .nav-container,
     html.proto .logo,
     html.proto .nav-links li,
-    html.proto .nav-actions,
     html.proto .topics-panel.is-open,
     html.proto .topics-panel.is-open .topics-list li {
         animation: none;
@@ -1012,7 +907,6 @@ html.proto .ds-progress {
     html.proto .topics-toggle:hover,
     html.proto .topics-list a:hover,
     html.proto .topics-list a:focus-visible,
-    html.proto .hamburger:hover,
     html.proto .logo:hover {
         translate: none;
         scale: none;
@@ -1020,7 +914,6 @@ html.proto .ds-progress {
     }
 
     html.proto .card:hover .card-icon,
-    html.proto .hamburger[aria-expanded="true"] i,
     html.proto .topics-toggle[aria-expanded="true"] i {
         transform: none;
     }
@@ -1031,8 +924,6 @@ html.proto .ds-progress {
     html.proto .nav-links > li > a:not(.btn-primary),
     html.proto .topics-toggle,
     html.proto .topics-list a,
-    html.proto .hamburger,
-    html.proto .hamburger i,
     html.proto .topics-toggle i,
     html.proto .logo,
     html.proto .nav-container {
@@ -1060,12 +951,6 @@ html.proto .ds-progress {
 
     html.proto .topics-panel.is-open {
         transition: opacity 0.2s ease, visibility 0s;
-    }
-
-    html.proto .nav-links,
-    html.proto .nav-links.active {
-        clip-path: none;
-        transition: visibility 0s;
     }
 
     html.proto .ds-progress {

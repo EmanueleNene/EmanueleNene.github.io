@@ -190,18 +190,6 @@ html.proto .project-detail-content li {
 }
 
 /* ------------------------------------------------------------
-   Island nav, desktop: name, Topics and Email Me only. The section
-   links stay in the markup for the mobile sheet, as on the homepage.
-   This mirrors PR #40; drop this block when that PR lands on main.
-   ------------------------------------------------------------ */
-@media (min-width: 769px) {
-    html.proto .nav-links > li.nav-section,
-    html.proto .nav-actions {
-        display: none;
-    }
-}
-
-/* ------------------------------------------------------------
    Reduced motion: no lifts, no zoom, no entrance travel.
    Colour and border changes stay, so hover and focus still read.
    ------------------------------------------------------------ */

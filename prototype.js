@@ -72,7 +72,8 @@
 
     // Topics popover (island nav). Opens from its button; Escape closes it and
     // returns focus to the button; a click outside, or focus moving elsewhere, closes it.
-    // A keyboard open moves focus into the list. The closed panel is inert.
+    // Choosing a link in the list closes it too. A keyboard open moves focus into the list.
+    // The closed panel is inert.
     const topicsToggle = document.querySelector('.topics-toggle');
     const topicsPanel = document.getElementById('topics-panel');
     if (topicsToggle && topicsPanel) {
@@ -92,6 +93,10 @@
         topicsToggle.addEventListener('click', (e) => {
             // detail === 0 means the click came from the keyboard (Enter or Space)
             setTopics(!isOpen(), { focusInside: e.detail === 0 });
+        });
+
+        topicsPanel.addEventListener('click', (e) => {
+            if (e.target.closest('a')) setTopics(false);
         });
 
         document.addEventListener('keydown', (e) => {
