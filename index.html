@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="style.css">
     <!-- Homepage prototype look and motion (opt-in via <html class="proto">) -->
     <link rel="stylesheet" href="prototype.css">
+    <!-- Featured Projects bento grid (opt-in via <html class="proto">) -->
+    <link rel="stylesheet" href="featured-proto.css">
 
     <!-- Icons (Phosphor Icons - lightweight and clean) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -106,14 +108,14 @@
 
         <!-- Background field: photos drift behind the copy, dimmed by .ds-scrim (decorative) -->
         <div class="ds-field" aria-hidden="true">
-            <span class="ds-photo ds-photo-1" data-parallax="0.16"><img src="images/radiculae_logo.jpg" alt="" loading="lazy" decoding="async"></span>
-            <span class="ds-photo ds-photo-2" data-parallax="0.28"><img src="images/unleash.png" alt="" loading="lazy" decoding="async"></span>
-            <span class="ds-photo ds-photo-3" data-parallax="0.12"><img src="images/UNLEASH/Group_final_day.jpeg" alt="" loading="lazy" decoding="async"></span>
-            <span class="ds-photo ds-photo-4" data-parallax="0.22"><img src="images/MAXIV/emalab2.JPG" alt="" loading="lazy" decoding="async"></span>
-            <span class="ds-photo ds-photo-5" data-parallax="0.34"><img src="images/MAXIV/emalab.JPG" alt="" loading="lazy" decoding="async"></span>
-            <span class="ds-photo ds-photo-6" data-parallax="0.14"><img src="images/ECCOMAS_MUNICH_2026/presentation.jpeg" alt="" loading="lazy" decoding="async"></span>
-            <span class="ds-photo ds-photo-7" data-parallax="0.26"><img src="images/radiculae_logo.jpg" alt="" loading="lazy" decoding="async"></span>
-            <span class="ds-photo ds-photo-8" data-parallax="0.2"><img src="images/unleash.png" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-1" data-parallax="0.16"><img src="images/web/hero-1.webp" alt="" width="480" height="640" decoding="async"></span>
+            <span class="ds-photo ds-photo-2" data-parallax="0.28"><img src="images/web/hero-2.webp" alt="" width="480" height="640" decoding="async"></span>
+            <span class="ds-photo ds-photo-3" data-parallax="0.12"><img src="images/web/hero-3.webp" alt="" width="480" height="640" decoding="async"></span>
+            <span class="ds-photo ds-photo-4" data-parallax="0.22"><img src="images/web/hero-4.webp" alt="" width="480" height="640" decoding="async"></span>
+            <span class="ds-photo ds-photo-5" data-parallax="0.34"><img src="images/web/hero-5.webp" alt="" width="480" height="640" decoding="async"></span>
+            <span class="ds-photo ds-photo-6" data-parallax="0.14"><img src="images/web/hero-6.webp" alt="" width="480" height="640" decoding="async"></span>
+            <span class="ds-photo ds-photo-7" data-parallax="0.26"><img src="images/web/hero-7.webp" alt="" width="480" height="640" decoding="async"></span>
+            <span class="ds-photo ds-photo-8" data-parallax="0.2"><img src="images/web/hero-8.webp" alt="" width="480" height="640" decoding="async"></span>
         </div>
         <div class="ds-scrim" aria-hidden="true"></div>
 
@@ -165,7 +167,7 @@
         </div>
     </section>
 
-    <!-- Featured Projects Section with Sticky Scroll Reveal -->
+    <!-- Featured Projects: bento grid. Layout and motion live in featured-proto.css / featured-proto.js -->
     <section id="projects" class="section bg-offset">
         <div class="container">
             <div class="section-header reveal reveal-up">
@@ -173,70 +175,55 @@
                 <p>A selection of my recent work.</p>
             </div>
 
-            <div class="sticky-scroll-wrapper" id="stickyScrollProjects">
-                <div class="sticky-scroll-text-col">
-                    <!-- Project 1 -->
-                    <article class="sticky-scroll-item active" data-index="0">
-                        <div class="mobile-project-img">
-                            <img src="images/radiculae.jpg" alt="Radiculae" loading="lazy" decoding="async">
-                        </div>
-                        <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Startup</span>
-                        <h3>Radiculae</h3>
-                        <p>Founded Radiculae, a startup developing cellulose-based solutions for vertical farm food production.</p>
-                        <a href="/projects/radiculae.html" class="link-arrow">Learn More <i class="ph ph-arrow-right"></i></a>
-                    </article>
+            <ul class="bento" role="list">
+                <li class="bento-cell bento-hero">
+                    <a class="bento-tile" href="/projects/radiculae.html">
+                        <span class="bento-media"><img src="images/web/radiculae.webp" alt="Radiculae" width="1264" height="848" loading="lazy" decoding="async"></span>
+                        <span class="bento-body">
+                            <span class="badge bento-badge">2026 • Startup</span>
+                            <h3 class="bento-title">Radiculae</h3>
+                            <p class="bento-text">Founded Radiculae, a startup developing cellulose-based solutions for vertical farm food production.</p>
+                            <span class="bento-cta">Learn More <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+                        </span>
+                    </a>
+                </li>
 
-                    <!-- Project 2 -->
-                    <article class="sticky-scroll-item" data-index="1">
-                        <div class="mobile-project-img">
-                            <img src="images/structural_curl.jpg" alt="Structural Curl" loading="lazy" decoding="async">
-                        </div>
-                        <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Paper Mechanics</span>
-                        <h3>Structural curl and the relative importance of the structural parameters</h3>
-                        <p>Investigating the impact of structural parameters on the curl of paper.</p>
-                        <a href="projects/structural-curl.html" class="link-arrow">View Case Study <i class="ph ph-arrow-right"></i></a>
-                    </article>
+                <li class="bento-cell bento-structural">
+                    <a class="bento-tile" href="projects/structural-curl.html">
+                        <span class="bento-media"><img src="images/web/structural_curl.webp" alt="Structural Curl" width="900" height="604" loading="lazy" decoding="async"></span>
+                        <span class="bento-body">
+                            <span class="badge bento-badge">2026 • Paper Mechanics</span>
+                            <h3 class="bento-title">Structural curl and the relative importance of the structural parameters</h3>
+                            <p class="bento-text">Investigating the impact of structural parameters on the curl of paper.</p>
+                            <span class="bento-cta">View Case Study <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+                        </span>
+                    </a>
+                </li>
 
-                    <!-- Project 3 -->
-                    <article class="sticky-scroll-item" data-index="2">
-                        <div class="mobile-project-img">
-                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity" loading="lazy" decoding="async">
-                        </div>
-                        <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2024 • Publication</span>
-                        <h3>Crystal Plasticity</h3>
-                        <p>Crystal plasticity analysis for bi-crystal Ni-base superalloy by adopting compact specimens with different crystal orientations.</p>
-                        <a href="projects/crystal-plasticity.html" class="link-arrow">Read Publication <i class="ph ph-arrow-right"></i></a>
-                    </article>
+                <li class="bento-cell bento-crystal">
+                    <a class="bento-tile" href="projects/crystal-plasticity.html">
+                        <span class="bento-media"><img src="images/web/crystal_plasticity.webp" alt="Crystal Plasticity" width="900" height="604" loading="lazy" decoding="async"></span>
+                        <span class="bento-body">
+                            <span class="badge bento-badge">2024 • Publication</span>
+                            <h3 class="bento-title">Crystal Plasticity</h3>
+                            <p class="bento-text">Crystal plasticity analysis for bi-crystal Ni-base superalloy by adopting compact specimens with different crystal orientations.</p>
+                            <span class="bento-cta">Read Publication <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+                        </span>
+                    </a>
+                </li>
 
-                    <!-- Project 4 -->
-                    <article class="sticky-scroll-item" data-index="3">
-                        <div class="mobile-project-img">
-                            <img src="images/ferrodastiro.png" alt="FerroDaStiro" loading="lazy" decoding="async">
-                        </div>
-                        <span class="badge" style="margin-bottom: 0.5rem; display: inline-block;">2026 • Web App</span>
-                        <h3>FerroDaStiro</h3>
-                        <p>A private, offline-first workout tracking app running entirely client-side in the browser with local storage.</p>
-                        <a href="https://ferrodastiro.vercel.app" target="_blank" rel="noopener noreferrer" class="link-arrow">Open App <i class="ph ph-arrow-right"></i></a>
-                    </article>
-                </div>
-
-                <div class="sticky-scroll-sticky-col">
-                    <div class="sticky-scroll-card">
-                        <div class="sticky-scroll-img-wrapper active" data-index="0">
-                            <img src="images/radiculae.jpg" alt="Radiculae" loading="lazy" decoding="async">
-                        </div>
-                        <div class="sticky-scroll-img-wrapper" data-index="1">
-                            <img src="images/structural_curl.jpg" alt="Structural Curl" loading="lazy" decoding="async">
-                        </div>
-                        <div class="sticky-scroll-img-wrapper" data-index="2">
-                            <img src="images/crystal_plasticity.jpg" alt="Crystal Plasticity" loading="lazy" decoding="async">
-                        </div>
-                        <div class="sticky-scroll-img-wrapper" data-index="3">
-                            <img src="images/ferrodastiro.png" alt="FerroDaStiro" loading="lazy" decoding="async">
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <li class="bento-cell bento-ferro">
+                    <a class="bento-tile" href="https://ferrodastiro.vercel.app" target="_blank" rel="noopener noreferrer">
+                        <span class="bento-media"><img src="images/ferrodastiro.png" alt="FerroDaStiro" width="512" height="512" loading="lazy" decoding="async"></span>
+                        <span class="bento-body">
+                            <span class="badge bento-badge">2026 • Web App</span>
+                            <h3 class="bento-title">FerroDaStiro</h3>
+                            <p class="bento-text">A private, offline-first workout tracking app running entirely client-side in the browser with local storage.</p>
+                            <span class="bento-cta">Open App <i class="ph ph-arrow-right" aria-hidden="true"></i></span>
+                        </span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </section>
 
@@ -477,6 +464,7 @@
 
     <script src="script.js"></script>
     <script src="prototype.js"></script>
+    <script src="featured-proto.js"></script>
 </body>
 
 </html>

@@ -31,12 +31,26 @@
         bar.style.transform = `scaleX(${ratio})`;
     };
 
+    // Only drifters on screen are measured. Reads run first and writes after,
+    // so the browser lays out once per frame instead of once per element.
+    const onScreen = new Set();
+    const watchDrift = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) onScreen.add(entry.target);
+            else onScreen.delete(entry.target);
+        });
+        onScroll();
+    });
+    drifters.forEach(el => watchDrift.observe(el));
+
     const updateDrift = () => {
         const mid = window.innerHeight / 2;
-        drifters.forEach(el => {
+        const moves = [];
+        onScreen.forEach(el => {
             const r = el.getBoundingClientRect();
-            if (r.bottom < 0 || r.top > window.innerHeight) return;
-            const offset = (r.top + r.height / 2 - mid) * Number(el.dataset.parallax);
+            moves.push([el, (r.top + r.height / 2 - mid) * Number(el.dataset.parallax)]);
+        });
+        moves.forEach(([el, offset]) => {
             el.style.translate = `0 ${offset.toFixed(1)}px`;
         });
     };
