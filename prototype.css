@@ -133,7 +133,7 @@ html.proto .hero-subtitle {
 }
 
 html.proto .badge {
-    background-color: var(--ds-mint);
+    background-color: var(--ds-sky);
     border: 0;
     color: var(--ds-ink);
     font-family: var(--ds-body);
