@@ -1081,24 +1081,60 @@ html.proto .ds-progress {
    The reveal stagger and hover lift sit on the outer .flip-card, so
    they never fight the flip.
    ------------------------------------------------------------ */
+
+/* The seven cards are one horizontal track (.flip-grid), slid with scroll-snap.
+   Phones show one card and a peek of the next; wider screens show about three.
+   The vertical padding holds the hover lift, the card shadow and the reveal offset,
+   so none of them are clipped; the negative margin keeps the section's spacing. */
 html.proto .flip-grid {
+    --values-gap: clamp(1.25rem, 2.5vw, 2.25rem);
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-    gap: clamp(1.5rem, 3vw, 2.75rem);
+    grid-auto-flow: column;
+    grid-auto-columns: 76vw;
+    gap: var(--values-gap);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 2.5rem 0 2rem;
+    margin-top: -2.5rem;
 }
 
-/* Desktop: three across; the seventh value takes a full-width row */
-@media (min-width: 900px) {
-    html.proto .flip-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+html.proto .flip-grid::-webkit-scrollbar {
+    display: none;
+}
 
-    html.proto .flip-card:nth-child(7) {
-        grid-column: 1 / -1;
+@media (min-width: 640px) {
+    html.proto .flip-grid {
+        grid-auto-columns: clamp(18rem, calc((100% + var(--values-gap)) / 3.2 - var(--values-gap)), 26rem);
+    }
+}
+
+/* Focus on the track itself (Tab stop) or on a card's control */
+html.proto .flip-grid:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+/* prototype.js sets .is-free while a drag or a button glide runs (snap off), and .is-dragging for the grab cursor */
+html.proto .flip-grid.is-free {
+    scroll-snap-type: none;
+}
+
+html.proto .flip-grid.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
+
+@media (pointer: fine) {
+    html.proto .flip-grid {
+        cursor: grab;
     }
 }
 
 html.proto .flip-card {
+    scroll-snap-align: start;
     perspective: 1200px;
     min-height: clamp(26rem, 36vw, 30rem);
     transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring);
@@ -1213,6 +1249,90 @@ html.proto .flip-back .link-arrow:focus-visible {
     outline-offset: 4px;
 }
 
+/* Values slider controls: previous and next pills, and a dot per page of cards */
+html.proto .values-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+html.proto .values-nav {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border: 2px solid var(--ds-ink);
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--ds-ink);
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--ds-ink);
+    transition: translate 0.4s var(--ds-spring), box-shadow 0.3s var(--ds-ease), background-color 0.3s var(--ds-ease), color 0.3s var(--ds-ease);
+}
+
+html.proto .values-nav:hover {
+    translate: 0 -3px;
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    box-shadow: 0 7px 0 var(--ds-ink);
+}
+
+html.proto .values-nav:active {
+    translate: 0 4px;
+    box-shadow: 0 0 0 transparent;
+}
+
+/* At either end the button stays focusable but does nothing */
+html.proto .values-nav[aria-disabled="true"] {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+html.proto .values-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+html.proto .values-dot {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 2rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+html.proto .values-dot::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    background-color: var(--text-muted);
+    transition: width 0.5s var(--ds-spring), background-color 0.3s var(--ds-ease);
+}
+
+html.proto .values-dot[aria-current] {
+    cursor: default;
+}
+
+html.proto .values-dot[aria-current]::before {
+    width: 2rem;
+    background-color: var(--ds-accent);
+}
+
+html.proto .values-nav:focus-visible,
+html.proto .values-dot:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
 /* No JavaScript: no button and no flip, so show both faces stacked */
 @media (scripting: none) {
     html.proto .flip-card {
@@ -1234,7 +1354,8 @@ html.proto .flip-back .link-arrow:focus-visible {
         transform: none;
     }
 
-    html.proto .flip-toggle {
+    html.proto .flip-toggle,
+    html.proto .values-controls {
         display: none;
     }
 }
@@ -1272,5 +1393,15 @@ html.proto .flip-back .link-arrow:focus-visible {
 
     html.proto .flip-card.is-flipped .flip-front {
         opacity: 0;
+    }
+
+    html.proto .values-nav,
+    html.proto .values-dot::before {
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    html.proto .values-nav:hover,
+    html.proto .values-nav:active {
+        translate: none;
     }
 }

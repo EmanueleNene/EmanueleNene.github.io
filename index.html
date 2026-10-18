@@ -292,7 +292,7 @@
                 <p>Philosophies I strive to follow in my research and life.</p>
             </div>
 
-            <div class="flip-grid">
+            <div class="flip-grid" role="region" aria-label="Values, scroll sideways to see all seven" tabindex="0">
                 <article class="reveal reveal-up stagger-1 flip-card" data-flip>
                     <div class="flip-inner">
                         <div class="flip-face flip-front">
@@ -433,6 +433,17 @@
                         </div>
                     </div>
                 </article>
+            </div>
+
+            <!-- Slider controls for the values track; hidden without JS (see prototype.css) -->
+            <div class="values-controls">
+                <button type="button" class="values-nav values-prev" aria-label="Previous values">
+                    <i class="ph ph-arrow-left" aria-hidden="true"></i>
+                </button>
+                <div class="values-dots"></div>
+                <button type="button" class="values-nav values-next" aria-label="Next values">
+                    <i class="ph ph-arrow-right" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     </section>
