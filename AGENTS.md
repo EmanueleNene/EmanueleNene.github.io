@@ -9,7 +9,7 @@ This is a personal portfolio website for Emanuele D'Allestro, a PhD Researcher a
 - `index.html`: Main entry point and landing page. Contains the hero section, about, values, and featured projects.
 - `style.css`: Core styling using a "Soft Pastel Earthy" theme. Uses CSS variables for easy customization. Note: `projects/radiculae.html` is a standalone exception with its own bespoke "Radiculae — Botanical Blueprint" styling (deep forest ink, warm parchment, moss green; Fraunces + IBM Plex Mono), self-contained in that page's own `<style>` block.
 - `script.js`: Interactivity, including scroll reveal animations, a 3D carousel for values, and navigation handling.
-- `prototype.css` / `prototype.js`: Homepage-only "Bright Ledger" prototype (Deepstash-inspired palette, type and motion). Opt-in via `<html class="proto">` in `index.html`; it re-maps `style.css` tokens under `html.proto`, so other pages are unchanged. Reduced motion and no-JS fallbacks are in `prototype.css`.
+- `prototype.css` / `prototype.js`: "Bright Ledger" look (Deepstash-inspired palette, type and motion), opt-in via `<html class="proto">` on `index.html` and `projects/*.html` (except `radiculae.html`). It re-maps `style.css` tokens under `html.proto`. Projects-only rules are in `projects-proto.css` / `projects-proto.js`. Reduced motion and no-JS fallbacks are in `prototype.css`.
 - `images/`: Contains static images for projects and personal branding.
 - `recipes/`: Sub-pages for various recipes (e.g., `recipes.html`, individual recipe pages).
 - `conferences/`: Sub-pages for conference notes and logs (e.g., `conferences.html`, individual conference pages).
