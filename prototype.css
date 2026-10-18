@@ -1073,13 +1073,24 @@ html.proto .ds-progress {
    ------------------------------------------------------------ */
 html.proto .flip-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-    gap: clamp(1.25rem, 2.5vw, 2rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+/* Desktop: three across; the seventh value takes a full-width row */
+@media (min-width: 900px) {
+    html.proto .flip-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    html.proto .flip-card:nth-child(7) {
+        grid-column: 1 / -1;
+    }
 }
 
 html.proto .flip-card {
     perspective: 1200px;
-    min-height: 24rem;
+    min-height: clamp(26rem, 36vw, 30rem);
     transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring);
 }
 
@@ -1105,9 +1116,9 @@ html.proto .flip-face {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.6rem;
-    padding: 2rem;
-    border-radius: 1.75rem;
+    gap: 0.8rem;
+    padding: clamp(2rem, 3vw, 3rem);
+    border-radius: 2rem;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
@@ -1126,22 +1137,29 @@ html.proto .flip-back {
 }
 
 html.proto .flip-face h3 {
-    font-size: 1.75rem;
-    line-height: 1.05;
+    font-size: clamp(2.1rem, 3.2vw, 3rem);
+    line-height: 1.02;
 }
 
 html.proto .flip-face p {
     color: inherit;
-    opacity: 0.85;
+    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    line-height: 1.5;
+    opacity: 0.88;
 }
 
 html.proto .flip-front .card-icon {
-    margin-bottom: 0.6rem;
+    width: 4.5rem;
+    height: 4.5rem;
+    margin-bottom: 1rem;
+    border-radius: 1.4rem;
+    font-size: 2.2rem;
 }
 
 html.proto .flip-back .link-arrow {
     margin-top: auto;
     color: var(--ds-bar-link);
+    font-size: 1.15rem;
     font-weight: 700;
 }
 
@@ -1150,12 +1168,12 @@ html.proto .flip-toggle {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.15rem;
+    padding: 0.85rem 1.5rem;
     border: 2px solid var(--ds-ink);
     border-radius: 999px;
     background-color: var(--ds-accent);
     color: var(--ds-on-accent);
-    font: 700 0.95rem var(--ds-body);
+    font: 700 1.05rem var(--ds-body);
     cursor: pointer;
     box-shadow: 0 4px 0 var(--ds-ink);
     transition: translate 0.4s var(--ds-spring), box-shadow 0.3s var(--ds-ease);
