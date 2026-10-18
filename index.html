@@ -71,19 +71,29 @@
         <div class="container nav-container">
             <a href="/index.html" class="logo">Emanuele D.</a>
             <ul class="nav-links">
+                <li>
+                    <button type="button" class="topics-toggle" aria-expanded="false" aria-controls="topics-panel">
+                        Topics <i class="ph ph-caret-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="topics-panel" id="topics-panel" role="region" aria-label="Topics">
+                        <p class="topics-head">Topics</p>
+                        <ul class="topics-list">
+                            <li><a href="/projects/projects.html"><strong>Projects</strong><span>Research and startup work</span></a></li>
+                            <li><a href="/conferences/conferences.html"><strong>Conferences</strong><span>Talks, posters and logs</span></a></li>
+                            <li><a href="/phd/phd-responsible.html"><strong>PhD</strong><span>Milestones and responsibilities</span></a></li>
+                            <li><a href="/recipes/recipes.html"><strong>Recipes</strong><span>Cooking notes</span></a></li>
+                            <li><a href="/#values"><strong>Values</strong><span>Philosophies I follow</span></a></li>
+                            <li><a href="/#events"><strong>Events</strong><span>Events and competitions</span></a></li>
+                        </ul>
+                    </div>
+                </li>
                 <li><a href="/projects/projects.html">Projects</a></li>
                 <li><a href="/conferences/conferences.html">Conferences</a></li>
                 <li><a href="/phd/phd-responsible.html">PhD Responsible</a></li>
                 <li><a href="/recipes/recipes.html">Recipes</a></li>
-                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li></ul>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
+            </ul>
             <div class="nav-actions">
-                <button class="theme-switch" id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Night Mode">
-                    <span class="theme-switch-track">
-                        <span class="theme-switch-icon sun"><i class="ph ph-sun"></i></span>
-                        <span class="theme-switch-icon moon"><i class="ph ph-moon"></i></span>
-                        <span class="theme-switch-thumb"></span>
-                    </span>
-                </button>
                 <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false">
                     <i class="ph ph-list" aria-hidden="true"></i>
                 </button>
@@ -93,6 +103,19 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
+
+        <!-- Background field: photos drift behind the copy, dimmed by .ds-scrim (decorative) -->
+        <div class="ds-field" aria-hidden="true">
+            <span class="ds-photo ds-photo-1" data-parallax="0.16"><img src="images/radiculae_logo.jpg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-2" data-parallax="0.28"><img src="images/unleash.png" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-3" data-parallax="0.12"><img src="images/UNLEASH/Group_final_day.jpeg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-4" data-parallax="0.22"><img src="images/MAXIV/emalab2.JPG" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-5" data-parallax="0.34"><img src="images/MAXIV/emalab.JPG" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-6" data-parallax="0.14"><img src="images/ECCOMAS_MUNICH_2026/presentation.jpeg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-7" data-parallax="0.26"><img src="images/radiculae_logo.jpg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-8" data-parallax="0.2"><img src="images/unleash.png" alt="" loading="lazy" decoding="async"></span>
+        </div>
+        <div class="ds-scrim" aria-hidden="true"></div>
 
         <div class="container hero-grid">
             <div class="hero-content">
@@ -111,17 +134,6 @@
                     <a href="mailto:emadal@kth.se" class="btn-secondary">Email Me</a>
                 </div>
             </div>
-
-            <div class="hero-gallery" id="hero-coverflow" data-autoplay="true" data-autoplay-dir="rightToLeft" data-parallax="0.1">
-                <div class="coverflow-stage" id="coverflow-stage"></div>
-            </div>
-        </div>
-
-        <!-- Decorative drifting tiles (prototype.css); hidden from assistive tech -->
-        <div class="ds-float-layer" aria-hidden="true">
-            <span class="ds-float ds-float-1" data-parallax="0.22"><i class="ph ph-flask"></i></span>
-            <span class="ds-float ds-float-2" data-parallax="0.34"><i class="ph ph-plant"></i></span>
-            <span class="ds-float ds-float-3" data-parallax="0.16"><i class="ph ph-book-open-text"></i></span>
         </div>
     </section>
 

@@ -4,6 +4,8 @@
 
 // Instant theme initialization to prevent flash of wrong theme (FOUC)
 (function () {
+    // Homepage is single-mode (prototype.css): no theme attribute, no night mode
+    if (document.documentElement.classList.contains('proto')) return;
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const theme = savedTheme || (prefersDark ? 'dark' : 'light');
@@ -19,10 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0a. Hero headline word-morph
     initTextMorph();
 
-    // 0b. Hero image coverflow
-    initCoverflow();
-
-    // 0c. Sticky Scroll Reveal for Featured Projects
+    // 0b. Sticky Scroll Reveal for Featured Projects
     initStickyScroll();
 
     // 0d. Card Hover Effect for Events
@@ -320,194 +319,6 @@ function initTextMorph() {
     }
 }
 
-/* Hero image coverflow — 3D stack of project photos, click to bring a card
-   to centre. Ported from a Framer Smooth3DSlideshow component (titles
-   dropped: this instance was configured showTitle:false). */
-function initCoverflow() {
-    const root = document.getElementById('hero-coverflow');
-    const stage = document.getElementById('coverflow-stage');
-    if (!root || !stage) return;
-
-    const slides = [
-        { src: 'images/radiculae_logo.jpg', alt: 'Startup' },
-        { src: 'images/unleash.png', alt: 'Smart paper sensor prototype' },
-        { src: 'images/UNLEASH/Group_final_day.jpeg', alt: 'Unleash final day' },
-        { src: 'images/MAXIV/emalab2.JPG', alt: 'MAX IV synchrotron lab work' },
-        { src: 'images/MAXIV/emalab.JPG', alt: 'MAX IV synchrotron lab work' },
-        { src: 'images/ECCOMAS_MUNICH_2026/presentation.jpeg', alt: 'WCCM-ECCOMAS 2026 presentation' }
-    ];
-    const n = slides.length;
-    if (!n) return;
-
-    const PERSPECTIVE = 1600;
-    const SCALE_STEP = 0.16;
-    const MAX_VISIBLE = 2;
-    const DEPTH = 200;
-    const TILT = 10;
-    const SIDE_TILT = 6;
-    const GAP = 7;
-    const DIM = 1 - 55 / 100;
-    const dur = 0.6;
-    const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
-
-    root.style.perspective = `${PERSPECTIVE}px`;
-
-    let active = 0;
-    let locked = false;
-
-    const cards = slides.map((slide, i) => {
-        const card = document.createElement('div');
-        card.className = 'coverflow-card';
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', slide.alt || '');
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleClick(i);
-            }
-        });
-
-        const img = document.createElement('img');
-        img.src = slide.src;
-        img.alt = slide.alt || '';
-        img.draggable = false;
-        card.appendChild(img);
-
-        const dimEl = document.createElement('div');
-        dimEl.className = 'coverflow-dim';
-        card.appendChild(dimEl);
-
-        card.addEventListener('click', () => handleClick(i));
-        stage.appendChild(card);
-        return { card, dimEl };
-    });
-
-    function lock() {
-        locked = true;
-        window.setTimeout(() => { locked = false; }, Math.max(50, dur * 1000));
-    }
-
-    function handleClick(i) {
-        if (locked) return;
-        lock();
-        active = i === active ? (active + 1) % n : i;
-        render();
-    }
-
-    function sizeFor() {
-        const w = root.clientWidth || 360;
-        const cardWidth = Math.max(200, Math.min(340, w * 0.62));
-        const cardHeight = cardWidth * 1.05;
-        return { cardWidth, cardHeight };
-    }
-
-    // mode: 'stacked' = all cards piled face-down at centre (pre-deal),
-    //       'deal'    = fan out from the pile, nearest cards first,
-    //       otherwise = normal coverflow move.
-    function render(mode) {
-        const { cardWidth, cardHeight } = sizeFor();
-        stage.style.width = `${cardWidth}px`;
-        stage.style.height = `${cardHeight}px`;
-
-        cards.forEach(({ card, dimEl }, i) => {
-            let rel = i - active;
-            if (rel > n / 2) rel -= n;
-            if (rel < -n / 2) rel += n;
-
-            const ax = Math.abs(rel);
-            const visible = ax <= MAX_VISIBLE;
-            const isActive = rel === 0;
-            const sc = Math.max(0.4, 1 - ax * SCALE_STEP);
-            const tx = rel * (GAP * 30);
-            const tz = -ax * DEPTH;
-            const ry = -rel * TILT;
-            const rz = rel * SIDE_TILT;
-
-            card.style.width = `${cardWidth}px`;
-            card.style.height = `${cardHeight}px`;
-
-            if (mode === 'stacked') {
-                card.style.transition = 'none';
-                card.style.transform =
-                    `translate(-50%, -50%) translateY(40px) rotateZ(${(i % 2 ? 1 : -1) * (2 + i)}deg) scale(0.86)`;
-                card.style.opacity = '0';
-                return;
-            }
-
-            const t = mode === 'deal' ? 1.1 : dur;
-            const delay = mode === 'deal' ? (0.45 + ax * 0.12).toFixed(2) : 0;
-            card.style.transition = `transform ${t}s ${ease} ${delay}s, opacity ${t * 0.6}s ${ease} ${delay}s`;
-            card.style.transform =
-                `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`;
-            card.style.opacity = visible ? '1' : '0';
-            card.style.pointerEvents = visible ? 'auto' : 'none';
-            card.style.cursor = isActive ? 'default' : 'pointer';
-            card.tabIndex = visible ? 0 : -1;
-
-            dimEl.style.transition = `opacity ${t}s ${ease} ${delay}s`;
-            dimEl.style.opacity = isActive ? '0' : String(DIM);
-        });
-    }
-
-    window.addEventListener('resize', () => render());
-
-    if (REDUCED_MOTION) {
-        render();
-    } else {
-        render('stacked');
-        stage.getBoundingClientRect(); // commit the stacked pose before dealing
-        requestAnimationFrame(() => render('deal'));
-        locked = true;
-        window.setTimeout(() => { locked = false; }, 1800);
-    }
-
-    root.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
-        if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
-    });
-
-    function step(dir) {
-        if (locked) return;
-        lock();
-        active = ((active + dir) % n + n) % n;
-        render();
-    }
-
-    let touchX = null;
-    stage.addEventListener('touchstart', (e) => {
-        touchX = e.touches[0].clientX;
-    }, { passive: true });
-    stage.addEventListener('touchend', (e) => {
-        if (touchX === null) return;
-        const dx = e.changedTouches[0].clientX - touchX;
-        touchX = null;
-        if (Math.abs(dx) < 30) return;
-        step(dx < 0 ? 1 : -1);
-    }, { passive: true });
-
-    if (root.dataset.autoplay === 'true' && n > 1 && !REDUCED_MOTION) {
-        const dir = root.dataset.autoplayDir === 'leftToRight' ? -1 : 1;
-        // Autoplay yields to the visitor: hover, keyboard focus, off screen, hidden tab
-        let hovered = false;
-        let focused = false;
-        let onScreen = true;
-        root.addEventListener('mouseenter', () => { hovered = true; });
-        root.addEventListener('mouseleave', () => { hovered = false; });
-        root.addEventListener('focusin', () => { focused = true; });
-        root.addEventListener('focusout', () => { focused = false; });
-        if ('IntersectionObserver' in window) {
-            new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; }).observe(root);
-        }
-
-        window.setInterval(() => {
-            if (locked || hovered || focused || !onScreen || document.hidden) return;
-            lock();
-            active = ((active + dir) % n + n) % n;
-            render();
-        }, 3200);
-    }
-}
-
 /* Sticky Scroll Reveal for Featured Projects */
 function initStickyScroll() {
     const items = document.querySelectorAll('.sticky-scroll-item');
@@ -611,6 +422,7 @@ function initCardHoverEffect() {
 
 /* Night Mode / Theme Toggle Logic */
 function initThemeToggle() {
+    if (document.documentElement.classList.contains('proto')) return;
     const getStoredTheme = () => localStorage.getItem('theme');
     const getSystemTheme = () => (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 

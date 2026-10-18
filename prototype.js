@@ -56,6 +56,43 @@
     updateProgress();
     if (!reduceMotion.matches) updateDrift();
 
+    // Topics popover (island nav). Opens from its button; Escape closes it and
+    // returns focus to the button; a click outside, or focus moving elsewhere, closes it.
+    // A keyboard open moves focus into the list. The closed panel is inert.
+    const topicsToggle = document.querySelector('.topics-toggle');
+    const topicsPanel = document.getElementById('topics-panel');
+    if (topicsToggle && topicsPanel) {
+        const topicsWrap = topicsToggle.closest('li');
+        const isOpen = () => topicsPanel.classList.contains('is-open');
+
+        const setTopics = (open, { focusInside = false, returnFocus = false } = {}) => {
+            topicsPanel.classList.toggle('is-open', open);
+            topicsToggle.setAttribute('aria-expanded', String(open));
+            topicsPanel.inert = !open;
+            if (open && focusInside) topicsPanel.querySelector('a').focus();
+            if (!open && returnFocus) topicsToggle.focus();
+        };
+
+        setTopics(false);
+
+        topicsToggle.addEventListener('click', (e) => {
+            // detail === 0 means the click came from the keyboard (Enter or Space)
+            setTopics(!isOpen(), { focusInside: e.detail === 0 });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen()) setTopics(false, { returnFocus: true });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (isOpen() && !topicsWrap.contains(e.target)) setTopics(false);
+        });
+
+        topicsWrap.addEventListener('focusout', (e) => {
+            if (isOpen() && e.relatedTarget && !topicsWrap.contains(e.relatedTarget)) setTopics(false);
+        });
+    }
+
     // Flip cards (values): the Details / Back buttons toggle the back face.
     // The face that is turned away is made inert so its link and text are
     // skipped by keyboard and screen readers.
