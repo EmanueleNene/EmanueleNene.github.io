@@ -1,0 +1,551 @@
+/*
+   --------------------------------------------------------------
+   Recipes pages: the "Bright Ledger" look from prototype.css.
+   Opt-in: <html class="proto"> on recipes/*.html. Loaded after
+   prototype.css, so it reuses its tokens and motion. Only layout,
+   card, step and filter rules live here. The filter and card
+   behaviour is in recipes-proto.js.
+
+   Motion rule: only opacity, transform, translate and scale are
+   animated. The hover shadow is a pseudo-element that fades in its
+   opacity, and the resting lip is static.
+   --------------------------------------------------------------
+*/
+
+/* Hero: same type as the homepage, with the title and intro centred */
+html.proto .hero-small {
+    padding: clamp(8rem, 14vw, 10rem) 0 clamp(2rem, 4vw, 3rem);
+}
+
+html.proto .hero-small p {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--ds-ink-2);
+    max-width: 34ch;
+    margin-inline: auto;
+}
+
+/* ------------------------------------------------------------
+   Reveal stagger: one custom property per stagger step, applied to
+   the first two transitions (opacity, transform). The rest of the
+   list (translate, scale, border) has no delay, so a hover is never
+   held back by the arrival stagger. Cards use a five-item list.
+   ------------------------------------------------------------ */
+html.proto .reveal.stagger-1 { --stagger: 0.14s; transition-delay: var(--stagger) var(--stagger) 0s 0s 0s; }
+html.proto .reveal.stagger-2 { --stagger: 0.28s; transition-delay: var(--stagger) var(--stagger) 0s 0s 0s; }
+html.proto .reveal.stagger-3 { --stagger: 0.42s; transition-delay: var(--stagger) var(--stagger) 0s 0s 0s; }
+html.proto .reveal.stagger-4 { --stagger: 0.56s; transition-delay: var(--stagger) var(--stagger) 0s 0s 0s; }
+
+/* ------------------------------------------------------------
+   Filters: chunky pills with a static lip, like the homepage buttons.
+   The pill lifts on hover and sinks on press. Active text is dark on
+   amber (AA).
+   ------------------------------------------------------------ */
+html.proto .recipe-filter-bar {
+    gap: 0.75rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+html.proto .filter-btn {
+    font: 700 0.95rem var(--ds-body);
+    padding: 0.6rem 1.3rem;
+    border: 2px solid var(--text-muted);
+    border-radius: 999px;
+    background-color: var(--ds-card);
+    color: var(--ds-ink);
+    box-shadow: 0 4px 0 var(--text-muted);
+    cursor: pointer;
+    transition: translate 0.4s var(--ds-spring), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+html.proto .filter-btn:hover {
+    translate: 0 -3px;
+    color: var(--ds-ink);
+    border-color: var(--ds-ink-2);
+}
+
+html.proto .filter-btn:active {
+    translate: 0 4px;
+    box-shadow: 0 0 0 transparent;
+}
+
+html.proto .filter-btn.active {
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    border-color: var(--ds-ink);
+    box-shadow: 0 4px 0 var(--ds-ink);
+}
+
+html.proto .filter-btn:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+/* ------------------------------------------------------------
+   Recipe cards: image on top, rounded like the homepage cards.
+   The lift, reveal and keyboard lift share one transition list,
+   declared after prototype.css so it wins the tie. The deep hover
+   shadow sits on ::after and fades its opacity, so the card itself
+   never animates box-shadow. The card does not clip (overflow stays
+   visible), so that shadow is not cut off. Only the image is clipped.
+   ------------------------------------------------------------ */
+html.proto .recipe-card {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border-radius: 1.75rem;
+    box-shadow: 0 8px 0 var(--ds-line-2);
+    transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring), scale 0.55s var(--ds-spring), border-color 0.3s ease;
+}
+
+html.proto .recipe-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    box-shadow: 0 34px 60px -26px rgb(0 0 0 / 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ds-ease);
+}
+
+html.proto .recipe-card:hover,
+html.proto .recipe-card:has(:focus-visible) {
+    translate: 0 -14px;
+    scale: 1.02;
+    transform: none;
+    border-color: var(--ds-ink-2);
+    box-shadow: 0 12px 0 var(--ds-line-2);
+}
+
+html.proto .recipe-card:hover::after,
+html.proto .recipe-card:has(:focus-visible)::after {
+    opacity: 1;
+}
+
+html.proto .recipe-card:has(:focus-visible) {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 6px;
+}
+
+html.proto .recipe-card .recipe-card-image {
+    height: auto;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: calc(1.75rem - 1px) calc(1.75rem - 1px) 0 0;
+    border-bottom: 1px solid var(--ds-line);
+    background-color: var(--ds-paper-2);
+}
+
+html.proto .recipe-card .recipe-card-image img {
+    transition: transform 0.8s var(--ds-ease);
+}
+
+html.proto .recipe-card:hover .recipe-card-image img,
+html.proto .recipe-card:has(:focus-visible) .recipe-card-image img {
+    transform: scale(1.06);
+}
+
+html.proto .recipe-card-icon {
+    display: inline-block;
+    transition: transform 0.8s var(--ds-spring);
+}
+
+html.proto .recipe-card:hover .recipe-card-icon,
+html.proto .recipe-card:has(:focus-visible) .recipe-card-icon {
+    transform: rotate(-14deg) scale(1.18);
+}
+
+html.proto .recipe-placeholder-text {
+    color: var(--ds-ink-2);
+}
+
+html.proto .recipe-card .recipe-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: clamp(1.5rem, 2.5vw, 2rem);
+}
+
+html.proto .recipe-card .recipe-card-content h3 {
+    font-size: 1.6rem;
+    margin: 0;
+}
+
+html.proto .recipe-card .recipe-card-content p {
+    margin: 0 0 0.5rem;
+    color: var(--ds-ink-2);
+}
+
+html.proto .recipe-card .link-arrow {
+    margin-top: auto;
+    color: var(--ds-accent-ink);
+    font-weight: 700;
+}
+
+html.proto .recipe-card .link-arrow i {
+    display: inline-block;
+    transition: translate 0.5s var(--ds-spring);
+}
+
+html.proto .recipe-card:hover .link-arrow i,
+html.proto .recipe-card:has(:focus-visible) .link-arrow i {
+    translate: 6px 0;
+}
+
+/* Entrance when a filter brings a card back: JS adds .is-entering
+   with a stagger delay. backwards fill only, so hover is not locked. */
+@keyframes ds-recipe-in {
+    from {
+        opacity: 0;
+        translate: 0 40px;
+        scale: 0.96;
+    }
+}
+
+html.proto .recipe-card.is-entering {
+    animation: ds-recipe-in 0.9s var(--ds-spring) backwards;
+    animation-delay: var(--ds-enter-delay, 0s);
+}
+
+/* ------------------------------------------------------------
+   Recipe detail pages
+   ------------------------------------------------------------ */
+
+/* Back link: a pill that lifts and sinks like the homepage buttons */
+html.proto .recipe-back {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.5rem;
+    margin: clamp(1rem, 3vw, 2rem) auto 2rem;
+    padding: 0.55rem 1.1rem;
+    border: 2px solid var(--ds-lip-ghost);
+    border-radius: 999px;
+    background-color: var(--ds-card);
+    color: var(--ds-ink);
+    font-weight: 700;
+    box-shadow: 0 4px 0 var(--ds-lip-ghost);
+    transition: translate 0.4s var(--ds-spring), background-color 0.2s ease;
+}
+
+html.proto .recipe-back:hover {
+    translate: 0 -3px;
+    background-color: var(--ds-paper-2);
+}
+
+html.proto .recipe-back:active {
+    translate: 0 4px;
+    box-shadow: 0 0 0 transparent;
+}
+
+html.proto .recipe-back:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+html.proto .recipe-back i {
+    transition: translate 0.5s var(--ds-spring);
+}
+
+html.proto .recipe-back:hover i {
+    translate: -4px 0;
+}
+
+html.proto .project-detail-header {
+    padding-top: clamp(7rem, 14vw, 9rem);
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+html.proto .project-detail-header h1 {
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+html.proto .project-detail-header .subtitle {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--ds-ink-2);
+    max-width: 36ch;
+    margin-inline: auto;
+}
+
+/* Hero photo or placeholder, framed like the project images */
+html.proto .project-detail-image {
+    overflow: hidden;
+    border: 1px solid var(--ds-line);
+    border-radius: 1.75rem;
+    box-shadow: 0 12px 0 var(--ds-line-2);
+    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+html.proto .project-detail-image .recipe-placeholder,
+html.proto .project-detail-image .recipe-placeholder-img {
+    height: clamp(240px, 40vw, 340px);
+    border: 0;
+    border-radius: 0;
+}
+
+html.proto .project-detail-image .recipe-placeholder-img {
+    padding: 2rem;
+}
+
+html.proto .project-detail-image .recipe-card-icon {
+    font-size: 4rem;
+}
+
+html.proto .project-detail-image .recipe-placeholder-text {
+    font-size: 1.5rem;
+}
+
+html.proto .recipe-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+html.proto .project-detail-content {
+    overflow-wrap: break-word;
+}
+
+html.proto .project-detail-content section {
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+html.proto .project-detail-content h2 {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+}
+
+html.proto .project-detail-content p,
+html.proto .project-detail-content li {
+    color: var(--ds-ink-2);
+}
+
+html.proto .project-detail-content h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Ingredients: each line is its own row with an amber dot */
+html.proto .recipe-ingredients {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+}
+
+html.proto .recipe-ingredients li {
+    position: relative;
+    margin: 0;
+    padding: 0.85rem 1.1rem 0.85rem 2.5rem;
+    border-radius: 1rem;
+    background-color: var(--ds-paper-2);
+    line-height: 1.55;
+}
+
+html.proto .recipe-ingredients li::before {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    top: 1.35rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: var(--ds-accent);
+}
+
+html.proto .recipe-ingredients li strong {
+    color: var(--ds-ink);
+}
+
+/* Steps: panels with a bold amber rail. Cards and steps share one
+   transition list and one stagger, the same as the listing cards. */
+html.proto .project-detail-content .card,
+html.proto .recipe-step {
+    transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring), scale 0.55s var(--ds-spring), border-color 0.3s ease;
+}
+
+html.proto .recipe-step {
+    margin-bottom: 1.25rem;
+    padding: clamp(1.25rem, 2.5vw, 1.75rem) clamp(1.25rem, 3vw, 2rem);
+    background-color: var(--ds-card);
+    border: 1px solid var(--ds-line);
+    border-left: 6px solid var(--ds-accent);
+    border-radius: 1.5rem;
+}
+
+html.proto .recipe-step:hover {
+    border-color: var(--ds-line-2);
+    border-left-color: var(--ds-accent);
+}
+
+html.proto .recipe-step h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.6rem;
+}
+
+html.proto .recipe-step ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+}
+
+html.proto .recipe-step li {
+    margin-bottom: 0.4rem;
+}
+
+/* Pro tips: a peach note with dark ink (AA) */
+html.proto .recipe-pro-tip {
+    display: block;
+    margin: 0.9rem 0 0;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    background-color: var(--ds-peach);
+    color: var(--ds-ink-2);
+    font-size: 0.98rem;
+    line-height: 1.6;
+}
+
+/* Ratio box: a bold amber frame around the one formula */
+html.proto .recipe-ratio-box {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 2px solid var(--ds-accent);
+    background-color: var(--ds-card);
+}
+
+html.proto .recipe-ratio-box:hover {
+    translate: none;
+    scale: none;
+}
+
+html.proto .recipe-ratio-text {
+    margin: 0;
+    font-family: var(--ds-display);
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--ds-ink);
+}
+
+/* Table: a scroller with a focus ring, so it can be reached and scrolled
+   by keyboard on narrow screens */
+html.proto .card.table-scroll {
+    padding: 0;
+    overflow-x: auto;
+}
+
+html.proto .card.table-scroll:hover {
+    translate: none;
+    scale: none;
+}
+
+html.proto .table-scroll:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+html.proto .styled-table thead tr {
+    background-color: var(--ds-paper-2);
+}
+
+html.proto .styled-table th {
+    font-family: var(--ds-display);
+    font-weight: 800;
+    color: var(--ds-ink);
+    padding: 1rem 1.25rem;
+}
+
+html.proto .styled-table td {
+    color: var(--ds-ink-2);
+    padding: 1rem 1.25rem;
+}
+
+html.proto .styled-table tbody tr {
+    border-bottom-color: var(--ds-line);
+}
+
+/* ------------------------------------------------------------
+   Phones: a smaller hero, frame and card padding
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+    html.proto .recipe-card .recipe-card-content {
+        padding: 1.5rem;
+    }
+
+    html.proto .recipe-step {
+        border-radius: 1.25rem;
+    }
+
+    html.proto .project-detail-image {
+        border-radius: 1.5rem;
+    }
+}
+
+/* ------------------------------------------------------------
+   Reduced motion: no lifts, no zoom, no entrance travel, no
+   stagger. Colour, border and opacity changes stay, so hover and
+   focus still read.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    html.proto .recipe-card,
+    html.proto .recipe-card:hover,
+    html.proto .recipe-card:has(:focus-visible),
+    html.proto .project-detail-content .card,
+    html.proto .project-detail-content .card:hover,
+    html.proto .recipe-step,
+    html.proto .filter-btn:hover,
+    html.proto .filter-btn:active,
+    html.proto .recipe-back:hover,
+    html.proto .recipe-back:active {
+        translate: none;
+        scale: none;
+        transform: none;
+    }
+
+    html.proto .recipe-card,
+    html.proto .project-detail-content .card,
+    html.proto .recipe-step {
+        transition: opacity 0.3s ease, border-color 0.3s ease;
+    }
+
+    html.proto .recipe-card::after {
+        transition: opacity 0.3s ease;
+    }
+
+    html.proto .recipe-card .recipe-card-image img,
+    html.proto .recipe-card:hover .recipe-card-image img,
+    html.proto .recipe-card:has(:focus-visible) .recipe-card-image img {
+        transform: none;
+        transition: none;
+    }
+
+    html.proto .recipe-card-icon,
+    html.proto .recipe-card:hover .recipe-card-icon,
+    html.proto .recipe-card:has(:focus-visible) .recipe-card-icon,
+    html.proto .recipe-card .link-arrow i,
+    html.proto .recipe-card:hover .link-arrow i,
+    html.proto .recipe-card:has(:focus-visible) .link-arrow i,
+    html.proto .recipe-back i,
+    html.proto .recipe-back:hover i {
+        transform: none;
+        translate: none;
+        transition: none;
+    }
+
+    html.proto .recipe-card.is-entering {
+        animation: none;
+    }
+
+    html.proto .reveal.stagger-1,
+    html.proto .reveal.stagger-2,
+    html.proto .reveal.stagger-3,
+    html.proto .reveal.stagger-4 {
+        transition-delay: 0s;
+    }
+}

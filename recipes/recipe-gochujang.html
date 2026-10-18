@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="proto">
 
 <head>
     <meta charset="UTF-8">
@@ -7,12 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Gochujang Glazed Chicken - Recipe Explained">
     <title>Gochujang Glazed Chicken | Emanuele D'Allestro</title>
-    <!-- Google Fonts: Source Serif 4 -->
+    <!-- Google Fonts: Bricolage Grotesque (display) + Figtree (text), prototype look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:wght@400..900&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../style.css">
+    <!-- Homepage prototype look and motion, then the recipes layer -->
+    <link rel="stylesheet" href="../prototype.css">
+    <link rel="stylesheet" href="../recipes-proto.css">
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -32,19 +35,29 @@
         <div class="container nav-container">
             <a href="/index.html" class="logo">Emanuele D.</a>
             <ul class="nav-links">
-                <li><a href="/projects/projects.html">Projects</a></li>
-                <li><a href="/conferences/conferences.html">Conferences</a></li>
-                <li><a href="/phd/phd-responsible.html">PhD Responsible</a></li>
-                <li><a href="/recipes/recipes.html">Recipes</a></li>
-                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li></ul>
+                <li>
+                    <button type="button" class="topics-toggle" aria-expanded="false" aria-controls="topics-panel">
+                        Topics <i class="ph ph-caret-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="topics-panel" id="topics-panel" role="region" aria-label="Topics">
+                        <p class="topics-head">Topics</p>
+                        <ul class="topics-list">
+                            <li><a href="/projects/projects.html"><strong>Projects</strong><span>Research and startup work</span></a></li>
+                            <li><a href="/conferences/conferences.html"><strong>Conferences</strong><span>Talks, posters and logs</span></a></li>
+                            <li><a href="/phd/phd-responsible.html"><strong>PhD</strong><span>Milestones and responsibilities</span></a></li>
+                            <li><a href="/recipes/recipes.html" aria-current="page"><strong>Recipes</strong><span>Cooking notes</span></a></li>
+                            <li><a href="/#values"><strong>Values</strong><span>Philosophies I follow</span></a></li>
+                            <li><a href="/#events"><strong>Events</strong><span>Events and competitions</span></a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-section"><a href="/projects/projects.html">Projects</a></li>
+                <li class="nav-section"><a href="/conferences/conferences.html">Conferences</a></li>
+                <li class="nav-section"><a href="/phd/phd-responsible.html">PhD Responsible</a></li>
+                <li class="nav-section"><a href="/recipes/recipes.html" aria-current="page">Recipes</a></li>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
+            </ul>
             <div class="nav-actions">
-                <button class="theme-switch" id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Night Mode">
-                    <span class="theme-switch-track">
-                        <span class="theme-switch-icon sun"><i class="ph ph-sun"></i></span>
-                        <span class="theme-switch-icon moon"><i class="ph ph-moon"></i></span>
-                        <span class="theme-switch-thumb"></span>
-                    </span>
-                </button>
                 <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false">
                     <i class="ph ph-list" aria-hidden="true"></i>
                 </button>
@@ -53,7 +66,7 @@
     </nav>
 
     <main class="container section">
-        <a href="javascript:history.back()" class="link-arrow" style="margin-bottom: 2rem; display: inline-flex;"><i class="ph ph-arrow-left"></i> Back</a>
+        <a href="recipes.html" class="link-arrow recipe-back"><i class="ph ph-arrow-left"></i> Back</a>
         <div class="project-detail-header reveal reveal-up">
             <span class="badge">Cooking Method</span>
             <h1>Gochujang Glazed Chicken</h1>
@@ -66,8 +79,8 @@
             </div>
         </div>
 
-        <div class="project-detail-content reveal reveal-up stagger-2">
-            <section>
+        <div class="project-detail-content">
+            <section class="reveal reveal-up">
                 <h2>What is Gochujang?</h2>
                 <p>Gochujang (고추장) is a fermented Korean red chili paste made from glutinous rice, fermented soybeans,
                     red chili powder, and salt. Its flavor profile is simultaneously spicy, sweet, umami, and slightly
@@ -75,12 +88,12 @@
                     1,000–10,000 SHU depending on the brand, but the fermented depth is what defines it.</p>
             </section>
 
-            <section>
+            <section class="reveal reveal-up">
                 <h2>Ingredients</h2>
                 <p><strong>Serves:</strong> 2–3 | <strong>Time:</strong> ~35 min</p>
 
                 <h3>Marinade/Sauce</h3>
-                <ul>
+                <ul class="recipe-ingredients">
                     <li><strong>2 tbsp</strong> Gochujang paste</li>
                     <li><strong>1 tbsp</strong> Soy sauce</li>
                     <li><strong>1 tbsp</strong> Rice vinegar</li>
@@ -92,24 +105,24 @@
                 </ul>
 
                 <h3>Protein & Garnish</h3>
-                <ul>
+                <ul class="recipe-ingredients">
                     <li><strong>500g</strong> Chicken thighs (bone-in or boneless — thighs hold moisture far better than
                         breast under high-heat glazing)</li>
                     <li><strong>Garnish:</strong> Sesame seeds, thin-sliced spring onion, lime wedge</li>
                 </ul>
             </section>
 
-            <section>
+            <section class="reveal reveal-up">
                 <h2>Method</h2>
 
-                <div class="recipe-step">
+                <div class="recipe-step reveal reveal-up stagger-1">
                     <h3>1. Marinate</h3>
                     <p>Mix all sauce ingredients. Score the chicken skin/flesh lightly (3–4 shallow cuts) — this
                         accelerates marinade penetration and prevents skin from curling. Coat well and marinate at least
                         30 min, ideally 2–4 hours refrigerated.</p>
                 </div>
 
-                <div class="recipe-step">
+                <div class="recipe-step reveal reveal-up stagger-2">
                     <h3>2. Cook</h3>
                     <p><strong>Pan method:</strong> Heat a cast iron or stainless skillet over medium-high. Add oil.
                         Sear chicken skin-side down 6–7 min without moving — you want a caramelized crust (the sugars in
@@ -118,7 +131,7 @@
                     <p><strong>Oven method:</strong> 200°C / 400°F, 25–30 min, baste once at halfway.</p>
                 </div>
 
-                <div class="recipe-step">
+                <div class="recipe-step reveal reveal-up stagger-3">
                     <h3>3. Rest & Finish</h3>
                     <p><strong>Rest:</strong> Let rest 5 min before cutting — this redistributes juices back into the
                         fibers.</p>
@@ -127,12 +140,12 @@
                 </div>
             </section>
 
-            <section>
+            <section class="reveal reveal-up">
                 <h2>Serving & Adjustments</h2>
                 <p><strong>Serve with:</strong> Steamed jasmine or short-grain rice, quick-pickled cucumber (rice
                     vinegar + salt + sugar, 15 min), and a fried egg if you want a proper bibimbap-adjacent bowl.</p>
 
-                <div class="card recipe-step">
+                <div class="card recipe-step reveal reveal-up stagger-4">
                     <h3>Key Ratios to Remember</h3>
                     <p>The sauce balance relies on five key elements. Adjusting any one
                         shifts the whole profile:</p>
@@ -177,6 +190,8 @@
     </footer>
 
     <script src="../script.js"></script>
+    <script src="../prototype.js"></script>
+    <script src="../recipes-proto.js"></script>
 </body>
 
 </html>
