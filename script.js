@@ -90,6 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const opacity = 1 - scrolled * 0.002;
             hero.style.transform = `scale(${scale})`;
             hero.style.opacity = Math.max(0, opacity);
+            // Prototype look (prototype.css): the hero also softens as it leaves
+            if (document.documentElement.classList.contains('proto')) {
+                hero.style.filter = `blur(${Math.min(scrolled / 240, 1) * 6}px)`;
+            }
         }
     };
 
