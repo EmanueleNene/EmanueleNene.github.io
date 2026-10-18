@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="proto">
 
 <head>
     <meta charset="UTF-8">
@@ -9,15 +9,17 @@
         content="Emanuele D'Allestro — PhD Researcher at KTH Royal Institute of Technology, Stockholm. Research on paper-based materials, cellulose nanofibers, and multiscale modeling.">
     <title>Emanuele D'Allestro - PhD Researcher at KTH</title>
 
-    <!-- Google Fonts: Source Serif 4 -->
+    <!-- Google Fonts: Bricolage Grotesque (display) + Figtree (text), prototype look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:wght@400..900&display=swap"
         rel="stylesheet">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
+    <!-- Homepage prototype look and motion (opt-in via <html class="proto">) -->
+    <link rel="stylesheet" href="prototype.css">
 
     <!-- Icons (Phosphor Icons - lightweight and clean) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -69,19 +71,29 @@
         <div class="container nav-container">
             <a href="/index.html" class="logo">Emanuele D.</a>
             <ul class="nav-links">
+                <li>
+                    <button type="button" class="topics-toggle" aria-expanded="false" aria-controls="topics-panel">
+                        Topics <i class="ph ph-caret-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="topics-panel" id="topics-panel" role="region" aria-label="Topics">
+                        <p class="topics-head">Topics</p>
+                        <ul class="topics-list">
+                            <li><a href="/projects/projects.html"><strong>Projects</strong><span>Research and startup work</span></a></li>
+                            <li><a href="/conferences/conferences.html"><strong>Conferences</strong><span>Talks, posters and logs</span></a></li>
+                            <li><a href="/phd/phd-responsible.html"><strong>PhD</strong><span>Milestones and responsibilities</span></a></li>
+                            <li><a href="/recipes/recipes.html"><strong>Recipes</strong><span>Cooking notes</span></a></li>
+                            <li><a href="/#values"><strong>Values</strong><span>Philosophies I follow</span></a></li>
+                            <li><a href="/#events"><strong>Events</strong><span>Events and competitions</span></a></li>
+                        </ul>
+                    </div>
+                </li>
                 <li><a href="/projects/projects.html">Projects</a></li>
                 <li><a href="/conferences/conferences.html">Conferences</a></li>
                 <li><a href="/phd/phd-responsible.html">PhD Responsible</a></li>
                 <li><a href="/recipes/recipes.html">Recipes</a></li>
-                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li></ul>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
+            </ul>
             <div class="nav-actions">
-                <button class="theme-switch" id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Night Mode">
-                    <span class="theme-switch-track">
-                        <span class="theme-switch-icon sun"><i class="ph ph-sun"></i></span>
-                        <span class="theme-switch-icon moon"><i class="ph ph-moon"></i></span>
-                        <span class="theme-switch-thumb"></span>
-                    </span>
-                </button>
                 <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false">
                     <i class="ph ph-list" aria-hidden="true"></i>
                 </button>
@@ -91,6 +103,19 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
+
+        <!-- Background field: photos drift behind the copy, dimmed by .ds-scrim (decorative) -->
+        <div class="ds-field" aria-hidden="true">
+            <span class="ds-photo ds-photo-1" data-parallax="0.16"><img src="images/radiculae_logo.jpg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-2" data-parallax="0.28"><img src="images/unleash.png" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-3" data-parallax="0.12"><img src="images/UNLEASH/Group_final_day.jpeg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-4" data-parallax="0.22"><img src="images/MAXIV/emalab2.JPG" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-5" data-parallax="0.34"><img src="images/MAXIV/emalab.JPG" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-6" data-parallax="0.14"><img src="images/ECCOMAS_MUNICH_2026/presentation.jpeg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-7" data-parallax="0.26"><img src="images/radiculae_logo.jpg" alt="" loading="lazy" decoding="async"></span>
+            <span class="ds-photo ds-photo-8" data-parallax="0.2"><img src="images/unleash.png" alt="" loading="lazy" decoding="async"></span>
+        </div>
+        <div class="ds-scrim" aria-hidden="true"></div>
 
         <div class="container hero-grid">
             <div class="hero-content">
@@ -108,10 +133,6 @@
                     <a href="#projects" class="btn-primary">View Work</a>
                     <a href="mailto:emadal@kth.se" class="btn-secondary">Email Me</a>
                 </div>
-            </div>
-
-            <div class="hero-gallery" id="hero-coverflow" data-autoplay="true" data-autoplay-dir="rightToLeft">
-                <div class="coverflow-stage" id="coverflow-stage"></div>
             </div>
         </div>
     </section>
@@ -263,111 +284,155 @@
         </div>
     </section>
 
-    <!-- Values Section (Hero Parallax) -->
-    <section id="values" class="section bg-offset hero-parallax-section">
+    <!-- Values Section: flip cards (front: name and tagline, back: details) -->
+    <section id="values" class="section bg-offset">
         <div class="container">
             <div class="section-header reveal reveal-up">
                 <h2>Values</h2>
                 <p>Philosophies I strive to follow in my research and life.</p>
             </div>
-        </div>
 
-        <div class="hero-parallax-container" id="heroParallax">
-            <!-- Row 1 (scrolls left) -->
-            <div class="parallax-row row-left">
-                <a href="values/wabi-sabi.html" class="parallax-card">
-                    <div class="parallax-card-icon"><i class="ph ph-wind"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Wabi-sabi</h3>
-                        <p>Beauty in imperfection</p>
+            <div class="flip-grid">
+                <article class="reveal reveal-up stagger-1 flip-card" data-flip>
+                    <div class="flip-inner">
+                        <div class="flip-face flip-front">
+                            <div class="card-icon"><i class="ph ph-wind" aria-hidden="true"></i></div>
+                            <h3>Wabi-sabi</h3>
+                            <p>Beauty in imperfection</p>
+                            <button type="button" class="flip-toggle" aria-expanded="false" aria-label="Flip card for details">
+                                <span>Details</span> <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <h3>Wabi-sabi</h3>
+                            <p>Finding beauty in imperfection and impermanence.</p>
+                            <a href="values/wabi-sabi.html" class="link-arrow">Read more <i class="ph ph-arrow-right"></i></a>
+                            <button type="button" class="flip-toggle" aria-expanded="true" aria-label="Flip card back to the front">
+                                <span>Back</span> <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
-                </a>
-                <a href="values/kaizen.html" class="parallax-card">
-                    <div class="parallax-card-icon"><i class="ph ph-chart-line-up"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Kaizen</h3>
-                        <p>Continuous improvement</p>
+                </article>
+                <article class="reveal reveal-up stagger-2 flip-card" data-flip>
+                    <div class="flip-inner">
+                        <div class="flip-face flip-front">
+                            <div class="card-icon"><i class="ph ph-chart-line-up" aria-hidden="true"></i></div>
+                            <h3>Kaizen</h3>
+                            <p>Continuous improvement</p>
+                            <button type="button" class="flip-toggle" aria-expanded="false" aria-label="Flip card for details">
+                                <span>Details</span> <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <h3>Kaizen</h3>
+                            <p>Small, steady improvements made again and again over time.</p>
+                            <a href="values/kaizen.html" class="link-arrow">Read more <i class="ph ph-arrow-right"></i></a>
+                            <button type="button" class="flip-toggle" aria-expanded="true" aria-label="Flip card back to the front">
+                                <span>Back</span> <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
-                </a>
-                <a href="values/ikigai.html" class="parallax-card">
-                    <div class="parallax-card-icon"><i class="ph ph-heartbeat"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Ikigai</h3>
-                        <p>Reason for being</p>
+                </article>
+                <article class="reveal reveal-up stagger-3 flip-card" data-flip>
+                    <div class="flip-inner">
+                        <div class="flip-face flip-front">
+                            <div class="card-icon"><i class="ph ph-heartbeat" aria-hidden="true"></i></div>
+                            <h3>Ikigai</h3>
+                            <p>Reason for being</p>
+                            <button type="button" class="flip-toggle" aria-expanded="false" aria-label="Flip card for details">
+                                <span>Details</span> <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <h3>Ikigai</h3>
+                            <p>The reason you get up: where what you love meets what the world needs.</p>
+                            <a href="values/ikigai.html" class="link-arrow">Read more <i class="ph ph-arrow-right"></i></a>
+                            <button type="button" class="flip-toggle" aria-expanded="true" aria-label="Flip card back to the front">
+                                <span>Back</span> <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
-                </a>
-                <a href="values/misogi.html" class="parallax-card">
-                    <div class="parallax-card-icon"><i class="ph ph-waves"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Misogi</h3>
-                        <p>Extreme challenge</p>
+                </article>
+                <article class="reveal reveal-up stagger-4 flip-card" data-flip>
+                    <div class="flip-inner">
+                        <div class="flip-face flip-front">
+                            <div class="card-icon"><i class="ph ph-waves" aria-hidden="true"></i></div>
+                            <h3>Misogi</h3>
+                            <p>Extreme challenge</p>
+                            <button type="button" class="flip-toggle" aria-expanded="false" aria-label="Flip card for details">
+                                <span>Details</span> <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <h3>Misogi</h3>
+                            <p>A purifying test, pushed to the edge of what you think you can do.</p>
+                            <a href="values/misogi.html" class="link-arrow">Read more <i class="ph ph-arrow-right"></i></a>
+                            <button type="button" class="flip-toggle" aria-expanded="true" aria-label="Flip card back to the front">
+                                <span>Back</span> <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
-                </a>
-            </div>
-
-            <!-- Repeated cards below are visual filler: hidden from screen readers and tab order -->
-            <!-- Row 2 (scrolls right) -->
-            <div class="parallax-row row-right">
-                <a href="values/gravitas.html" class="parallax-card">
-                    <div class="parallax-card-icon"><i class="ph ph-scales"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Gravitas</h3>
-                        <p>Dignity and depth</p>
+                </article>
+                <article class="reveal reveal-up stagger-1 flip-card" data-flip>
+                    <div class="flip-inner">
+                        <div class="flip-face flip-front">
+                            <div class="card-icon"><i class="ph ph-scales" aria-hidden="true"></i></div>
+                            <h3>Gravitas</h3>
+                            <p>Dignity and depth</p>
+                            <button type="button" class="flip-toggle" aria-expanded="false" aria-label="Flip card for details">
+                                <span>Details</span> <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <h3>Gravitas</h3>
+                            <p>Carrying yourself and your work with weight, care and substance.</p>
+                            <a href="values/gravitas.html" class="link-arrow">Read more <i class="ph ph-arrow-right"></i></a>
+                            <button type="button" class="flip-toggle" aria-expanded="true" aria-label="Flip card back to the front">
+                                <span>Back</span> <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
-                </a>
-                <a href="values/virtus.html" class="parallax-card">
-                    <div class="parallax-card-icon"><i class="ph ph-sword"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Virtus</h3>
-                        <p>Moral excellence</p>
+                </article>
+                <article class="reveal reveal-up stagger-2 flip-card" data-flip>
+                    <div class="flip-inner">
+                        <div class="flip-face flip-front">
+                            <div class="card-icon"><i class="ph ph-sword" aria-hidden="true"></i></div>
+                            <h3>Virtus</h3>
+                            <p>Moral excellence</p>
+                            <button type="button" class="flip-toggle" aria-expanded="false" aria-label="Flip card for details">
+                                <span>Details</span> <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <h3>Virtus</h3>
+                            <p>Doing what is right, with courage and integrity.</p>
+                            <a href="values/virtus.html" class="link-arrow">Read more <i class="ph ph-arrow-right"></i></a>
+                            <button type="button" class="flip-toggle" aria-expanded="true" aria-label="Flip card back to the front">
+                                <span>Back</span> <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
-                </a>
-                <a href="values/pietas.html" class="parallax-card">
-                    <div class="parallax-card-icon"><i class="ph ph-bank"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Pietas</h3>
-                        <p>Duty and devotion</p>
+                </article>
+                <article class="reveal reveal-up stagger-3 flip-card" data-flip>
+                    <div class="flip-inner">
+                        <div class="flip-face flip-front">
+                            <div class="card-icon"><i class="ph ph-bank" aria-hidden="true"></i></div>
+                            <h3>Pietas</h3>
+                            <p>Duty and devotion</p>
+                            <button type="button" class="flip-toggle" aria-expanded="false" aria-label="Flip card for details">
+                                <span>Details</span> <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <h3>Pietas</h3>
+                            <p>Commitment to the people and responsibilities you have taken on.</p>
+                            <a href="values/pietas.html" class="link-arrow">Read more <i class="ph ph-arrow-right"></i></a>
+                            <button type="button" class="flip-toggle" aria-expanded="true" aria-label="Flip card back to the front">
+                                <span>Back</span> <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
-                </a>
-                <a href="values/wabi-sabi.html" class="parallax-card" aria-hidden="true" tabindex="-1">
-                    <div class="parallax-card-icon"><i class="ph ph-wind"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Wabi-sabi</h3>
-                        <p>Beauty in imperfection</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Row 3 (scrolls left) -->
-            <div class="parallax-row row-left">
-                <a href="values/kaizen.html" class="parallax-card" aria-hidden="true" tabindex="-1">
-                    <div class="parallax-card-icon"><i class="ph ph-chart-line-up"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Kaizen</h3>
-                        <p>Continuous improvement</p>
-                    </div>
-                </a>
-                <a href="values/ikigai.html" class="parallax-card" aria-hidden="true" tabindex="-1">
-                    <div class="parallax-card-icon"><i class="ph ph-heartbeat"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Ikigai</h3>
-                        <p>Reason for being</p>
-                    </div>
-                </a>
-                <a href="values/misogi.html" class="parallax-card" aria-hidden="true" tabindex="-1">
-                    <div class="parallax-card-icon"><i class="ph ph-waves"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Misogi</h3>
-                        <p>Extreme challenge</p>
-                    </div>
-                </a>
-                <a href="values/gravitas.html" class="parallax-card" aria-hidden="true" tabindex="-1">
-                    <div class="parallax-card-icon"><i class="ph ph-scales"></i></div>
-                    <div class="parallax-card-info">
-                        <h3>Gravitas</h3>
-                        <p>Dignity and depth</p>
-                    </div>
-                </a>
+                </article>
             </div>
         </div>
     </section>
@@ -400,6 +465,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="prototype.js"></script>
 </body>
 
 </html>

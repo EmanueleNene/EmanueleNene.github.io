@@ -1,0 +1,1248 @@
+/*
+   --------------------------------------------------------------
+   Prototype: "Bright Ledger" (Deepstash-inspired look and motion)
+   Opt-in: <html class="proto"> on index.html only. Loaded after
+   style.css; the tokens below re-map its existing variables, so
+   the nav, cards and sections pick up the new palette.
+   --------------------------------------------------------------
+*/
+
+html.proto {
+    /* Palette: one mode, on the site's blue-dark page (#0f172a) */
+    --ds-paper: #0f172a;
+    --ds-paper-2: #1e293b;
+    --ds-card: #172238;
+    --ds-ink: #f8fafc;
+    --ds-ink-2: #cbd5e1;
+    --ds-accent: #f2b233;
+    --ds-accent-hover: #f7c25c;
+    --ds-accent-ink: #f6c15a;
+    --ds-on-accent: #0f172a;
+    --ds-lip-accent: #020617;
+    --ds-lip-ghost: #f8fafc;
+    --ds-mint: #213a2c;
+    --ds-peach: #3b2a20;
+    --ds-sky: #1f3140;
+    --ds-line: #2c3a52;
+    --ds-line-2: #3a4a66;
+
+    /* Island nav and Topics panel */
+    --ds-bar: #020617;
+    --ds-bar-ink: #f8fafc;
+    --ds-bar-link: #f2b233;
+
+    /* Type */
+    --ds-display: 'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
+    --ds-body: 'Figtree', system-ui, sans-serif;
+
+    /* Motion */
+    --ds-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --ds-spring: cubic-bezier(0.34, 1.5, 0.64, 1);
+
+    /* Re-map the site's existing tokens */
+    --bg-body: var(--ds-paper);
+    --bg-surface: var(--ds-card);
+    --bg-surface-hover: var(--ds-paper-2);
+    --text-primary: var(--ds-ink);
+    --text-secondary: var(--ds-ink-2);
+    --text-muted: #aab4c4;
+    --primary: var(--ds-accent-ink);
+    --primary-hover: #ffd98a;
+    --primary-ink: var(--ds-accent-ink);
+    --primary-ink-hover: #ffd98a;
+    --on-primary-ink: var(--ds-on-accent);
+    --secondary: #7fc3d9;
+    --border: var(--ds-line);
+    --border-light: var(--ds-line-2);
+    --bg-offset: var(--ds-paper-2);
+    --navbar-bg-scrolled: var(--ds-bar);
+    --card-shadow: rgb(0 0 0 / 0.4);
+    --radius-sm: 0.75rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.5rem;
+}
+
+/* Spring curve with ~16% overshoot. Browsers without linear() keep the cubic-bezier above. */
+@supports (transition-timing-function: linear(0, 1)) {
+    html.proto {
+        --ds-spring: linear(0, 0.042, 0.149, 0.296, 0.461, 0.625, 0.776, 0.905, 1.008, 1.083, 1.131, 1.157, 1.163, 1.154, 1.136, 1.111, 1.084, 1.058, 1.034, 1.013, 0.997, 0.985, 0.978, 0.974, 0.973, 0.975, 0.978, 0.982, 0.987, 0.991, 0.995, 0.998, 1.001, 1.003, 1.004, 1.004, 1);
+    }
+}
+
+/* Typography & spacing */
+html.proto body {
+    font-family: var(--ds-body);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+}
+
+html.proto h1,
+html.proto h2,
+html.proto h3 {
+    font-family: var(--ds-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+html.proto h1 {
+    font-size: clamp(2.75rem, 5.2vw, 4.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    margin-bottom: 1.25rem;
+}
+
+html.proto h2 {
+    font-size: clamp(2.5rem, 5.6vw, 4.25rem);
+    line-height: 1;
+    margin-bottom: 1.25rem;
+}
+
+html.proto h3 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+}
+
+html.proto .section {
+    padding: clamp(5rem, 10vw, 8.5rem) 0;
+}
+
+html.proto .bg-offset {
+    border: 0;
+}
+
+html.proto .section-header {
+    margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+html.proto .section-header p {
+    font-size: 1.25rem;
+    color: var(--ds-ink-2);
+    max-width: 36ch;
+}
+
+html.proto .hero {
+    background-color: var(--ds-paper);
+}
+
+html.proto .hero-subtitle {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--ds-ink-2);
+    max-width: 30ch;
+}
+
+html.proto .badge {
+    background-color: var(--ds-mint);
+    border: 0;
+    color: var(--ds-ink);
+    font-family: var(--ds-body);
+    font-weight: 700;
+}
+
+html.proto .text-morph-word {
+    color: var(--ds-accent-ink);
+}
+
+/* The hidden sizer holds the longest morph word; keep it to one line so the gap below stays tight */
+html.proto .text-morph-anchor {
+    height: 1em;
+    overflow: hidden;
+}
+
+/* Centred hero: copy and both buttons sit in front of the photo field.
+   The widest morph word ("vertical farm plugs") must stay on one line. */
+html.proto .hero {
+    text-align: center;
+    isolation: isolate;
+}
+
+html.proto .hero-grid {
+    justify-content: center;
+}
+
+html.proto .hero-grid .hero-content {
+    flex: none;
+    max-width: 880px;
+    margin: 0 auto;
+}
+
+html.proto .hero-subtitle {
+    margin-inline: auto;
+}
+
+html.proto .hero-buttons {
+    justify-content: center;
+}
+
+/* ------------------------------------------------------------
+   Hero background: photos float behind the copy, each at its own
+   depth (scale, blur, opacity), with scroll parallax from prototype.js.
+   The scrim keeps the copy at AA contrast on top of the photos.
+   ------------------------------------------------------------ */
+@keyframes ds-photo-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes ds-photo-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-22px);
+    }
+}
+
+html.proto .ds-field {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+html.proto .ds-photo {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: clamp(120px, 13vw, 200px);
+    aspect-ratio: 3 / 4;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    rotate: var(--r, 0deg);
+    scale: var(--s, 1);
+    opacity: var(--o, 1);
+    filter: blur(var(--b, 0px));
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.7);
+    animation:
+        ds-photo-in 1.6s ease-out var(--d, 0s) backwards,
+        ds-photo-float var(--f, 9s) ease-in-out calc(var(--d, 0s) + 1.6s) infinite;
+    will-change: transform;
+}
+
+html.proto .ds-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+html.proto .ds-photo-1 { --x: 2%;  --y: 8%;  --r: -9deg; --s: 0.8;  --o: 0.55; --b: 1.5px; --d: 0.2s;  --f: 9s; }
+html.proto .ds-photo-2 { --x: 14%; --y: 54%; --r: 6deg;  --s: 0.95; --o: 0.9;  --d: 0.35s; --f: 11s; }
+html.proto .ds-photo-3 { --x: 4%;  --y: 70%; --r: -4deg; --s: 0.85; --o: 0.7;  --b: 0.6px; --d: 0.5s;  --f: 8s; }
+html.proto .ds-photo-4 { --x: 84%; --y: 66%; --r: 5deg;  --s: 0.9;  --o: 0.85; --d: 0.4s;  --f: 10s; }
+html.proto .ds-photo-5 { --x: 83%; --y: 6%;  --r: 8deg;  --s: 0.78; --o: 0.5;  --b: 2px;   --d: 0.25s; --f: 12s; }
+html.proto .ds-photo-6 { --x: 72%; --y: 46%; --r: -6deg; --s: 0.7;  --o: 0.4;  --b: 3px;   --d: 0.6s;  --f: 9.5s; }
+html.proto .ds-photo-7 { --x: 26%; --y: 3%;  --r: 4deg;  --s: 0.72; --o: 0.45; --b: 2.5px; --d: 0.45s; --f: 10.5s; }
+html.proto .ds-photo-8 { --x: 88%; --y: 82%; --r: -10deg; --s: 0.68; --o: 0.4; --b: 3px;   --d: 0.7s;  --f: 8.5s; }
+
+html.proto .ds-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse 70% 62% at 50% 50%, rgb(15 23 42 / 0.8), rgb(15 23 42 / 0.94));
+}
+
+@media (max-width: 768px) {
+    html.proto .ds-photo {
+        width: clamp(96px, 26vw, 130px);
+    }
+
+    html.proto .ds-photo-3,
+    html.proto .ds-photo-4,
+    html.proto .ds-photo-7,
+    html.proto .ds-photo-8 {
+        display: none;
+    }
+
+    html.proto .ds-photo-1 { --x: -4%; --y: 5%; }
+    html.proto .ds-photo-2 { --x: 2%;  --y: 66%; }
+    html.proto .ds-photo-5 { --x: 70%; --y: 4%; }
+    html.proto .ds-photo-6 { --x: 74%; --y: 68%; }
+}
+
+/* ------------------------------------------------------------
+   Hero entrance: the headline lines flip up in 3D, staggered,
+   then the copy, the buttons and the gallery follow
+   ------------------------------------------------------------ */
+@keyframes ds-line-in {
+    from {
+        opacity: 0;
+        transform: translateY(0.9em) rotateX(-70deg);
+    }
+}
+
+@keyframes ds-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(44px) scale(0.94);
+    }
+}
+
+html.proto .hero-content h1 {
+    perspective: 900px;
+}
+
+html.proto .hero-line {
+    display: block;
+    transform-origin: 0 100%;
+    animation: ds-line-in 1.3s var(--ds-spring) backwards;
+}
+
+html.proto .hero-line:nth-child(1) { animation-delay: 0.15s; }
+html.proto .hero-line:nth-child(2) { animation-delay: 0.32s; }
+html.proto .hero-line:nth-child(3) { animation-delay: 0.49s; }
+
+html.proto .hero-content > .badgewrapper,
+html.proto .hero-content > .hero-subtitle,
+html.proto .hero-content > .hero-buttons {
+    animation: ds-fade-up 1.1s var(--ds-spring) backwards;
+}
+
+html.proto .hero-content > .badgewrapper { animation-delay: 0.05s; }
+html.proto .hero-content > .hero-subtitle { animation-delay: 0.7s; }
+html.proto .hero-content > .hero-buttons { animation-delay: 0.85s; }
+
+/* ------------------------------------------------------------
+   Reveals: long rise and a scale-up on a strong spring.
+   Stagger is wide so groups read as a sequence.
+   (The observer in script.js still adds .visible.)
+   ------------------------------------------------------------ */
+html.proto .reveal,
+html.proto .reveal-up,
+html.proto .reveal-left,
+html.proto .reveal-right,
+html.proto .reveal-scale {
+    filter: none;
+    transform: translateY(72px) scale(0.92);
+    transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring);
+}
+
+html.proto .reveal.visible {
+    transform: none;
+}
+
+html.proto .reveal.stagger-1 { transition-delay: 0.14s; }
+html.proto .reveal.stagger-2 { transition-delay: 0.28s; }
+html.proto .reveal.stagger-3 { transition-delay: 0.42s; }
+html.proto .reveal.stagger-4 { transition-delay: 0.56s; }
+
+/* ------------------------------------------------------------
+   Cards: big hover lift with a hard lip and a deep soft shadow.
+   Uses translate and scale, so the reveal's transform is untouched.
+   ------------------------------------------------------------ */
+html.proto .card {
+    background-color: var(--ds-card);
+    border: 1px solid var(--ds-line);
+    border-radius: 1.75rem;
+    padding: 2.5rem;
+    transition: translate 0.55s var(--ds-spring), scale 0.55s var(--ds-spring), box-shadow 0.5s var(--ds-ease), border-color 0.3s ease;
+}
+
+html.proto .card:hover {
+    translate: 0 -14px;
+    scale: 1.02;
+    border-color: var(--ds-line-2);
+    box-shadow: 0 12px 0 var(--ds-line-2), 0 34px 60px -26px rgb(23 26 31 / 0.4);
+}
+
+html.proto .card:has(a):hover {
+    transform: none;
+}
+
+html.proto .card-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1.1rem;
+    background-color: var(--ds-peach);
+    color: var(--ds-ink);
+    font-size: 1.6rem;
+    transition: transform 0.8s var(--ds-spring);
+}
+
+html.proto .card:hover .card-icon {
+    transform: rotate(-14deg) scale(1.18);
+}
+
+/* ------------------------------------------------------------
+   Buttons: a darker lip under the pill; hover lifts it further,
+   press sinks it flat
+   ------------------------------------------------------------ */
+html.proto .btn-primary:not([href^="mailto"]),
+html.proto .btn-secondary:not([href^="mailto"]) {
+    --lip: 5px;
+    font-family: var(--ds-body);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    padding: 1rem 2rem;
+    border: 2px solid var(--ds-lip-accent);
+    border-radius: 999px;
+    transition: translate 0.4s var(--ds-spring), box-shadow 0.3s var(--ds-ease), background-color 0.2s ease;
+}
+
+html.proto .btn-primary:not([href^="mailto"]) {
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    box-shadow: 0 var(--lip) 0 var(--ds-lip-accent);
+}
+
+html.proto .btn-secondary:not([href^="mailto"]) {
+    background-color: var(--ds-card);
+    color: var(--ds-ink);
+    border-color: var(--ds-lip-ghost);
+    box-shadow: 0 var(--lip) 0 var(--ds-lip-ghost);
+}
+
+html.proto .btn-primary:not([href^="mailto"]):hover {
+    background-color: var(--ds-accent-hover);
+    translate: 0 -4px;
+    box-shadow: 0 calc(var(--lip) + 4px) 0 var(--ds-lip-accent);
+    transform: none;
+}
+
+html.proto .btn-secondary:not([href^="mailto"]):hover {
+    background-color: var(--ds-paper-2);
+    translate: 0 -4px;
+    box-shadow: 0 calc(var(--lip) + 4px) 0 var(--ds-lip-ghost);
+    transform: none;
+}
+
+html.proto .btn-primary:not([href^="mailto"]):active,
+html.proto .btn-secondary:not([href^="mailto"]):active {
+    translate: 0 var(--lip);
+    box-shadow: 0 0 0 transparent;
+    transform: none;
+    transition-duration: 0.08s;
+}
+
+/* ------------------------------------------------------------
+   Header: a floating island at the top centre. A compact dark pill
+   with the name, the section links, a Topics popover and Email Me.
+   It is see-through around the edges (pointer events pass through),
+   shrinks and gains a shadow on scroll, and script.js still hides it
+   on scroll down.
+   ------------------------------------------------------------ */
+@keyframes ds-island-in {
+    from {
+        opacity: 0;
+        transform: translateY(-160%) scale(0.92);
+    }
+}
+
+@keyframes ds-logo-in {
+    from {
+        opacity: 0;
+        transform: translateX(-24px);
+    }
+}
+
+@keyframes ds-logo-stripe {
+    from {
+        background-size: 0% 0.2em;
+    }
+}
+
+@keyframes ds-nav-in {
+    from {
+        opacity: 0;
+        transform: translateY(-14px);
+    }
+}
+
+html.proto .navbar {
+    top: 1rem;
+    left: 0;
+    right: 0;
+    width: auto;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 0;
+    box-shadow: none;
+    pointer-events: none;
+    /* Email Me inside the island: accent pill with dark text */
+    --primary-ink: var(--ds-accent);
+    --on-primary-ink: var(--ds-on-accent);
+}
+
+html.proto .navbar.scrolled {
+    background: none;
+    box-shadow: none;
+}
+
+html.proto .nav-container {
+    pointer-events: auto;
+    width: max-content;
+    max-width: calc(100vw - 2rem);
+    min-height: 0;
+    gap: 0.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    background-color: var(--ds-bar);
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgb(248 250 252 / 0.1), 0 22px 40px -20px rgb(0 0 0 / 0.7);
+    transition: padding 0.5s var(--ds-spring), box-shadow 0.4s var(--ds-ease);
+    animation: ds-island-in 1.1s var(--ds-spring) 0.05s backwards;
+}
+
+html.proto .navbar.scrolled .nav-container {
+    padding: 0.3rem 0.3rem 0.3rem 0.95rem;
+    box-shadow: inset 0 0 0 1px rgb(248 250 252 / 0.14), 0 28px 50px -18px rgb(0 0 0 / 0.85);
+}
+
+html.proto .logo {
+    display: inline-block;
+    padding: 0.35rem 0.1rem;
+    font-family: var(--ds-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    color: var(--ds-bar-ink);
+    background-image: linear-gradient(var(--ds-accent), var(--ds-accent));
+    background-repeat: no-repeat;
+    background-size: 100% 0.2em;
+    background-position: 0 100%;
+    transition: font-size 0.5s var(--ds-spring);
+    animation:
+        ds-logo-in 0.9s var(--ds-spring) 0.3s backwards,
+        ds-logo-stripe 0.9s var(--ds-ease) 0.8s backwards;
+}
+
+html.proto .navbar.scrolled .logo {
+    font-size: 1.05rem;
+}
+
+html.proto .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    list-style: none;
+}
+
+html.proto .nav-links li {
+    position: relative;
+    animation: ds-nav-in 0.8s var(--ds-spring) backwards;
+}
+
+html.proto .nav-links li:nth-child(1) { animation-delay: 0.3s; }
+html.proto .nav-links li:nth-child(2) { animation-delay: 0.36s; }
+html.proto .nav-links li:nth-child(3) { animation-delay: 0.42s; }
+html.proto .nav-links li:nth-child(4) { animation-delay: 0.48s; }
+html.proto .nav-links li:nth-child(5) { animation-delay: 0.54s; }
+html.proto .nav-links li:nth-child(6) { animation-delay: 0.6s; }
+
+/* Links and the Topics button share one look: a marigold wipe on hover or while open */
+html.proto .nav-links > li > a:not(.btn-primary),
+html.proto .topics-toggle {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.9rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--ds-bar-ink);
+    font: 700 0.95rem var(--ds-body);
+    cursor: pointer;
+    transition: color 0.35s ease, translate 0.45s var(--ds-spring);
+}
+
+html.proto .nav-links > li > a:not(.btn-primary)::before,
+html.proto .topics-toggle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: var(--ds-accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.6s var(--ds-ease);
+}
+
+html.proto .nav-links > li > a:not(.btn-primary)::after {
+    display: none;
+}
+
+html.proto .nav-links > li > a:not(.btn-primary):hover,
+html.proto .nav-links > li > a:not(.btn-primary).active,
+html.proto .topics-toggle:hover,
+html.proto .topics-toggle[aria-expanded="true"] {
+    color: var(--ds-on-accent);
+    translate: 0 -2px;
+}
+
+html.proto .nav-links > li > a:not(.btn-primary):hover::before,
+html.proto .nav-links > li > a:not(.btn-primary).active::before,
+html.proto .topics-toggle:hover::before,
+html.proto .topics-toggle[aria-expanded="true"]::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+html.proto .topics-toggle i {
+    transition: transform 0.6s var(--ds-spring);
+}
+
+html.proto .topics-toggle[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+/* Email Me: solid accent pill with dark text. Its dome is hidden here; a lift replaces it */
+html.proto .nav-links a[href="mailto:emadal@kth.se"].btn-primary {
+    background-color: var(--ds-accent) !important;
+    border-color: var(--ds-accent) !important;
+    color: var(--ds-on-accent);
+    font-size: 0.95rem;
+    font-weight: 800;
+    box-shadow: 0 4px 0 var(--ds-bar-ink) !important;
+    transition: translate 0.4s var(--ds-spring), box-shadow 0.3s var(--ds-ease);
+}
+
+html.proto .nav-links a[href="mailto:emadal@kth.se"].btn-primary::before {
+    display: none;
+}
+
+html.proto .nav-links a[href="mailto:emadal@kth.se"].btn-primary:hover {
+    color: var(--ds-on-accent);
+    translate: 0 -2px;
+    box-shadow: 0 6px 0 var(--ds-bar-ink) !important;
+}
+
+/* Topics popover: a window-style panel under the island, aligned to its button */
+html.proto .topics-panel {
+    position: absolute;
+    top: calc(100% + 0.9rem);
+    left: 0;
+    width: min(92vw, 30rem);
+    padding: 0.75rem;
+    border-radius: 1.5rem;
+    background-color: var(--ds-bar);
+    color: var(--ds-bar-ink);
+    box-shadow: inset 0 0 0 1px rgb(248 250 252 / 0.12), 0 30px 60px -20px rgb(0 0 0 / 0.8);
+    transform-origin: top center;
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 -12px;
+    scale: 0.94;
+    transition: opacity 0.3s ease, translate 0.5s var(--ds-spring), scale 0.5s var(--ds-spring), visibility 0s linear 0.5s;
+    text-align: left;
+}
+
+html.proto .topics-panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    scale: 1;
+    transition: opacity 0.3s ease, translate 0.6s var(--ds-spring), scale 0.6s var(--ds-spring), visibility 0s;
+}
+
+html.proto .topics-head {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.25rem 0.6rem 0.75rem;
+    font: 800 0.8rem var(--ds-body);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ds-ink-2);
+}
+
+html.proto .topics-head::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: var(--ds-accent);
+}
+
+html.proto .topics-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    list-style: none;
+}
+
+html.proto .topics-list li {
+    animation: none;
+}
+
+html.proto .topics-panel.is-open .topics-list li {
+    animation: ds-nav-in 0.6s var(--ds-spring) backwards;
+}
+
+html.proto .topics-panel.is-open .topics-list li:nth-child(1) { animation-delay: 0.05s; }
+html.proto .topics-panel.is-open .topics-list li:nth-child(2) { animation-delay: 0.1s; }
+html.proto .topics-panel.is-open .topics-list li:nth-child(3) { animation-delay: 0.15s; }
+html.proto .topics-panel.is-open .topics-list li:nth-child(4) { animation-delay: 0.2s; }
+html.proto .topics-panel.is-open .topics-list li:nth-child(5) { animation-delay: 0.25s; }
+html.proto .topics-panel.is-open .topics-list li:nth-child(6) { animation-delay: 0.3s; }
+
+html.proto .topics-list a {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    background-color: rgb(248 250 252 / 0.05);
+    color: var(--ds-bar-ink);
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease, translate 0.45s var(--ds-spring);
+}
+
+html.proto .topics-list strong {
+    font-family: var(--ds-display);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+html.proto .topics-list span {
+    font-size: 0.85rem;
+    color: var(--ds-ink-2);
+}
+
+html.proto .topics-list a:hover,
+html.proto .topics-list a:focus-visible {
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    translate: 0 -3px;
+    outline: none;
+}
+
+html.proto .topics-list a:hover span,
+html.proto .topics-list a:focus-visible span {
+    color: var(--ds-on-accent);
+}
+
+html.proto .hamburger {
+    display: none;
+    place-items: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    border: 0;
+    border-radius: 999px;
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: translate 0.4s var(--ds-spring);
+}
+
+html.proto .hamburger:hover {
+    translate: 0 -2px;
+}
+
+html.proto .hamburger i {
+    transition: transform 0.7s var(--ds-spring);
+}
+
+html.proto .hamburger[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+html.proto .nav-links a:focus-visible,
+html.proto .topics-toggle:focus-visible,
+html.proto .hamburger:focus-visible,
+html.proto .logo:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+/* Scroll progress: a thin bar under the nav, driven by prototype.js */
+html.proto .ds-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: var(--ds-accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    z-index: 1001;
+    pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   Mobile: the island collapses to the name and the menu button. The
+   menu is a full-screen dark sheet (circular wipe from the button)
+   holding every link and the Topics list, which opens inline.
+   ------------------------------------------------------------ */
+@keyframes ds-nav-item {
+    from {
+        opacity: 0;
+        transform: translateY(70px);
+    }
+}
+
+@keyframes ds-topics-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+@media (max-width: 768px) {
+    html.proto .section {
+        padding: 4.5rem 0;
+    }
+
+    html.proto .card {
+        padding: 2rem;
+    }
+
+    html.proto .navbar {
+        top: 0.75rem;
+    }
+
+    html.proto .nav-container {
+        width: calc(100vw - 1.5rem);
+        max-width: none;
+        justify-content: space-between;
+        padding: 0.4rem 0.4rem 0.4rem 1rem;
+    }
+
+    html.proto .navbar.scrolled .nav-container {
+        padding: 0.3rem 0.3rem 0.3rem 0.8rem;
+    }
+
+    html.proto .logo {
+        position: relative;
+        z-index: 1001;
+        font-size: 1.15rem;
+    }
+
+    html.proto .nav-actions {
+        position: relative;
+        z-index: 1001;
+        display: flex;
+    }
+
+    html.proto .hamburger {
+        display: grid;
+    }
+
+    /* The sheet: fixed, full screen, opened by a circular wipe from the button */
+    html.proto .nav-links {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 6.5rem 1.5rem 3rem;
+        overflow-y: auto;
+        background-color: var(--ds-bar);
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        clip-path: circle(0px at calc(100% - 2rem) 2.6rem);
+        visibility: hidden;
+        transition: clip-path 0.75s var(--ds-ease), visibility 0s linear 0.75s;
+    }
+
+    html.proto .nav-links.active {
+        clip-path: circle(150% at calc(100% - 2rem) 2.6rem);
+        visibility: visible;
+        transition: clip-path 0.85s var(--ds-ease), visibility 0s;
+    }
+
+    html.proto .nav-links li {
+        position: static;
+    }
+
+    html.proto .nav-links li:last-child {
+        padding-top: 1.25rem;
+    }
+
+    html.proto .nav-links > li > a:not(.btn-primary),
+    html.proto .topics-toggle {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        padding: 0.2rem 0;
+        border-radius: 0;
+        background: none;
+        overflow: visible;
+        font-family: var(--ds-display);
+        font-size: clamp(2.2rem, 10vw, 3.4rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+        color: var(--ds-bar-ink);
+    }
+
+    html.proto .nav-links > li > a:not(.btn-primary)::before,
+    html.proto .topics-toggle::before {
+        display: none;
+    }
+
+    html.proto .nav-links > li > a:not(.btn-primary):hover,
+    html.proto .nav-links > li > a:not(.btn-primary).active,
+    html.proto .topics-toggle:hover,
+    html.proto .topics-toggle[aria-expanded="true"] {
+        color: var(--ds-accent);
+        translate: 0 0;
+    }
+
+    html.proto .topics-toggle i {
+        font-size: 1.6rem;
+    }
+
+    html.proto .topics-panel {
+        position: static;
+        display: none;
+        width: 100%;
+        padding: 0.25rem 0 0.5rem;
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+        opacity: 1;
+        visibility: visible;
+        translate: none;
+        scale: none;
+        transition: none;
+    }
+
+    html.proto .topics-panel.is-open {
+        display: block;
+        animation: ds-topics-in 0.5s var(--ds-spring) backwards;
+    }
+
+    html.proto .topics-head {
+        display: none;
+    }
+
+    html.proto .topics-list {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    html.proto .topics-list strong {
+        font-size: 1.4rem;
+    }
+
+    html.proto .nav-links a[href="mailto:emadal@kth.se"].btn-primary {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+        padding: 1.1rem 2rem !important;
+        font-size: 1.2rem;
+    }
+
+    html.proto .nav-links.active li {
+        animation: ds-nav-item 0.8s var(--ds-spring) backwards;
+    }
+
+    html.proto .nav-links.active li:nth-child(1) { animation-delay: 0.1s; }
+    html.proto .nav-links.active li:nth-child(2) { animation-delay: 0.16s; }
+    html.proto .nav-links.active li:nth-child(3) { animation-delay: 0.22s; }
+    html.proto .nav-links.active li:nth-child(4) { animation-delay: 0.28s; }
+    html.proto .nav-links.active li:nth-child(5) { animation-delay: 0.34s; }
+    html.proto .nav-links.active li:nth-child(6) { animation-delay: 0.4s; }
+    html.proto .nav-links.active li:nth-child(7) { animation-delay: 0.46s; }
+}
+
+/* No JavaScript: nothing adds .visible, so show content as-is */
+@media (scripting: none) {
+    html.proto .reveal,
+    html.proto .reveal-up,
+    html.proto .reveal-left,
+    html.proto .reveal-right,
+    html.proto .reveal-scale {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+}
+
+/* Reduced motion: no movement, no 3D, no wipes, no clip-path sweep, no drift.
+   Colour and opacity changes stay so hover and focus still read. */
+@media (prefers-reduced-motion: reduce) {
+    html.proto .hero-line,
+    html.proto .hero-content > .badgewrapper,
+    html.proto .hero-content > .hero-subtitle,
+    html.proto .hero-content > .hero-buttons,
+    html.proto .ds-photo,
+    html.proto .nav-container,
+    html.proto .logo,
+    html.proto .nav-links li,
+    html.proto .nav-actions,
+    html.proto .topics-panel.is-open,
+    html.proto .topics-panel.is-open .topics-list li {
+        animation: none;
+    }
+
+    html.proto .reveal,
+    html.proto .reveal-up,
+    html.proto .reveal-left,
+    html.proto .reveal-right,
+    html.proto .reveal-scale {
+        transform: none;
+        transition: opacity 0.3s ease;
+    }
+
+    html.proto .card:hover,
+    html.proto .btn-primary:not([href^="mailto"]):hover,
+    html.proto .btn-secondary:not([href^="mailto"]):hover,
+    html.proto .nav-links a[href="mailto:emadal@kth.se"].btn-primary:hover,
+    html.proto .nav-links > li > a:not(.btn-primary):hover,
+    html.proto .topics-toggle:hover,
+    html.proto .topics-list a:hover,
+    html.proto .topics-list a:focus-visible,
+    html.proto .hamburger:hover,
+    html.proto .logo:hover {
+        translate: none;
+        scale: none;
+        transform: none;
+    }
+
+    html.proto .card:hover .card-icon,
+    html.proto .hamburger[aria-expanded="true"] i,
+    html.proto .topics-toggle[aria-expanded="true"] i {
+        transform: none;
+    }
+
+    html.proto .card,
+    html.proto .btn-primary:not([href^="mailto"]),
+    html.proto .btn-secondary:not([href^="mailto"]),
+    html.proto .nav-links > li > a:not(.btn-primary),
+    html.proto .topics-toggle,
+    html.proto .topics-list a,
+    html.proto .hamburger,
+    html.proto .hamburger i,
+    html.proto .topics-toggle i,
+    html.proto .logo,
+    html.proto .nav-container {
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    html.proto .nav-links > li > a:not(.btn-primary)::before,
+    html.proto .topics-toggle::before {
+        transition: none;
+        transform: scaleX(0);
+    }
+
+    html.proto .nav-links > li > a:not(.btn-primary):hover::before,
+    html.proto .nav-links > li > a:not(.btn-primary).active::before,
+    html.proto .topics-toggle:hover::before,
+    html.proto .topics-toggle[aria-expanded="true"]::before {
+        transform: scaleX(1);
+    }
+
+    html.proto .topics-panel {
+        translate: none;
+        scale: none;
+        transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+    }
+
+    html.proto .topics-panel.is-open {
+        transition: opacity 0.2s ease, visibility 0s;
+    }
+
+    html.proto .nav-links,
+    html.proto .nav-links.active {
+        clip-path: none;
+        transition: visibility 0s;
+    }
+
+    html.proto .ds-progress {
+        transition: none;
+    }
+}
+
+/* ------------------------------------------------------------
+   Values: flip cards. Front: name and tagline with a Details button.
+   Back: definition and a link. The inner element rotates 180deg on Y
+   (preserve-3d, perspective on the card, backface-hidden faces).
+   The reveal stagger and hover lift sit on the outer .flip-card, so
+   they never fight the flip.
+   ------------------------------------------------------------ */
+html.proto .flip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+html.proto .flip-card {
+    perspective: 1200px;
+    min-height: 24rem;
+    transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring);
+}
+
+html.proto .flip-card:hover {
+    translate: 0 -12px;
+}
+
+html.proto .flip-inner {
+    position: relative;
+    height: 100%;
+    min-height: inherit;
+    transform-style: preserve-3d;
+    transition: transform 0.9s var(--ds-spring);
+}
+
+html.proto .flip-card.is-flipped .flip-inner {
+    transform: rotateY(180deg);
+}
+
+html.proto .flip-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 2rem;
+    border-radius: 1.75rem;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+html.proto .flip-front {
+    background-color: var(--ds-card);
+    border: 1px solid var(--ds-line);
+    box-shadow: 0 12px 0 var(--ds-line-2);
+}
+
+html.proto .flip-back {
+    background-color: var(--ds-bar);
+    color: var(--ds-bar-ink);
+    box-shadow: 0 12px 0 var(--ds-accent);
+    transform: rotateY(180deg);
+}
+
+html.proto .flip-face h3 {
+    font-size: 1.75rem;
+    line-height: 1.05;
+}
+
+html.proto .flip-face p {
+    color: inherit;
+    opacity: 0.85;
+}
+
+html.proto .flip-front .card-icon {
+    margin-bottom: 0.6rem;
+}
+
+html.proto .flip-back .link-arrow {
+    margin-top: auto;
+    color: var(--ds-bar-link);
+    font-weight: 700;
+}
+
+html.proto .flip-toggle {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.15rem;
+    border: 2px solid var(--ds-ink);
+    border-radius: 999px;
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    font: 700 0.95rem var(--ds-body);
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--ds-ink);
+    transition: translate 0.4s var(--ds-spring), box-shadow 0.3s var(--ds-ease);
+}
+
+html.proto .flip-toggle:hover {
+    translate: 0 -3px;
+    box-shadow: 0 7px 0 var(--ds-ink);
+}
+
+html.proto .flip-toggle:active {
+    translate: 0 4px;
+    box-shadow: 0 0 0 transparent;
+}
+
+html.proto .flip-back .flip-toggle {
+    margin-top: 0;
+    background-color: transparent;
+    color: var(--ds-bar-ink);
+    border-color: var(--ds-bar-ink);
+    box-shadow: 0 4px 0 var(--ds-bar-ink);
+}
+
+html.proto .flip-toggle:focus-visible,
+html.proto .flip-back .link-arrow:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+/* No JavaScript: no button and no flip, so show both faces stacked */
+@media (scripting: none) {
+    html.proto .flip-card {
+        perspective: none;
+        min-height: 0;
+    }
+
+    html.proto .flip-inner {
+        display: grid;
+        gap: 1rem;
+        transform: none;
+        transform-style: flat;
+    }
+
+    html.proto .flip-face {
+        position: relative;
+        inset: auto;
+        backface-visibility: visible;
+        transform: none;
+    }
+
+    html.proto .flip-toggle {
+        display: none;
+    }
+}
+
+/* Reduced motion for the flip cards. Kept last so it overrides the base flip rules above:
+   no rotation, no hover lift; the faces cross-fade instead. */
+@media (prefers-reduced-motion: reduce) {
+    html.proto .flip-card:hover,
+    html.proto .flip-toggle:hover,
+    html.proto .flip-toggle:active {
+        translate: none;
+    }
+
+    html.proto .flip-inner,
+    html.proto .flip-card.is-flipped .flip-inner {
+        transform: none;
+        transform-style: flat;
+        transition: none;
+    }
+
+    html.proto .flip-front,
+    html.proto .flip-back,
+    html.proto .flip-toggle {
+        transition: opacity 0.3s ease, background-color 0.2s ease, color 0.2s ease;
+    }
+
+    html.proto .flip-back {
+        transform: none;
+        opacity: 0;
+    }
+
+    html.proto .flip-card.is-flipped .flip-back {
+        opacity: 1;
+    }
+
+    html.proto .flip-card.is-flipped .flip-front {
+        opacity: 0;
+    }
+}
