@@ -245,6 +245,15 @@ html.proto .ds-scrim {
     background: radial-gradient(ellipse 70% 62% at 50% 50%, rgb(15 23 42 / 0.8), rgb(15 23 42 / 0.94));
 }
 
+/* Phone: the hero fits its copy instead of filling the whole screen */
+@media (max-width: 639px) {
+    html.proto .hero {
+        height: auto;
+        min-height: min(72svh, 620px);
+        padding: 6rem 0 2.5rem;
+    }
+}
+
 @media (max-width: 768px) {
     html.proto .ds-photo {
         width: clamp(96px, 26vw, 130px);
@@ -1022,6 +1031,12 @@ html.proto .flip-card {
     perspective: 1200px;
     min-height: clamp(26rem, 36vw, 30rem);
     transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring);
+}
+
+@media (max-width: 639px) {
+    html.proto .flip-card {
+        min-height: 22rem;
+    }
 }
 
 html.proto .flip-card:hover {

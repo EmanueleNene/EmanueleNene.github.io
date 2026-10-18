@@ -297,15 +297,15 @@ html.proto .bento-tile:focus-visible .bento-cta i {
     }
 
     html.proto .bento-tile {
-        min-height: 340px;
+        min-height: 280px;
     }
 
     html.proto .bento-hero .bento-tile {
-        min-height: 440px;
+        min-height: 340px;
     }
 
     html.proto .bento-body {
-        padding: 5rem 1.25rem 1.25rem;
+        padding: 4rem 1.25rem 1.25rem;
     }
 }
 
