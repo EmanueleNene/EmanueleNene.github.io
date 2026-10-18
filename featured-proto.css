@@ -1,0 +1,320 @@
+/* ------------------------------------------------------------
+   Featured Projects: bento grid on the homepage (html.proto only).
+   Three layers, one job each, so transforms never fight:
+   .bento-cell  entrance (translate, tilt, scale, staggered)
+   .bento-tile  hover lift, cursor tilt, border sweep, spotlight
+   .bento-media image parallax (--py) and hover zoom (--zoom)
+   Only transform and opacity animate. featured-proto.js sets
+   --py on each cell, and --rx, --ry, --mx, --my on each tile.
+   ------------------------------------------------------------ */
+
+html.proto #projects {
+    overflow-x: clip;
+}
+
+html.proto .bento {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(300px, auto);
+    grid-template-areas:
+        "hero hero structural structural"
+        "hero hero crystal ferro";
+}
+
+/* Each tile enters from its own side, so the grid reads as a sequence
+   rather than one wipe. --i is the stagger slot, --f* the start pose. */
+html.proto .bento-hero       { grid-area: hero;       --i: 0; --fx: -16vw; --fy: 10vh;  --fr: -5deg; }
+html.proto .bento-structural { grid-area: structural; --i: 1; --fx: 14vw;  --fy: 6vh;   --fr: 4deg; }
+html.proto .bento-crystal    { grid-area: crystal;    --i: 2; --fx: 0px;   --fy: 16vh;  --fr: -3deg; }
+html.proto .bento-ferro      { grid-area: ferro;      --i: 3; --fx: 12vw;  --fy: -12vh; --fr: 6deg; }
+
+html.proto .bento-cell {
+    position: relative;
+    min-width: 0;
+    transition:
+        opacity 0.8s ease-out calc(var(--i) * 0.12s),
+        transform 1.4s var(--ds-spring) calc(var(--i) * 0.12s);
+}
+
+/* Set by featured-proto.js only when it can observe the tiles. No script, no hidden tiles. */
+html.proto .bento.is-armed .bento-cell {
+    opacity: 0;
+    transform: translate3d(var(--fx), var(--fy), 0) rotate(var(--fr)) scale(0.84);
+}
+
+html.proto .bento.is-armed .bento-cell.is-in {
+    opacity: 1;
+    transform: none;
+}
+
+/* The whole tile is the link */
+html.proto .bento-tile {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 300px;
+    overflow: hidden;
+    border: 1px solid var(--ds-line);
+    border-radius: var(--radius-lg);
+    background-color: var(--ds-card);
+    color: var(--ds-ink);
+    text-decoration: none;
+    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.6);
+    --rx: 0deg;
+    --ry: 0deg;
+    --lift: 0px;
+    --zoom: 1.12;
+    --mx: 50%;
+    --my: 50%;
+    transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translate3d(0, var(--lift), 0);
+    transition:
+        transform 0.6s var(--ds-spring),
+        box-shadow 0.6s var(--ds-ease),
+        border-color 0.3s ease;
+}
+
+/* Cursor tilt follows the pointer closely, so it drops the spring for a short ease */
+html.proto .bento-tile.is-tilting {
+    transition: transform 0.25s ease-out, box-shadow 0.6s var(--ds-ease), border-color 0.3s ease;
+}
+
+html.proto .bento-tile:hover,
+html.proto .bento-tile:focus-visible {
+    --lift: -12px;
+    --zoom: 1.24;
+    border-color: var(--ds-line-2);
+    box-shadow: 0 34px 70px -28px rgb(242 178 51 / 0.42);
+}
+
+html.proto .bento-tile:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+/* Spotlight that follows the cursor, under the text */
+html.proto .bento-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(420px circle at var(--mx) var(--my), rgb(127 195 217 / 0.22), transparent 62%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+html.proto .bento-tile:hover::before,
+html.proto .bento-tile:focus-visible::before {
+    opacity: 1;
+}
+
+/* Border sweep: an accent ring that wipes on from the left */
+html.proto .bento-tile::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 2px var(--ds-accent);
+    clip-path: inset(0 100% 0 0 round var(--radius-lg));
+    transition: clip-path 0.7s var(--ds-ease);
+}
+
+html.proto .bento-tile:hover::after,
+html.proto .bento-tile:focus-visible::after {
+    clip-path: inset(0 0 0 0 round var(--radius-lg));
+}
+
+/* Image: sits under the scrim. Parallax shifts it, hover zooms it. */
+html.proto .bento-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+html.proto .bento-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: translate3d(0, calc(var(--py, 0) * -4%), 0) scale(var(--zoom));
+    transition: transform 0.9s var(--ds-ease);
+}
+
+/* Scrim: opaque under the text, fading to clear at the top so the image shows */
+html.proto .bento-body {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 6rem 1.75rem 1.75rem;
+    background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--ds-paper) 96%, transparent) 0%,
+        color-mix(in srgb, var(--ds-paper) 92%, transparent) 55%,
+        transparent 100%
+    );
+}
+
+html.proto .bento-badge {
+    margin-bottom: 0.25rem;
+}
+
+html.proto .bento-title {
+    margin: 0;
+    font-family: var(--ds-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--ds-ink);
+    text-wrap: balance;
+}
+
+html.proto .bento-hero .bento-title {
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    line-height: 1.05;
+}
+
+html.proto .bento-text {
+    margin: 0;
+    font-size: 0.975rem;
+    line-height: 1.5;
+    color: var(--ds-ink-2);
+    max-width: 38ch;
+}
+
+/* CTA: a pill that turns accent on hover and focus, with the arrow sliding */
+html.proto .bento-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.4rem;
+    padding: 0.6rem 1.05rem;
+    border-radius: 999px;
+    background-color: var(--ds-sky);
+    color: var(--ds-ink);
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.proto .bento-cta i {
+    transition: transform 0.5s var(--ds-spring);
+}
+
+html.proto .bento-tile:hover .bento-cta,
+html.proto .bento-tile:focus-visible .bento-cta {
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+}
+
+html.proto .bento-tile:hover .bento-cta i,
+html.proto .bento-tile:focus-visible .bento-cta i {
+    transform: translateX(5px);
+}
+
+/* Desktop: 4 columns. Hero is 2x2; the long-titled paper is 2x1. */
+/* Tablet: 2 columns. Hero and the paper each take a full row. */
+@media (max-width: 1023px) {
+    html.proto .bento {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+            "hero hero"
+            "structural structural"
+            "crystal ferro";
+    }
+
+    html.proto .bento-hero .bento-tile {
+        min-height: 420px;
+    }
+}
+
+/* Phone (390px): one column, stacked in order */
+@media (max-width: 639px) {
+    html.proto .bento {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "hero"
+            "structural"
+            "crystal"
+            "ferro";
+        grid-auto-rows: auto;
+        gap: 1rem;
+    }
+
+    html.proto .bento-tile {
+        min-height: 340px;
+    }
+
+    html.proto .bento-hero .bento-tile {
+        min-height: 440px;
+    }
+
+    html.proto .bento-body {
+        padding: 5rem 1.25rem 1.25rem;
+    }
+}
+
+/* Reduced motion: a static grid. No entrance, no parallax, no tilt, no zoom, no sweep.
+   Colour, border and outline changes stay, so hover and focus still read. */
+@media (prefers-reduced-motion: reduce) {
+    html.proto .bento-cell,
+    html.proto .bento.is-armed .bento-cell,
+    html.proto .bento.is-armed .bento-cell.is-in {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    html.proto .bento-tile,
+    html.proto .bento-tile.is-tilting,
+    html.proto .bento-tile:hover,
+    html.proto .bento-tile:focus-visible {
+        --rx: 0deg;
+        --ry: 0deg;
+        --lift: 0px;
+        --zoom: 1;
+        transform: none;
+        transition: border-color 0.3s ease, color 0.3s ease;
+    }
+
+    html.proto .bento-tile::before {
+        display: none;
+    }
+
+    html.proto .bento-tile::after {
+        clip-path: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    html.proto .bento-tile:hover::after,
+    html.proto .bento-tile:focus-visible::after {
+        opacity: 1;
+    }
+
+    html.proto .bento-media img {
+        transform: none;
+        transition: none;
+    }
+
+    html.proto .bento-cta,
+    html.proto .bento-cta i,
+    html.proto .bento-tile:hover .bento-cta i,
+    html.proto .bento-tile:focus-visible .bento-cta i {
+        transition: background-color 0.2s ease, color 0.2s ease;
+        transform: none;
+    }
+}

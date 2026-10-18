@@ -21,9 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 0a. Hero headline word-morph
     initTextMorph();
 
-    // 0b. Sticky Scroll Reveal for Featured Projects
-    initStickyScroll();
-
     // 0d. Card Hover Effect for Events
     initCardHoverEffect();
 
@@ -317,70 +314,6 @@ function initTextMorph() {
             hero.classList.toggle('is-offscreen', !entry.isIntersecting);
         }).observe(hero);
     }
-}
-
-/* Sticky Scroll Reveal for Featured Projects */
-function initStickyScroll() {
-    const items = document.querySelectorAll('.sticky-scroll-item');
-    const images = document.querySelectorAll('.sticky-scroll-img-wrapper');
-    const container = document.getElementById('stickyScrollProjects');
-
-    if (!items.length || !images.length || !container) return;
-
-    let activeIndex = 0;
-
-    const setActive = (index) => {
-        activeIndex = index;
-        items.forEach((item, i) => item.classList.toggle('active', i === index));
-        images.forEach((img, i) => img.classList.toggle('active', i === index));
-    };
-
-    // Keyboard: tabbing to a project's link brings its image forward
-    items.forEach((item, index) => {
-        item.addEventListener('focusin', () => {
-            if (window.innerWidth >= 850) setActive(index);
-        });
-    });
-
-    // The big image opens whichever project is active
-    const card = container.querySelector('.sticky-scroll-card');
-    if (card) {
-        card.addEventListener('click', () => {
-            const link = items[activeIndex] && items[activeIndex].querySelector('a');
-            if (link) link.click();
-        });
-    }
-
-    const handleScroll = () => {
-        if (window.innerWidth < 850) return;
-
-        const viewportHeight = window.innerHeight;
-        let nearest = 0;
-        let minDistance = Infinity;
-
-        items.forEach((item, index) => {
-            const rect = item.getBoundingClientRect();
-            const itemCenter = rect.top + rect.height / 2;
-            const viewportCenter = viewportHeight / 2;
-            const distance = Math.abs(itemCenter - viewportCenter);
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearest = index;
-            }
-        });
-
-        if (nearest !== activeIndex) setActive(nearest);
-    };
-
-    window.addEventListener('scroll', () => {
-        requestAnimationFrame(handleScroll);
-    }, { passive: true });
-
-    window.addEventListener('resize', handleScroll, { passive: true });
-
-    // Initial check
-    handleScroll();
 }
 
 /* Card Hover Effect for Events (Aceternity UI style) */
