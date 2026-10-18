@@ -14,7 +14,7 @@ This is a personal portfolio website for Emanuele D'Allestro, a PhD Researcher a
 - `images/`: Contains static images for projects and personal branding.
 - `recipes/`: Sub-pages for various recipes (e.g., `recipes.html`, individual recipe pages).
 - `conferences/`: Sub-pages for conference notes and logs (e.g., `conferences.html`, individual conference pages). Bright Ledger look, single mode, via `<html class="proto">` and `conferences-proto.css` / `conferences-proto.js`.
-- `phd/`: PhD-related documentation and milestones.
+- `phd/`: PhD-related documentation and milestones. `phd-responsible.html` uses the Bright Ledger look, single mode, via `<html class="proto">` and `phd-proto.css`.
 - `projects/`: Detailed case studies and publication summaries for research projects.
 - `values/`: Pages exploring personal philosophies (e.g., Wabi-sabi, Kaizen, Ikigai).
 - `events/`: Documentation for events like UNLEASH.
