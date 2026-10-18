@@ -1,0 +1,228 @@
+/*
+   --------------------------------------------------------------
+   Projects pages: the "Bright Ledger" look from prototype.css.
+   Opt-in: <html class="proto"> on projects/*.html. Loaded after
+   prototype.css, so it reuses its tokens and motion. Only layout
+   and card rules live here.
+   --------------------------------------------------------------
+*/
+
+/* Hero: same type as the homepage, with the title and intro centred */
+html.proto .hero-small {
+    padding: clamp(8rem, 14vw, 10rem) 0 clamp(2rem, 4vw, 3rem);
+}
+
+html.proto .hero-small p {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--ds-ink-2);
+    max-width: 34ch;
+    margin-inline: auto;
+}
+
+/* ------------------------------------------------------------
+   Filters: chunky pills with a lip, like the homepage buttons.
+   Text on the active pill is dark on amber (AA), not the old
+   light text that failed contrast.
+   ------------------------------------------------------------ */
+html.proto .recipe-filter-bar {
+    gap: 0.75rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+html.proto .filter-btn {
+    font: 700 0.95rem var(--ds-body);
+    padding: 0.6rem 1.3rem;
+    border: 2px solid var(--text-muted);
+    border-radius: 999px;
+    background-color: var(--ds-card);
+    color: var(--ds-ink);
+    box-shadow: 0 4px 0 var(--text-muted);
+    cursor: pointer;
+    transition: translate 0.4s var(--ds-spring), box-shadow 0.3s var(--ds-ease), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+html.proto .filter-btn:hover {
+    translate: 0 -3px;
+    box-shadow: 0 7px 0 var(--text-muted);
+    color: var(--ds-ink);
+    border-color: var(--ds-ink-2);
+}
+
+html.proto .filter-btn:active {
+    translate: 0 4px;
+    box-shadow: 0 0 0 transparent;
+}
+
+html.proto .filter-btn.active {
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    border-color: var(--ds-ink);
+    box-shadow: 0 4px 0 var(--ds-ink);
+}
+
+html.proto .filter-btn.active:hover {
+    box-shadow: 0 7px 0 var(--ds-ink);
+}
+
+html.proto .filter-btn:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+/* ------------------------------------------------------------
+   Project cards: image on top, rounded like the homepage cards.
+   The reveal, hover lift and keyboard lift share one transition
+   list here. It is declared after prototype.css, so it wins the
+   tie on the same selector weight.
+   ------------------------------------------------------------ */
+html.proto .project-card {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: 1.75rem;
+    transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring), scale 0.55s var(--ds-spring), box-shadow 0.5s var(--ds-ease), border-color 0.3s ease;
+}
+
+html.proto .project-card:hover,
+html.proto .project-card:has(:focus-visible) {
+    translate: 0 -14px;
+    scale: 1.02;
+    border-color: var(--ds-line-2);
+    box-shadow: 0 12px 0 var(--ds-line-2), 0 34px 60px -26px rgb(0 0 0 / 0.5);
+}
+
+html.proto .project-card .recipe-card-image {
+    height: auto;
+    aspect-ratio: 16 / 10;
+    background-color: var(--ds-paper-2);
+    border-bottom: 1px solid var(--ds-line);
+}
+
+html.proto .project-card .recipe-card-image img {
+    transition: transform 0.8s var(--ds-ease);
+}
+
+html.proto .project-card:hover .recipe-card-image img,
+html.proto .project-card:has(:focus-visible) .recipe-card-image img {
+    transform: scale(1.06);
+}
+
+html.proto .project-card .recipe-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: clamp(1.5rem, 2.5vw, 2rem);
+}
+
+html.proto .project-card .recipe-card-content h3 {
+    font-size: 1.6rem;
+    margin: 0;
+}
+
+html.proto .project-card .recipe-card-content p {
+    margin: 0 0 0.5rem;
+    color: var(--ds-ink-2);
+}
+
+html.proto .project-card .link-arrow {
+    margin-top: auto;
+    color: var(--ds-accent-ink);
+    font-weight: 700;
+}
+
+/* Entrance when a filter brings a card back: JS adds .is-entering
+   with a stagger delay. backwards fill only, so hover is not locked. */
+@keyframes ds-card-in {
+    from {
+        opacity: 0;
+        translate: 0 40px;
+        scale: 0.96;
+    }
+}
+
+html.proto .project-card.is-entering {
+    animation: ds-card-in 0.9s var(--ds-spring) backwards;
+    animation-delay: var(--ds-enter-delay, 0s);
+}
+
+/* ------------------------------------------------------------
+   Project detail pages (structural-curl, crystal-plasticity)
+   ------------------------------------------------------------ */
+html.proto .project-detail-header {
+    padding-top: clamp(7rem, 14vw, 9rem);
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+html.proto .project-detail-header h1 {
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+html.proto .project-detail-header .subtitle {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--ds-ink-2);
+    max-width: 36ch;
+    margin-inline: auto;
+}
+
+html.proto .project-detail-image {
+    border: 1px solid var(--ds-line);
+    border-radius: 1.75rem;
+    box-shadow: 0 12px 0 var(--ds-line-2);
+    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+html.proto .project-detail-content section {
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+html.proto .project-detail-content h2 {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+}
+
+html.proto .project-detail-content p,
+html.proto .project-detail-content li {
+    color: var(--ds-ink-2);
+}
+
+/* ------------------------------------------------------------
+   Island nav, desktop: name, Topics and Email Me only. The section
+   links stay in the markup for the mobile sheet, as on the homepage.
+   This mirrors PR #40; drop this block when that PR lands on main.
+   ------------------------------------------------------------ */
+@media (min-width: 769px) {
+    html.proto .nav-links > li.nav-section,
+    html.proto .nav-actions {
+        display: none;
+    }
+}
+
+/* ------------------------------------------------------------
+   Reduced motion: no lifts, no zoom, no entrance travel.
+   Colour and border changes stay, so hover and focus still read.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    html.proto .project-card,
+    html.proto .project-card:hover,
+    html.proto .project-card:has(:focus-visible),
+    html.proto .filter-btn:hover,
+    html.proto .filter-btn:active {
+        translate: none;
+        scale: none;
+    }
+
+    html.proto .project-card:hover .recipe-card-image img,
+    html.proto .project-card:has(:focus-visible) .recipe-card-image img,
+    html.proto .project-card .recipe-card-image img {
+        transform: none;
+        transition: none;
+    }
+
+    html.proto .project-card.is-entering {
+        animation: none;
+    }
+}
