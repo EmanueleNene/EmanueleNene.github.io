@@ -1,0 +1,211 @@
+/*
+   --------------------------------------------------------------
+   PhD Responsible page: the "Bright Ledger" look from prototype.css.
+   Opt-in: <html class="proto"> on phd/phd-responsible.html. Loaded
+   after prototype.css, so it reuses its tokens, reveals and nav.
+   Only the bento layout, card motion and list rules live here.
+   Motion uses transform (translate and scale) and opacity only.
+   The entrance animations finish within 1.3s, because script.js
+   removes the .visible class at that point.
+   --------------------------------------------------------------
+*/
+
+/* Hero: same type as the homepage, with the title and intro centred */
+html.proto .hero-small {
+    padding: clamp(8rem, 14vw, 10rem) 0 clamp(2rem, 4vw, 3rem);
+}
+
+html.proto .hero-small p {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--ds-ink-2);
+    max-width: 34ch;
+    margin-inline: auto;
+}
+
+/* ------------------------------------------------------------
+   Bento: six columns on desktop. Teaching is wide on top; the
+   other four cards sit in a row of three below it, with the
+   portfolio card last.
+   ------------------------------------------------------------ */
+html.proto .phd-bento {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+html.proto .phd-card {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    min-width: 0;
+    padding: clamp(1.75rem, 3vw, 2.5rem);
+    border-radius: 1.75rem;
+    /* A static lip under the card. It is never animated, so it costs nothing per frame. */
+    box-shadow: 0 10px 0 var(--ds-line);
+    /* Explicit list: the reveal's transform and the hover's translate and scale share it */
+    transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.6s var(--ds-spring), scale 0.6s var(--ds-spring), border-color 0.3s ease;
+}
+
+html.proto .phd-card-wide {
+    grid-column: span 4;
+}
+
+html.proto .phd-card h3 {
+    font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+    line-height: 1.1;
+}
+
+html.proto .phd-card p {
+    margin: 0;
+    color: var(--ds-ink-2);
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+/* Lift on hover and on keyboard focus within the card, with a spring */
+html.proto .phd-card:hover,
+html.proto .phd-card:focus-within {
+    translate: 0 -12px;
+    scale: 1.02;
+    border-color: var(--ds-line-2);
+}
+
+/* ------------------------------------------------------------
+   Responsibility lists: a dot per item, in the accent colour
+   ------------------------------------------------------------ */
+html.proto .phd-card .responsibility-list {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+html.proto .phd-card-wide .responsibility-list {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+html.proto .phd-card .responsibility-list li {
+    position: relative;
+    margin: 0;
+    padding-left: 1.5rem;
+    color: var(--ds-ink-2);
+    line-height: 1.55;
+}
+
+html.proto .phd-card .responsibility-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: var(--ds-accent);
+}
+
+/* Portfolio card: the download sits at the foot of the card */
+html.proto .phd-download {
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+html.proto .phd-download .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+html.proto .phd-download .btn-primary:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+/* ------------------------------------------------------------
+   Entrance: the icon pops in with a spring and the list items
+   step in one after another. Each animation ends within 1.3s.
+   ------------------------------------------------------------ */
+html.proto .phd-card.visible .card-icon {
+    animation: ds-phd-pop 0.9s var(--ds-spring) 0.2s backwards;
+}
+
+html.proto .phd-card.visible .responsibility-list li {
+    animation: ds-phd-li 0.6s var(--ds-ease) backwards;
+}
+
+html.proto .phd-card.visible .responsibility-list li:nth-child(1) { animation-delay: 0.35s; }
+html.proto .phd-card.visible .responsibility-list li:nth-child(2) { animation-delay: 0.42s; }
+html.proto .phd-card.visible .responsibility-list li:nth-child(3) { animation-delay: 0.49s; }
+
+@keyframes ds-phd-pop {
+    from {
+        transform: scale(0) rotate(-40deg);
+    }
+}
+
+@keyframes ds-phd-li {
+    from {
+        opacity: 0;
+        transform: translateX(-14px);
+    }
+}
+
+/* ------------------------------------------------------------
+   Tablet: two columns. Teaching spans both; the rest fill 2x2.
+   ------------------------------------------------------------ */
+@media (max-width: 900px) {
+    html.proto .phd-bento {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    html.proto .phd-card {
+        grid-column: span 1;
+    }
+
+    html.proto .phd-card-wide {
+        grid-column: span 2;
+    }
+}
+
+/* ------------------------------------------------------------
+   Phones (down to 390px): one column, tighter cards
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+    html.proto .phd-bento {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    html.proto .phd-card,
+    html.proto .phd-card-wide {
+        grid-column: 1;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+    }
+
+    html.proto .phd-card-wide .responsibility-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* ------------------------------------------------------------
+   Reduced motion: no lift, no pop-in, no list slide. Colour and
+   border changes stay, so hover and focus still read.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    html.proto .phd-card,
+    html.proto .phd-card:hover,
+    html.proto .phd-card:focus-within {
+        translate: none;
+        scale: none;
+    }
+
+    html.proto .phd-card:hover .card-icon {
+        transform: none;
+    }
+
+    html.proto .phd-card.visible .card-icon,
+    html.proto .phd-card.visible .responsibility-list li {
+        animation: none;
+    }
+}
