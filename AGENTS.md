@@ -13,6 +13,7 @@ This is a personal portfolio website for Emanuele D'Allestro, a PhD Researcher a
 - `featured-proto.css` / `featured-proto.js`: the homepage Featured Projects bento grid (`#projects`), loaded only by `index.html`. It animates transform and opacity only and has its own reduced-motion block.
 - `images/`: Contains static images for projects and personal branding.
 - `recipes/`: Sub-pages for various recipes (e.g., `recipes.html`, individual recipe pages).
+- `recipes-proto.css` / `recipes-proto.js`: Bright Ledger layer for `recipes/*.html`, opt-in via `<html class="proto">` and loaded after `prototype.css`.
 - `conferences/`: Sub-pages for conference notes and logs (e.g., `conferences.html`, individual conference pages). Bright Ledger look, single mode, via `<html class="proto">` and `conferences-proto.css` / `conferences-proto.js`.
 - `phd/`: PhD-related documentation and milestones. `phd-responsible.html` uses the Bright Ledger look, single mode, via `<html class="proto">` and `phd-proto.css`.
 - `projects/`: Detailed case studies and publication summaries for research projects.

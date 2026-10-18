@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="proto">
 
 <head>
     <meta charset="UTF-8">
@@ -7,12 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Pepper Beef Stir-fry - Recipe Explained">
     <title>Pepper Beef Stir-fry | Emanuele D'Allestro</title>
-    <!-- Google Fonts: Source Serif 4 -->
+    <!-- Google Fonts: Bricolage Grotesque (display) + Figtree (text), prototype look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:wght@400..900&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../style.css">
+    <!-- Homepage prototype look and motion, then the recipes layer -->
+    <link rel="stylesheet" href="../prototype.css">
+    <link rel="stylesheet" href="../recipes-proto.css">
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -32,19 +35,29 @@
         <div class="container nav-container">
             <a href="/index.html" class="logo">Emanuele D.</a>
             <ul class="nav-links">
-                <li><a href="/projects/projects.html">Projects</a></li>
-                <li><a href="/conferences/conferences.html">Conferences</a></li>
-                <li><a href="/phd/phd-responsible.html">PhD Responsible</a></li>
-                <li><a href="/recipes/recipes.html">Recipes</a></li>
-                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li></ul>
+                <li>
+                    <button type="button" class="topics-toggle" aria-expanded="false" aria-controls="topics-panel">
+                        Topics <i class="ph ph-caret-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="topics-panel" id="topics-panel" role="region" aria-label="Topics">
+                        <p class="topics-head">Topics</p>
+                        <ul class="topics-list">
+                            <li><a href="/projects/projects.html"><strong>Projects</strong><span>Research and startup work</span></a></li>
+                            <li><a href="/conferences/conferences.html"><strong>Conferences</strong><span>Talks, posters and logs</span></a></li>
+                            <li><a href="/phd/phd-responsible.html"><strong>PhD</strong><span>Milestones and responsibilities</span></a></li>
+                            <li><a href="/recipes/recipes.html" aria-current="page"><strong>Recipes</strong><span>Cooking notes</span></a></li>
+                            <li><a href="/#values"><strong>Values</strong><span>Philosophies I follow</span></a></li>
+                            <li><a href="/#events"><strong>Events</strong><span>Events and competitions</span></a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-section"><a href="/projects/projects.html">Projects</a></li>
+                <li class="nav-section"><a href="/conferences/conferences.html">Conferences</a></li>
+                <li class="nav-section"><a href="/phd/phd-responsible.html">PhD Responsible</a></li>
+                <li class="nav-section"><a href="/recipes/recipes.html" aria-current="page">Recipes</a></li>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
+            </ul>
             <div class="nav-actions">
-                <button class="theme-switch" id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Night Mode">
-                    <span class="theme-switch-track">
-                        <span class="theme-switch-icon sun"><i class="ph ph-sun"></i></span>
-                        <span class="theme-switch-icon moon"><i class="ph ph-moon"></i></span>
-                        <span class="theme-switch-thumb"></span>
-                    </span>
-                </button>
                 <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false">
                     <i class="ph ph-list" aria-hidden="true"></i>
                 </button>
@@ -53,7 +66,7 @@
     </nav>
 
     <main class="container section">
-        <a href="javascript:history.back()" class="link-arrow" style="margin-bottom: 2rem; display: inline-flex;"><i
+        <a href="recipes.html" class="link-arrow recipe-back"><i
                 class="ph ph-arrow-left"></i> Back</a>
         <div class="project-detail-header reveal reveal-up">
             <span class="badge">Stir-fry</span>
@@ -63,12 +76,11 @@
         </div>
 
         <div class="project-detail-image reveal reveal-up stagger-1">
-            <img src="../images/pepper_beef.png" alt="Pepper Beef Stir-fry"
-                style="width: 100%; border-radius: 20px; box-shadow: var(--shadow-lg);">
+            <img loading="lazy" decoding="async" src="../images/pepper_beef.png" alt="Pepper Beef Stir-fry" class="recipe-photo">
         </div>
 
-        <div class="project-detail-content reveal reveal-up stagger-2">
-            <section>
+        <div class="project-detail-content">
+            <section class="reveal reveal-up">
                 <h2>Authentic Stir-fry Technique</h2>
                 <p>Pepper Beef is a staple of Cantonese cuisine, relying on the "wok hei" (breath of the wok) and the
                     technique of velveting meat. By marinating the beef with cornstarch and a touch of baking soda, we
@@ -76,12 +88,12 @@
                     contrast between the succulent beef and the crisp, vibrant peppers defines this dish.</p>
             </section>
 
-            <section>
+            <section class="reveal reveal-up">
                 <h2>Ingredients</h2>
                 <p><strong>Serves:</strong> 2 | <strong>Time:</strong> ~25 min</p>
 
                 <h3>Base Ingredients</h3>
-                <ul>
+                <ul class="recipe-ingredients">
                     <li><strong>225g</strong> Flank steak (or skirt, flat iron, hanger steak)</li>
                     <li><strong>½ large</strong> Red bell pepper, diced</li>
                     <li><strong>½ large</strong> Green bell pepper, diced</li>
@@ -90,7 +102,7 @@
                 </ul>
 
                 <h3>Marinade</h3>
-                <ul>
+                <ul class="recipe-ingredients">
                     <li><strong>4 cloves</strong> Garlic, minced</li>
                     <li><strong>10ml</strong> Regular soy sauce</li>
                     <li><strong>10ml</strong> Dark soy sauce</li>
@@ -103,7 +115,7 @@
                 </ul>
 
                 <h3>Sauce</h3>
-                <ul>
+                <ul class="recipe-ingredients">
                     <li><strong>15ml</strong> Oyster sauce</li>
                     <li><strong>15ml</strong> Dark soy sauce</li>
                     <li><strong>15ml</strong> Regular soy sauce</li>
@@ -114,10 +126,10 @@
                 </ul>
             </section>
 
-            <section>
+            <section class="reveal reveal-up">
                 <h2>Method</h2>
 
-                <div class="recipe-step">
+                <div class="recipe-step reveal reveal-up stagger-1">
                     <h3>1. Prepare & Marinate</h3>
                     <p>Slice the beef against the grain at a 45-degree angle into 6mm thick pieces.
                         <span class="recipe-pro-tip"><em>Pro Tip: To thinly slice beef easily, freeze it for 45-60
@@ -127,19 +139,19 @@
                     </p>
                 </div>
 
-                <div class="recipe-step">
+                <div class="recipe-step reveal reveal-up stagger-2">
                     <h3>2. Sear the Beef</h3>
                     <p>Heat 15ml of vegetable oil in a large pan or wok over medium-high heat. Fry the beef until cooked
                         and slightly browned on the edges (about 2 minutes). Remove the beef and set aside.</p>
                 </div>
 
-                <div class="recipe-step">
+                <div class="recipe-step reveal reveal-up stagger-3">
                     <h3>3. Stir-fry Vegetables</h3>
                     <p>In the same pan, fry the onions and bell peppers until they are crisp yet slightly tender (about
                         30 seconds). Be careful not to overcook them to maintain their vibrant color and crunch.</p>
                 </div>
 
-                <div class="recipe-step">
+                <div class="recipe-step reveal reveal-up stagger-4">
                     <h3>4. Thicken & Combine</h3>
                     <p>Stir the prepared sauce mixture and add it to the pan. Simmer until the sauce thickens (about 1
                         minute). Return the cooked beef to the pan and toss everything together to coat evenly. Serve
@@ -147,9 +159,9 @@
                 </div>
             </section>
 
-            <section>
+            <section class="reveal reveal-up">
                 <h2>Key Ratios & Tips</h2>
-                <div class="card recipe-step">
+                <div class="card recipe-step reveal reveal-up stagger-1">
                     <h3>The Secret to Tenderness</h3>
                     <p>The <strong>velveting</strong> process is crucial. The combination of cornstarch and baking soda
                         breaks down the muscle fibers while locking in moisture.
@@ -187,6 +199,8 @@
     </footer>
 
     <script src="../script.js"></script>
+    <script src="../prototype.js"></script>
+    <script src="../recipes-proto.js"></script>
 </body>
 
 </html>
