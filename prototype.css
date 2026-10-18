@@ -214,7 +214,6 @@ html.proto .ds-photo {
     rotate: var(--r, 0deg);
     scale: var(--s, 1);
     opacity: var(--o, 1);
-    filter: blur(var(--b, 0px));
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.7);
     animation:
         ds-photo-in 1.6s ease-out var(--d, 0s) backwards,
@@ -229,14 +228,14 @@ html.proto .ds-photo img {
     object-fit: cover;
 }
 
-html.proto .ds-photo-1 { --x: 2%;  --y: 8%;  --r: -9deg; --s: 0.8;  --o: 0.55; --b: 1.5px; --d: 0.2s;  --f: 9s; }
+html.proto .ds-photo-1 { --x: 2%;  --y: 8%;  --r: -9deg; --s: 0.8;  --o: 0.55; --d: 0.2s;  --f: 9s; }
 html.proto .ds-photo-2 { --x: 14%; --y: 54%; --r: 6deg;  --s: 0.95; --o: 0.9;  --d: 0.35s; --f: 11s; }
-html.proto .ds-photo-3 { --x: 4%;  --y: 70%; --r: -4deg; --s: 0.85; --o: 0.7;  --b: 0.6px; --d: 0.5s;  --f: 8s; }
+html.proto .ds-photo-3 { --x: 4%;  --y: 70%; --r: -4deg; --s: 0.85; --o: 0.7;  --d: 0.5s;  --f: 8s; }
 html.proto .ds-photo-4 { --x: 84%; --y: 66%; --r: 5deg;  --s: 0.9;  --o: 0.85; --d: 0.4s;  --f: 10s; }
-html.proto .ds-photo-5 { --x: 83%; --y: 6%;  --r: 8deg;  --s: 0.78; --o: 0.5;  --b: 2px;   --d: 0.25s; --f: 12s; }
-html.proto .ds-photo-6 { --x: 72%; --y: 46%; --r: -6deg; --s: 0.7;  --o: 0.4;  --b: 3px;   --d: 0.6s;  --f: 9.5s; }
-html.proto .ds-photo-7 { --x: 26%; --y: 3%;  --r: 4deg;  --s: 0.72; --o: 0.45; --b: 2.5px; --d: 0.45s; --f: 10.5s; }
-html.proto .ds-photo-8 { --x: 88%; --y: 82%; --r: -10deg; --s: 0.68; --o: 0.4; --b: 3px;   --d: 0.7s;  --f: 8.5s; }
+html.proto .ds-photo-5 { --x: 83%; --y: 6%;  --r: 8deg;  --s: 0.78; --o: 0.5;    --d: 0.25s; --f: 12s; }
+html.proto .ds-photo-6 { --x: 72%; --y: 46%; --r: -6deg; --s: 0.7;  --o: 0.4;    --d: 0.6s;  --f: 9.5s; }
+html.proto .ds-photo-7 { --x: 26%; --y: 3%;  --r: 4deg;  --s: 0.72; --o: 0.45; --d: 0.45s; --f: 10.5s; }
+html.proto .ds-photo-8 { --x: 88%; --y: 82%; --r: -10deg; --s: 0.68; --o: 0.4;   --d: 0.7s;  --f: 8.5s; }
 
 html.proto .ds-scrim {
     position: absolute;

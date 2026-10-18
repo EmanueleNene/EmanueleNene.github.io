@@ -5,7 +5,7 @@
    .bento-tile  hover lift, cursor tilt, border sweep, spotlight
    .bento-media image parallax (--py) and hover zoom (--zoom)
    Only transform and opacity animate. featured-proto.js sets
-   --py on each cell, and --rx, --ry, --mx, --my on each tile.
+   --py on each cell, and --rx, --ry, --sx, --sy on each tile.
    ------------------------------------------------------------ */
 
 html.proto #projects {
@@ -34,6 +34,7 @@ html.proto .bento-ferro      { grid-area: ferro;      --i: 3; --fx: 12vw;  --fy:
 
 html.proto .bento-cell {
     position: relative;
+    isolation: isolate;
     min-width: 0;
     transition:
         opacity 0.8s ease-out calc(var(--i) * 0.12s),
@@ -51,6 +52,41 @@ html.proto .bento.is-armed .bento-cell.is-in {
     transform: none;
 }
 
+/* Shadows sit on the cell, not the tile: a box-shadow that transitions repaints every frame.
+   The dark rest shadow fades out and the accent glow fades in, both moving with the lift. */
+html.proto .bento-cell::before,
+html.proto .bento-cell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+    transition: opacity 0.6s var(--ds-ease), transform 0.6s var(--ds-spring);
+}
+
+html.proto .bento-cell::before {
+    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.6);
+}
+
+html.proto .bento-cell::after {
+    box-shadow: 0 34px 70px -28px rgb(242 178 51 / 0.42);
+    opacity: 0;
+}
+
+html.proto .bento-cell:has(.bento-tile:hover)::before,
+html.proto .bento-cell:has(.bento-tile:focus-visible)::before {
+    opacity: 0;
+    transform: translate3d(0, -12px, 0);
+}
+
+html.proto .bento-cell:has(.bento-tile:hover)::after,
+html.proto .bento-cell:has(.bento-tile:focus-visible)::after {
+    opacity: 1;
+    transform: translate3d(0, -12px, 0);
+    will-change: opacity, transform;
+}
+
 /* The whole tile is the link */
 html.proto .bento-tile {
     position: relative;
@@ -65,23 +101,22 @@ html.proto .bento-tile {
     background-color: var(--ds-card);
     color: var(--ds-ink);
     text-decoration: none;
-    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.6);
+    contain: layout;
     --rx: 0deg;
     --ry: 0deg;
     --lift: 0px;
     --zoom: 1.12;
-    --mx: 50%;
-    --my: 50%;
+    --sx: 0px;
+    --sy: 0px;
     transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translate3d(0, var(--lift), 0);
     transition:
         transform 0.6s var(--ds-spring),
-        box-shadow 0.6s var(--ds-ease),
         border-color 0.3s ease;
 }
 
 /* Cursor tilt follows the pointer closely, so it drops the spring for a short ease */
 html.proto .bento-tile.is-tilting {
-    transition: transform 0.25s ease-out, box-shadow 0.6s var(--ds-ease), border-color 0.3s ease;
+    transition: transform 0.25s ease-out, border-color 0.3s ease;
 }
 
 html.proto .bento-tile:hover,
@@ -89,7 +124,6 @@ html.proto .bento-tile:focus-visible {
     --lift: -12px;
     --zoom: 1.24;
     border-color: var(--ds-line-2);
-    box-shadow: 0 34px 70px -28px rgb(242 178 51 / 0.42);
 }
 
 html.proto .bento-tile:focus-visible {
@@ -97,21 +131,29 @@ html.proto .bento-tile:focus-visible {
     outline-offset: 4px;
 }
 
-/* Spotlight that follows the cursor, under the text */
+/* Spotlight that follows the cursor, under the text. The gradient is drawn once;
+   the cursor only moves it (--sx, --sy from featured-proto.js), so it stays a transform. */
 html.proto .bento-tile::before {
     content: "";
     position: absolute;
-    inset: 0;
+    left: 50%;
+    top: 50%;
+    width: 840px;
+    height: 840px;
+    margin: -420px 0 0 -420px;
     z-index: 1;
     pointer-events: none;
-    background: radial-gradient(420px circle at var(--mx) var(--my), rgb(127 195 217 / 0.22), transparent 62%);
+    background: radial-gradient(circle 420px at 50% 50%, rgb(127 195 217 / 0.22), transparent 62%);
+    transform: translate3d(var(--sx), var(--sy), 0);
     opacity: 0;
     transition: opacity 0.4s ease;
 }
 
+/* will-change only while the tile is hovered or focused, so idle tiles hold no extra layers */
 html.proto .bento-tile:hover::before,
 html.proto .bento-tile:focus-visible::before {
     opacity: 1;
+    will-change: transform, opacity;
 }
 
 /* Border sweep: an accent ring that wipes on from the left */
@@ -292,6 +334,17 @@ html.proto .bento-tile:focus-visible .bento-cta i {
 
     html.proto .bento-tile::before {
         display: none;
+    }
+
+    html.proto .bento-cell::before,
+    html.proto .bento-cell::after,
+    html.proto .bento-cell:has(.bento-tile:hover)::before,
+    html.proto .bento-cell:has(.bento-tile:hover)::after,
+    html.proto .bento-cell:has(.bento-tile:focus-visible)::before,
+    html.proto .bento-cell:has(.bento-tile:focus-visible)::after {
+        transform: none;
+        will-change: auto;
+        transition: opacity 0.3s ease;
     }
 
     html.proto .bento-tile::after {

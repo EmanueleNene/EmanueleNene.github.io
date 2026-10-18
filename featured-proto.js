@@ -31,19 +31,23 @@
         cells.forEach((cell) => entrance.observe(cell));
     }
 
-    // Scroll parallax: each cell reports how far it sits from the middle of the screen
+    // Scroll parallax. The observer keeps the set of cells on screen, so off-screen
+    // cells are never measured. Each frame reads all visible cells first, then writes.
+    const onScreen = new Set();
     let queued = false;
 
     const updateParallax = () => {
         queued = false;
         const mid = window.innerHeight / 2;
+        const moves = [];
 
-        cells.forEach((cell) => {
+        onScreen.forEach((cell) => {
             const r = cell.getBoundingClientRect();
-            if (r.bottom < 0 || r.top > window.innerHeight) return;
             const p = (r.top + r.height / 2 - mid) / window.innerHeight;
-            cell.style.setProperty('--py', Math.max(-1, Math.min(1, p)).toFixed(3));
+            moves.push([cell, Math.max(-1, Math.min(1, p)).toFixed(3)]);
         });
+
+        moves.forEach(([cell, p]) => cell.style.setProperty('--py', p));
     };
 
     const onScroll = () => {
@@ -52,9 +56,17 @@
         requestAnimationFrame(updateParallax);
     };
 
+    const watchVisible = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) onScreen.add(entry.target);
+            else onScreen.delete(entry.target);
+        });
+        onScroll();
+    });
+
+    cells.forEach((cell) => watchVisible.observe(cell));
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
-    if (!reduceMotion.matches) updateParallax();
 
     // Cursor (fine pointers only): tilt toward the pointer and move the spotlight with it.
     // The tile's rect is read once on enter, so each move only writes custom properties.
@@ -77,8 +89,9 @@
             if (!box || !tile.classList.contains('is-tilting')) return;
             const x = Math.min(1, Math.max(0, (e.clientX - box.left) / box.width));
             const y = Math.min(1, Math.max(0, (e.clientY - box.top) / box.height));
-            tile.style.setProperty('--mx', `${(x * 100).toFixed(1)}%`);
-            tile.style.setProperty('--my', `${(y * 100).toFixed(1)}%`);
+            // The spotlight is centred on the tile, so offset it from the centre to the pointer
+            tile.style.setProperty('--sx', `${(x * box.width - box.width / 2).toFixed(1)}px`);
+            tile.style.setProperty('--sy', `${(y * box.height - box.height / 2).toFixed(1)}px`);
             tile.style.setProperty('--rx', `${((0.5 - y) * 8).toFixed(2)}deg`);
             tile.style.setProperty('--ry', `${((x - 0.5) * 10).toFixed(2)}deg`);
         });
