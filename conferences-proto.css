@@ -1,0 +1,426 @@
+/*
+   --------------------------------------------------------------
+   Conferences pages: the "Bright Ledger" look from prototype.css.
+   Opt-in: <html class="proto"> on conferences/*.html. Loaded after
+   prototype.css, so it reuses its tokens and motion. Only layout,
+   timeline and card rules live here. The rail fill is set by
+   conferences-proto.js.
+   --------------------------------------------------------------
+*/
+
+/* Hero: same type as the homepage, with the title and intro centred */
+html.proto .hero-small {
+    padding: clamp(8rem, 14vw, 10rem) 0 clamp(2rem, 4vw, 3rem);
+}
+
+html.proto .hero-small p {
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+    color: var(--ds-ink-2);
+    max-width: 34ch;
+    margin-inline: auto;
+}
+
+/* ------------------------------------------------------------
+   Timeline: one column with a spine on the left. The spine is a
+   muted track with an amber fill. conferences-proto.js sets --fill
+   (0 to 1) as the page scrolls. Without JS or with reduced motion
+   the fill stays at 1, so the rail is fully drawn.
+   ------------------------------------------------------------ */
+html.proto .conference-timeline {
+    --spine: 1.25rem;
+    --gutter: 3.5rem;
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+    max-width: 880px;
+    padding-left: var(--gutter);
+}
+
+html.proto .conference-timeline::before,
+html.proto .conference-timeline::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--spine) - 1.5px);
+    width: 3px;
+    border-radius: 999px;
+}
+
+html.proto .conference-timeline::before {
+    background-color: var(--ds-line-2);
+}
+
+html.proto .conference-timeline::after {
+    background-color: var(--ds-accent);
+    transform-origin: top;
+    transform: scaleY(var(--fill, 1));
+}
+
+/* ------------------------------------------------------------
+   Cards: a rounded panel with a hard lip, like the homepage cards.
+   The whole card is the link, so keyboard focus lifts it too. The
+   transition list is explicit, so the reveal and the hover lift
+   share one list and the "all" from style.css is dropped.
+   ------------------------------------------------------------ */
+html.proto .conference-entry {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    overflow: visible;
+    padding: clamp(1.6rem, 3vw, 2.4rem);
+    background-color: var(--ds-card);
+    border: 1px solid var(--ds-line);
+    border-radius: 1.75rem;
+    box-shadow: 0 8px 0 var(--ds-line);
+    color: var(--ds-ink);
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.9s ease-out, transform 1.3s var(--ds-spring), translate 0.55s var(--ds-spring), scale 0.55s var(--ds-spring), box-shadow 0.5s var(--ds-ease), border-color 0.3s ease;
+}
+
+html.proto .conference-entry:hover,
+html.proto .conference-entry:focus-visible {
+    translate: 0 -14px;
+    scale: 1.02;
+    transform: none;
+    border-color: var(--ds-line-2);
+    box-shadow: 0 12px 0 var(--ds-line-2), 0 34px 60px -26px rgb(0 0 0 / 0.5);
+}
+
+html.proto .conference-entry:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 6px;
+}
+
+/* Dot on the spine, level with the title. It pops in when the card arrives. */
+html.proto .conference-entry::before {
+    content: "";
+    position: absolute;
+    top: 2.7rem;
+    left: calc(var(--spine) - var(--gutter) - 0.6rem);
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 4px solid var(--ds-paper);
+    border-radius: 50%;
+    background-color: var(--ds-accent);
+    box-shadow: 0 0 0 2px var(--ds-accent);
+}
+
+html.proto .conference-entry.visible::before {
+    animation: ds-dot-in 0.8s var(--ds-spring) 0.35s backwards;
+}
+
+@keyframes ds-dot-in {
+    from {
+        scale: 0;
+    }
+}
+
+html.proto .conference-entry .conference-header {
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+}
+
+html.proto .conference-name {
+    min-width: 0;
+    font-family: var(--ds-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    overflow-wrap: break-word;
+}
+
+html.proto .conference-entry.clickable .conference-name {
+    color: var(--ds-ink);
+    transition: color 0.3s ease;
+}
+
+html.proto .conference-entry.clickable:hover .conference-name,
+html.proto .conference-entry.clickable:focus-visible .conference-name {
+    color: var(--ds-accent-ink);
+}
+
+/* Role: an amber pill with dark text (AA on the card) */
+html.proto .conference-role {
+    padding: 0.4rem 0.95rem;
+    border: 0;
+    border-radius: 999px;
+    background-color: var(--ds-accent);
+    color: var(--ds-on-accent);
+    font: 700 0.8rem/1.2 var(--ds-body);
+}
+
+html.proto .conference-role:hover {
+    transform: none;
+    margin-bottom: 0;
+    border-bottom-width: 0;
+    background-color: var(--ds-accent);
+}
+
+/* Date and venue as chips */
+html.proto .conference-meta {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    color: var(--ds-ink-2);
+    font-size: 0.95rem;
+}
+
+html.proto .conference-meta span {
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background-color: var(--ds-paper-2);
+}
+
+html.proto .conference-meta i {
+    color: var(--secondary);
+}
+
+html.proto .conference-body {
+    color: var(--ds-ink-2);
+    font-size: 1.05rem;
+    line-height: 1.65;
+}
+
+html.proto .conference-body p {
+    margin: 0;
+}
+
+html.proto .read-more-link {
+    margin-top: 0.25rem;
+    color: var(--ds-accent-ink);
+    font-weight: 700;
+}
+
+html.proto .read-more-link i {
+    display: inline-block;
+    transition: translate 0.5s var(--ds-spring);
+}
+
+html.proto .conference-entry:hover .read-more-link i,
+html.proto .conference-entry:focus-visible .read-more-link i {
+    translate: 6px 0;
+}
+
+/* ------------------------------------------------------------
+   Detail pages (conference-*.html)
+   ------------------------------------------------------------ */
+
+/* Back link: a pill that lifts and sinks like the homepage buttons */
+html.proto .conference-back {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.5rem;
+    margin: clamp(1rem, 3vw, 2rem) auto 2rem;
+    padding: 0.55rem 1.1rem;
+    border: 2px solid var(--ds-lip-ghost);
+    border-radius: 999px;
+    background-color: var(--ds-card);
+    color: var(--ds-ink);
+    font-weight: 700;
+    box-shadow: 0 4px 0 var(--ds-lip-ghost);
+    transition: translate 0.4s var(--ds-spring), box-shadow 0.3s var(--ds-ease), background-color 0.2s ease;
+}
+
+html.proto .conference-back:hover {
+    translate: 0 -3px;
+    background-color: var(--ds-paper-2);
+    box-shadow: 0 7px 0 var(--ds-lip-ghost);
+}
+
+html.proto .conference-back:active {
+    translate: 0 4px;
+    box-shadow: 0 0 0 transparent;
+}
+
+html.proto .conference-back:focus-visible {
+    outline: 3px solid var(--ds-accent);
+    outline-offset: 4px;
+}
+
+html.proto .conference-back i {
+    transition: translate 0.5s var(--ds-spring);
+}
+
+html.proto .conference-back:hover i {
+    translate: -4px 0;
+}
+
+/* The header clears the island nav through the section padding, so it
+   does not need its own top padding. */
+html.proto .conference-blog-header {
+    max-width: 900px;
+    margin: 0 auto clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: 0;
+}
+
+html.proto .conference-blog-header h1 {
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin: 1rem 0 1.25rem;
+    text-wrap: balance;
+}
+
+html.proto .conference-blog-header .subtitle {
+    max-width: 36ch;
+    margin: 0 auto;
+    color: var(--ds-ink-2);
+    font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+}
+
+html.proto .conference-blog-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+}
+
+html.proto .conference-blog-meta span {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--ds-line);
+    border-radius: 999px;
+    background-color: var(--ds-card);
+    color: var(--ds-ink-2);
+    font-size: 0.95rem;
+}
+
+html.proto .conference-blog-meta i {
+    color: var(--ds-accent-ink);
+}
+
+html.proto .conference-blog-content {
+    max-width: 760px;
+}
+
+html.proto .conference-blog-content section {
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+html.proto .conference-blog-content h2 {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    margin-bottom: 1rem;
+}
+
+html.proto .conference-blog-content p {
+    color: var(--ds-ink-2);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.75;
+    margin-bottom: 1.25rem;
+}
+
+html.proto .conference-blog-content ul {
+    display: grid;
+    gap: 0.75rem;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+html.proto .conference-blog-content li {
+    position: relative;
+    margin: 0;
+    padding-left: 1.6rem;
+    color: var(--ds-ink-2);
+    line-height: 1.6;
+}
+
+html.proto .conference-blog-content li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: var(--ds-accent);
+}
+
+/* Pull quote as a bold panel */
+html.proto .conference-blog-content blockquote {
+    margin: 2rem 0;
+    padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1.25rem, 3vw, 2rem);
+    background-color: var(--ds-card);
+    border: 1px solid var(--ds-line);
+    border-left: 6px solid var(--ds-accent);
+    border-radius: 1.5rem;
+    color: var(--ds-ink);
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    font-style: normal;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+}
+
+/* Photo: framed like the project images, with a caption strip */
+html.proto .photo-single {
+    background-color: var(--ds-card);
+    border: 1px solid var(--ds-line);
+    border-radius: 1.75rem;
+    box-shadow: 0 12px 0 var(--ds-line-2);
+    overflow: hidden;
+}
+
+html.proto .photo-single img {
+    display: block;
+}
+
+html.proto .photo-single .photo-caption {
+    margin: 0;
+    padding: 0.9rem 1.2rem 1.1rem;
+    border-top: 1px solid var(--ds-line);
+    color: var(--ds-ink-2);
+    font-size: 0.95rem;
+    font-style: normal;
+    text-align: left;
+}
+
+/* ------------------------------------------------------------
+   Phones: a narrower spine and gutter, smaller cards
+   ------------------------------------------------------------ */
+@media (max-width: 600px) {
+    html.proto .conference-timeline {
+        --spine: 0.6rem;
+        --gutter: 2.25rem;
+    }
+
+    html.proto .conference-entry {
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+    }
+
+    html.proto .conference-entry::before {
+        top: 1.7rem;
+    }
+}
+
+/* ------------------------------------------------------------
+   Reduced motion: no lifts, no zoom, no pop-in. Colour and border
+   changes stay, so hover and focus still read. The rail is not
+   scroll-linked (conferences-proto.js does not run), so it stays drawn.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    html.proto .conference-entry,
+    html.proto .conference-entry:hover,
+    html.proto .conference-entry:focus-visible,
+    html.proto .conference-back:hover,
+    html.proto .conference-back:active {
+        translate: none;
+        scale: none;
+    }
+
+    html.proto .conference-entry.visible::before {
+        animation: none;
+    }
+
+    html.proto .conference-entry:hover .read-more-link i,
+    html.proto .conference-entry:focus-visible .read-more-link i,
+    html.proto .conference-back:hover i {
+        translate: none;
+    }
+}

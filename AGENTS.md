@@ -12,7 +12,7 @@ This is a personal portfolio website for Emanuele D'Allestro, a PhD Researcher a
 - `prototype.css` / `prototype.js`: "Bright Ledger" look (Deepstash-inspired palette, type and motion), opt-in via `<html class="proto">` on `index.html` and `projects/*.html` (except `radiculae.html`). It re-maps `style.css` tokens under `html.proto`. Projects-only rules are in `projects-proto.css` / `projects-proto.js`. Reduced motion and no-JS fallbacks are in `prototype.css`. The values flip cards are a scroll-snap track (`.flip-grid`); `prototype.js` adds its drag, dots and buttons.
 - `images/`: Contains static images for projects and personal branding.
 - `recipes/`: Sub-pages for various recipes (e.g., `recipes.html`, individual recipe pages).
-- `conferences/`: Sub-pages for conference notes and logs (e.g., `conferences.html`, individual conference pages).
+- `conferences/`: Sub-pages for conference notes and logs (e.g., `conferences.html`, individual conference pages). Bright Ledger look, single mode, via `<html class="proto">` and `conferences-proto.css` / `conferences-proto.js`.
 - `phd/`: PhD-related documentation and milestones.
 - `projects/`: Detailed case studies and publication summaries for research projects.
 - `values/`: Pages exploring personal philosophies (e.g., Wabi-sabi, Kaizen, Ikigai).
