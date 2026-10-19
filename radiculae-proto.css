@@ -1,0 +1,413 @@
+/*
+   Radiculae project page (see projects/radiculae.html). Bright Ledger look:
+   only html.proto tokens and fonts from prototype.css, no page palette.
+   Entrance is a fade-up on transform and opacity; no scroll parallax, tilt
+   or spotlight. Reduced-motion turns the marquee and entrances off.
+*/
+
+html.proto .rad-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(7rem, 16vh, 10rem) 0 clamp(3.5rem, 8vh, 5rem);
+}
+
+/* Root graphic sits in the right half of the centred hero box, clear of the text column */
+html.proto .rad-hero-bg {
+    position: absolute;
+    top: -14rem;
+    right: 0;
+    bottom: -12rem;
+    left: 40%;
+    pointer-events: none;
+    opacity: 0.35;
+    animation: none;
+}
+
+@media (max-width: 768px) {
+    html.proto .rad-hero-bg {
+        display: none;
+    }
+
+}
+
+html.proto .rad-hero-bg svg {
+    width: 100%;
+    height: 100%;
+}
+
+html.proto .rad-root-path {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+}
+
+/* Text and graphic share one centred box, so the group sits in the middle of the page */
+html.proto .rad-hero-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    width: min(90%, 68rem);
+    margin-inline: auto;
+}
+
+/* Optical nudge on desktop: the root graphic reaches less far right than the text reaches left */
+@media (min-width: 769px) {
+    html.proto .rad-hero-inner {
+        padding-left: 1.875rem;
+    }
+}
+
+html.proto .rad-hero-inner > :not(.rad-hero-bg) {
+    animation: rad-fade-up 0.9s var(--ds-ease) both;
+}
+
+html.proto .rad-hero-inner > *:nth-child(2) { animation-delay: 0.08s; }
+html.proto .rad-hero-inner > *:nth-child(3) { animation-delay: 0.16s; }
+html.proto .rad-hero-inner > *:nth-child(4) { animation-delay: 0.24s; }
+html.proto .rad-hero-inner > *:nth-child(5) { animation-delay: 0.32s; }
+html.proto .rad-hero-inner > *:nth-child(6) { animation-delay: 0.4s; }
+html.proto .rad-hero-inner > *:nth-child(7) { animation-delay: 0.48s; }
+
+@keyframes rad-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+html.proto .rad-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+html.proto .rad-back:hover,
+html.proto .rad-back:focus-visible {
+    color: var(--primary);
+}
+
+html.proto .rad-hero-logo img {
+    width: clamp(4.5rem, 10vw, 6rem);
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+html.proto .rad-overline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+html.proto .rad-title {
+    margin: 0;
+    font-family: var(--ds-display);
+    font-size: clamp(3rem, 9vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+html.proto .rad-gloss {
+    margin: 0;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+html.proto .rad-tagline {
+    margin: 0;
+    max-width: 24rem;
+    font-size: clamp(1.1rem, 2.4vw, 1.3rem);
+    color: var(--text-secondary);
+}
+
+/* Marquee: one transform loop, no scroll tie-in */
+html.proto .rad-marquee {
+    overflow: hidden;
+    border-block: 1px solid var(--border);
+    background: var(--bg-surface);
+}
+
+html.proto .rad-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: rad-marquee 38s linear infinite;
+}
+
+html.proto .rad-marquee-group {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 0.625rem;
+    white-space: nowrap;
+}
+
+html.proto .rad-marquee-track .word {
+    font-family: var(--ds-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+html.proto .rad-marquee-track .dot {
+    color: var(--primary);
+}
+
+@keyframes rad-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Layers: three numbered cards */
+html.proto .rad-layers {
+    padding-block: clamp(3.5rem, 8vw, 6rem);
+}
+
+html.proto .rad-kicker {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+html.proto .rad-layers-head {
+    max-width: 44rem;
+    margin-bottom: 2.5rem;
+}
+
+html.proto .rad-layer {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+html.proto .rad-layer-num {
+    font-family: var(--ds-display);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+html.proto .rad-layer-tag {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+html.proto .rad-layer h3 {
+    margin: 0 0 0.5rem;
+}
+
+html.proto .rad-layer p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+    html.proto .rad-layer {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 1.25rem;
+    }
+}
+
+/* Simulation: a button reveals the figure and notes */
+html.proto .rad-simulation {
+    padding-block: clamp(3rem, 7vw, 5rem);
+}
+
+html.proto .rad-simulation-head {
+    max-width: 44rem;
+}
+
+html.proto .rad-sim-desc {
+    color: var(--text-secondary);
+}
+
+html.proto .rad-simulation-action {
+    margin-top: 1.5rem;
+}
+
+html.proto .rad-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.25rem;
+    font: inherit;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+html.proto .rad-btn-outline:hover,
+html.proto .rad-btn-outline:focus-visible {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+html.proto .rad-btn-outline .icon-toggle {
+    transition: transform 0.3s var(--ds-ease);
+}
+
+html.proto .rad-btn-outline[aria-expanded="true"] .icon-toggle {
+    transform: rotate(45deg);
+}
+
+html.proto .rad-sim-results {
+    display: none;
+    margin-top: 1.5rem;
+}
+
+html.proto .rad-sim-results.open {
+    display: block;
+    animation: rad-fade-up 0.5s var(--ds-ease) both;
+}
+
+html.proto .rad-sim-results-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+html.proto .rad-sim-figure,
+html.proto .rad-specimen figure {
+    margin: 0;
+}
+
+html.proto .rad-sim-figure img,
+html.proto .rad-specimen img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+}
+
+html.proto .rad-sim-figure figcaption,
+html.proto .rad-specimen figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+html.proto .rad-sim-figure figcaption span:first-child,
+html.proto .rad-specimen figcaption span:first-child {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+html.proto .rad-sim-notes {
+    padding: 1.5rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+html.proto .rad-sim-notes h4 {
+    margin: 0 0 0.75rem;
+    font-family: var(--ds-display);
+}
+
+html.proto .rad-sim-notes p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 800px) {
+    html.proto .rad-sim-results-inner {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Specimen */
+html.proto .rad-specimen {
+    padding-bottom: clamp(3rem, 7vw, 5rem);
+}
+
+html.proto .rad-specimen figure {
+    max-width: 48rem;
+}
+
+/* Closing call to action */
+html.proto .rad-cta {
+    padding-block: clamp(3.5rem, 8vw, 6rem);
+    background: var(--bg-offset);
+    text-align: center;
+}
+
+html.proto .rad-cta h2 {
+    margin: 0 0 1.5rem;
+    font-family: var(--ds-display);
+}
+
+html.proto .rad-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    font-weight: 700;
+    color: var(--on-primary-ink);
+    background: var(--primary);
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.2s var(--ds-spring);
+}
+
+html.proto .rad-cta-btn:hover,
+html.proto .rad-cta-btn:focus-visible {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.proto .rad-marquee-track,
+    html.proto .rad-hero-inner > *,
+    html.proto .rad-sim-results.open {
+        animation: none;
+    }
+
+    html.proto .rad-btn-outline .icon-toggle,
+    html.proto .rad-cta-btn {
+        transition: none;
+    }
+
+    html.proto .rad-cta-btn:hover {
+        transform: none;
+    }
+}
