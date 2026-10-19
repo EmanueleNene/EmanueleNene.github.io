@@ -14,10 +14,10 @@ html.proto .rad-hero {
 /* Root graphic sits in the right half of the centred hero box, clear of the text column */
 html.proto .rad-hero-bg {
     position: absolute;
-    top: -8rem;
+    top: -14rem;
     right: 0;
-    bottom: -6rem;
-    left: 55%;
+    bottom: -12rem;
+    left: 40%;
     pointer-events: none;
     opacity: 0.35;
     animation: none;
@@ -131,7 +131,7 @@ html.proto .rad-gloss {
 
 html.proto .rad-tagline {
     margin: 0;
-    max-width: 36rem;
+    max-width: 24rem;
     font-size: clamp(1.1rem, 2.4vw, 1.3rem);
     color: var(--text-secondary);
 }
