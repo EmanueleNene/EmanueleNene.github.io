@@ -1,11 +1,12 @@
 /* ------------------------------------------------------------
    Featured Projects: bento grid on the homepage (html.proto only).
-   Three layers, one job each, so transforms never fight:
-   .bento-cell  entrance (translate, tilt, scale, staggered)
-   .bento-tile  hover lift, cursor tilt, border sweep, spotlight
-   .bento-media image parallax (translate) and hover zoom (--zoom)
-   Only transform and opacity animate. featured-proto.js sets
-   translate on each image, and --rx, --ry, --sx, --sy on each tile.
+   Kept cheap on purpose: no scroll-driven motion and no 3D or perspective
+   transforms, so a laptop GPU only composites a short fade-up and a hover lift.
+   A fly-in with image parallax and cursor tilt lagged badly on laptops.
+   .bento-cell  entrance (fade up, staggered)
+   .bento-tile  hover lift and border sweep
+   .bento-media hover zoom (--zoom)
+   Only transform, translate, scale and opacity animate.
    ------------------------------------------------------------ */
 
 html.proto #projects {
@@ -25,26 +26,25 @@ html.proto .bento {
         "hero hero crystal ferro";
 }
 
-/* Each tile enters from its own side, so the grid reads as a sequence
-   rather than one wipe. --i is the stagger slot, --f* the start pose. */
-html.proto .bento-hero       { grid-area: hero;       --i: 0; --fx: -16vw; --fy: 10vh;  --fr: -5deg; }
-html.proto .bento-structural { grid-area: structural; --i: 1; --fx: 14vw;  --fy: 6vh;   --fr: 4deg; }
-html.proto .bento-crystal    { grid-area: crystal;    --i: 2; --fx: 0px;   --fy: 16vh;  --fr: -3deg; }
-html.proto .bento-ferro      { grid-area: ferro;      --i: 3; --fx: 12vw;  --fy: -12vh; --fr: 6deg; }
+/* --i is the stagger slot: the tiles fade up one after another. */
+html.proto .bento-hero       { grid-area: hero;       --i: 0; }
+html.proto .bento-structural { grid-area: structural; --i: 1; }
+html.proto .bento-crystal    { grid-area: crystal;    --i: 2; }
+html.proto .bento-ferro      { grid-area: ferro;      --i: 3; }
 
 html.proto .bento-cell {
     position: relative;
     isolation: isolate;
     min-width: 0;
     transition:
-        opacity 0.8s ease-out calc(var(--i) * 0.12s),
-        transform 1.4s var(--ds-spring) calc(var(--i) * 0.12s);
+        opacity 0.7s ease-out calc(var(--i) * 0.1s),
+        transform 0.8s var(--ds-ease) calc(var(--i) * 0.1s);
 }
 
 /* Set by featured-proto.js only when it can observe the tiles. No script, no hidden tiles. */
 html.proto .bento.is-armed .bento-cell {
     opacity: 0;
-    transform: translate3d(var(--fx), var(--fy), 0) rotate(var(--fr)) scale(0.84);
+    transform: translate3d(0, 28px, 0);
 }
 
 html.proto .bento.is-armed .bento-cell.is-in {
@@ -102,21 +102,14 @@ html.proto .bento-tile {
     color: var(--ds-ink);
     text-decoration: none;
     contain: layout;
-    --rx: 0deg;
-    --ry: 0deg;
     --lift: 0px;
     --zoom: 1.12;
-    --sx: 0px;
-    --sy: 0px;
-    transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translate3d(0, var(--lift), 0);
+    /* 2D `translate`, not a 3D transform: a 3D one holds a compositor layer with a rounded
+       clip per tile even at rest. This only gets a layer while it is lifting. */
+    translate: 0 var(--lift);
     transition:
-        transform 0.6s var(--ds-spring),
+        translate 0.6s var(--ds-spring),
         border-color 0.3s ease;
-}
-
-/* Cursor tilt follows the pointer closely, so it drops the spring for a short ease */
-html.proto .bento-tile.is-tilting {
-    transition: transform 0.25s ease-out, border-color 0.3s ease;
 }
 
 html.proto .bento-tile:hover,
@@ -129,31 +122,6 @@ html.proto .bento-tile:focus-visible {
 html.proto .bento-tile:focus-visible {
     outline: 3px solid var(--ds-accent);
     outline-offset: 4px;
-}
-
-/* Spotlight that follows the cursor, under the text. The gradient is drawn once;
-   the cursor only moves it (--sx, --sy from featured-proto.js), so it stays a transform. */
-html.proto .bento-tile::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 840px;
-    height: 840px;
-    margin: -420px 0 0 -420px;
-    z-index: 1;
-    pointer-events: none;
-    background: radial-gradient(circle 420px at 50% 50%, rgb(127 195 217 / 0.22), transparent 62%);
-    transform: translate3d(var(--sx), var(--sy), 0);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-/* will-change only while the tile is hovered or focused, so idle tiles hold no extra layers */
-html.proto .bento-tile:hover::before,
-html.proto .bento-tile:focus-visible::before {
-    opacity: 1;
-    will-change: transform, opacity;
 }
 
 /* Border sweep: an accent ring that wipes on from the left */
@@ -174,7 +142,7 @@ html.proto .bento-tile:focus-visible::after {
     clip-path: inset(0 0 0 0 round var(--radius-lg));
 }
 
-/* Image: sits under the scrim. Parallax shifts it, hover zooms it. */
+/* Image: sits under the scrim. Static at rest; hover zooms it. */
 html.proto .bento-media {
     position: absolute;
     inset: 0;
@@ -182,9 +150,6 @@ html.proto .bento-media {
     overflow: hidden;
 }
 
-/* Parallax is `translate`, written inline by featured-proto.js every scroll frame, so it
-   must not be transitioned (each write would restart the ease and the image would trail
-   the scroll). Only `scale` eases, for the hover zoom. */
 html.proto .bento-media img {
     display: block;
     width: 100%;
@@ -312,7 +277,7 @@ html.proto .bento-tile:focus-visible .bento-cta i {
     }
 }
 
-/* Reduced motion: a static grid. No entrance, no parallax, no tilt, no zoom, no sweep.
+/* Reduced motion: a static grid. No entrance, no lift, no zoom, no sweep.
    Colour, border and outline changes stay, so hover and focus still read. */
 @media (prefers-reduced-motion: reduce) {
     html.proto .bento-cell,
@@ -324,19 +289,11 @@ html.proto .bento-tile:focus-visible .bento-cta i {
     }
 
     html.proto .bento-tile,
-    html.proto .bento-tile.is-tilting,
     html.proto .bento-tile:hover,
     html.proto .bento-tile:focus-visible {
-        --rx: 0deg;
-        --ry: 0deg;
         --lift: 0px;
         --zoom: 1;
-        transform: none;
         transition: border-color 0.3s ease, color 0.3s ease;
-    }
-
-    html.proto .bento-tile::before {
-        display: none;
     }
 
     html.proto .bento-cell::before,
@@ -362,7 +319,6 @@ html.proto .bento-tile:focus-visible .bento-cta i {
     }
 
     html.proto .bento-media img {
-        translate: none !important;
         scale: none;
         transition: none;
     }
