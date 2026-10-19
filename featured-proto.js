@@ -33,6 +33,9 @@
 
     // Scroll parallax. The observer keeps the set of cells on screen, so off-screen
     // cells are never measured. Each frame reads all visible cells first, then writes.
+    // The shift goes straight onto the image's `translate`, not a custom property on the
+    // cell: an inherited property would restyle the whole tile subtree every frame.
+    const media = new Map(cells.map((cell) => [cell, cell.querySelector('.bento-media img')]));
     const onScreen = new Set();
     let queued = false;
 
@@ -44,10 +47,10 @@
         onScreen.forEach((cell) => {
             const r = cell.getBoundingClientRect();
             const p = (r.top + r.height / 2 - mid) / window.innerHeight;
-            moves.push([cell, Math.max(-1, Math.min(1, p)).toFixed(3)]);
+            moves.push([cell, Math.max(-1, Math.min(1, p)) * -4]);
         });
 
-        moves.forEach(([cell, p]) => cell.style.setProperty('--py', p));
+        moves.forEach(([cell, y]) => { media.get(cell).style.translate = `0 ${y.toFixed(2)}%`; });
     };
 
     const onScroll = () => {
