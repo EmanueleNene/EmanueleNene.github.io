@@ -11,11 +11,21 @@ html.proto .rad-hero {
     padding: clamp(7rem, 16vh, 10rem) 0 clamp(3.5rem, 8vh, 5rem);
 }
 
+/* Root graphic sits in the right half, clear of the text column */
 html.proto .rad-hero-bg {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 52%;
     pointer-events: none;
     opacity: 0.35;
+}
+
+@media (max-width: 768px) {
+    html.proto .rad-hero-bg {
+        display: none;
+    }
 }
 
 html.proto .rad-hero-bg svg {
@@ -112,21 +122,6 @@ html.proto .rad-tagline {
     max-width: 36rem;
     font-size: clamp(1.1rem, 2.4vw, 1.3rem);
     color: var(--text-secondary);
-}
-
-html.proto .rad-scroll-cue {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-}
-
-html.proto .rad-cue-line {
-    display: inline-block;
-    width: 3rem;
-    height: 2px;
-    background: var(--primary);
 }
 
 /* Marquee: one transform loop, no scroll tie-in */
