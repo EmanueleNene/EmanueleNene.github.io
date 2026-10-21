@@ -244,10 +244,11 @@ html.proto .rad-simulation {
 }
 
 html.proto .rad-simulation-head {
-    max-width: 44rem;
+    max-width: none;
 }
 
 html.proto .rad-sim-desc {
+    max-width: 44rem;
     color: var(--text-secondary);
 }
 
@@ -265,18 +266,34 @@ html.proto .rad-sim-media {
         align-items: start;
     }
 
-    html.proto .rad-sim-renders,
-    html.proto .rad-sim-action {
+    html.proto .rad-sim-renders {
         grid-column: 1 / -1;
     }
 }
 
-/* Standalone button to the comparison page: right-aligned, about 70% of the primary button size */
-html.proto .rad-sim-action {
+/* Section title row: the comparison button sits beside the title, and wraps under it on phones */
+html.proto .rad-sim-title-row {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 1rem;
 }
 
+html.proto .rad-sim-title-row h2 {
+    flex: 1 1 100%;
+    margin: 0;
+}
+
+@media (min-width: 641px) {
+    html.proto .rad-sim-title-row h2 {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
+
+/* Comparison button: about 70% of the primary button size */
 html.proto .btn-primary.rad-compare-btn:not([href^="mailto"]) {
     --lip: 3.5px;
     gap: 0.35rem;
