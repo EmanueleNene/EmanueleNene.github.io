@@ -346,6 +346,68 @@ html.proto .rad-sim-renders:focus-visible {
     border-radius: var(--radius-lg);
 }
 
+/* Comparison page: three growth videos in a row, stacked on phones */
+html.proto .rad-compare-page {
+    padding-block: clamp(6.5rem, 12vw, 8rem) clamp(3rem, 7vw, 5rem);
+}
+
+html.proto .rad-compare-head {
+    max-width: 44rem;
+    margin-top: 1.5rem;
+}
+
+html.proto .rad-compare-head h1 {
+    margin: 0 0 0.75rem;
+    font-family: var(--ds-display);
+}
+
+html.proto .rad-compare-head .rad-sim-desc {
+    margin: 0;
+}
+
+html.proto .rad-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+html.proto .rad-compare-item {
+    margin: 0;
+}
+
+html.proto .rad-compare-item video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+}
+
+html.proto .rad-compare-item figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+}
+
+html.proto .rad-compare-item figcaption span:first-child {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+html.proto .rad-compare-item figcaption span:last-child {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+    html.proto .rad-compare-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 html.proto .rad-sim-notes {
     padding: 1.5rem;
     background: var(--bg-surface);
