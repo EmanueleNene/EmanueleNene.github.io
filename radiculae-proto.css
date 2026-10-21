@@ -270,13 +270,27 @@ html.proto .rad-sim-media {
     }
 }
 
-/* Comparison button under the Fig. 01 video: right-aligned, about 70% of the primary button size */
+/* Action row under the Fig. 01 caption: a sentence on the left, the comparison button on the right */
 html.proto .rad-sim-action {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-top: 1.5rem;
 }
 
+html.proto .rad-sim-action-text {
+    flex: 1 1 auto;
+    margin: 0;
+    max-width: 26rem;
+    font-family: var(--ds-body);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+/* About 70% of the primary button size */
 html.proto .btn-primary.rad-compare-btn:not([href^="mailto"]) {
     --lip: 3.5px;
     gap: 0.35rem;
@@ -286,7 +300,36 @@ html.proto .btn-primary.rad-compare-btn:not([href^="mailto"]) {
 
 html.proto .rad-compare-btn {
     display: inline-flex;
+    flex: none;
     align-items: center;
+}
+
+html.proto .rad-compare-btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+    html.proto .rad-sim-action {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    html.proto .rad-sim-action-text {
+        max-width: none;
+    }
+
+    html.proto .rad-compare-btn {
+        justify-content: center;
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.proto .rad-compare-btn:hover,
+    html.proto .rad-compare-btn:active {
+        translate: none;
+    }
 }
 
 html.proto .rad-sim-figure {
