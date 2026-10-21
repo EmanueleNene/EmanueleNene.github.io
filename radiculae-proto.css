@@ -238,7 +238,7 @@ html.proto .rad-layer p {
     }
 }
 
-/* Simulation: a button reveals the figure and notes */
+/* Simulation: growth video, renders and the methodology note */
 html.proto .rad-simulation {
     padding-block: clamp(3rem, 7vw, 5rem);
 }
@@ -251,63 +251,31 @@ html.proto .rad-sim-desc {
     color: var(--text-secondary);
 }
 
-html.proto .rad-simulation-action {
-    margin-top: 1.5rem;
-}
-
-html.proto .rad-btn-outline {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.8rem 1.25rem;
-    font: inherit;
-    font-weight: 600;
-    color: var(--text-primary);
-    background: transparent;
-    border: 1.5px solid var(--border);
-    border-radius: 999px;
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
-}
-
-html.proto .rad-btn-outline:hover,
-html.proto .rad-btn-outline:focus-visible {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-html.proto .rad-btn-outline .icon-toggle {
-    transition: transform 0.3s var(--ds-ease);
-}
-
-html.proto .rad-btn-outline[aria-expanded="true"] .icon-toggle {
-    transform: rotate(45deg);
-}
-
-html.proto .rad-sim-results {
-    display: none;
-    margin-top: 1.5rem;
-}
-
-html.proto .rad-sim-results.open {
-    display: block;
-    animation: rad-fade-up 0.5s var(--ds-ease) both;
-}
-
-html.proto .rad-sim-results-inner {
+html.proto .rad-sim-media {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
-    align-items: start;
+    margin-top: 1.75rem;
 }
 
-html.proto .rad-sim-figure,
-html.proto .rad-specimen figure {
+/* Desktop: video beside the text so both can be read at once; the renders run full width below */
+@media (min-width: 900px) {
+    html.proto .rad-sim-media {
+        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+        align-items: start;
+    }
+
+    html.proto .rad-sim-renders {
+        grid-column: 1 / -1;
+    }
+}
+
+html.proto .rad-sim-figure {
     margin: 0;
 }
 
 html.proto .rad-sim-figure img,
-html.proto .rad-specimen img {
+html.proto .rad-sim-figure video {
     display: block;
     width: 100%;
     height: auto;
@@ -316,8 +284,11 @@ html.proto .rad-specimen img {
     background: var(--bg-surface);
 }
 
-html.proto .rad-sim-figure figcaption,
-html.proto .rad-specimen figcaption {
+html.proto .rad-sim-video video {
+    aspect-ratio: 16 / 9;
+}
+
+html.proto .rad-sim-figure figcaption {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -326,10 +297,53 @@ html.proto .rad-specimen figcaption {
     font-size: 0.9rem;
 }
 
-html.proto .rad-sim-figure figcaption span:first-child,
-html.proto .rad-specimen figcaption span:first-child {
+html.proto .rad-sim-figure figcaption span:first-child {
     color: var(--primary);
     font-weight: 700;
+}
+
+/* Three renders: a row on desktop, a snap strip on phones */
+html.proto .rad-sim-renders {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+html.proto .rad-sim-renders img {
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+html.proto .rad-sim-renders figure:first-child img {
+    object-position: 45% 50%;
+}
+
+html.proto .rad-sim-renders figure:last-child img {
+    object-position: 43% 50%;
+}
+
+@media (max-width: 640px) {
+    html.proto .rad-sim-renders {
+        grid-template-columns: none;
+        grid-auto-flow: column;
+        grid-auto-columns: 78%;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-light) transparent;
+        padding-bottom: 0.75rem;
+    }
+
+    html.proto .rad-sim-renders figure {
+        scroll-snap-align: start;
+    }
+}
+
+html.proto .rad-sim-renders:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    border-radius: var(--radius-lg);
 }
 
 html.proto .rad-sim-notes {
@@ -339,7 +353,7 @@ html.proto .rad-sim-notes {
     border-radius: var(--radius-lg);
 }
 
-html.proto .rad-sim-notes h4 {
+html.proto .rad-sim-notes h3 {
     margin: 0 0 0.75rem;
     font-family: var(--ds-display);
 }
@@ -349,19 +363,9 @@ html.proto .rad-sim-notes p {
     color: var(--text-secondary);
 }
 
-@media (max-width: 800px) {
-    html.proto .rad-sim-results-inner {
-        grid-template-columns: minmax(0, 1fr);
-    }
-}
-
-/* Specimen */
-html.proto .rad-specimen {
-    padding-bottom: clamp(3rem, 7vw, 5rem);
-}
-
-html.proto .rad-specimen figure {
-    max-width: 48rem;
+html.proto .rad-sim-notes strong {
+    color: var(--text-primary);
+    font-weight: 700;
 }
 
 /* Closing call to action */
@@ -397,12 +401,10 @@ html.proto .rad-cta-btn:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
     html.proto .rad-marquee-track,
-    html.proto .rad-hero-inner > *,
-    html.proto .rad-sim-results.open {
+    html.proto .rad-hero-inner > * {
         animation: none;
     }
 
-    html.proto .rad-btn-outline .icon-toggle,
     html.proto .rad-cta-btn {
         transition: none;
     }
