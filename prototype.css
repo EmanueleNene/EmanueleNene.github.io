@@ -272,6 +272,37 @@ html.proto .ds-scrim {
     html.proto .ds-photo-6 { --x: 74%; --y: 68%; }
 }
 
+/* Phones: smaller photos, pinned to the corners so they stay clear of the
+   copy and both buttons. The bottom pair sits 40px above the bottom edge: the
+   scroll drift (prototype.js) pushes lower photos further down on taller
+   screens, so this inset keeps them on screen and below the buttons. */
+@media (max-width: 639px) {
+    html.proto .ds-photo {
+        width: clamp(84px, 23vw, 104px);
+    }
+
+    html.proto .ds-photo-1 { --x: -6%; --y: 4%; }
+    html.proto .ds-photo-5 { --x: 80%; --y: 3%; }
+
+    html.proto .ds-photo-2,
+    html.proto .ds-photo-6 {
+        top: auto;
+        bottom: 40px;
+    }
+
+    html.proto .ds-photo-2 { --x: -8%; }
+    html.proto .ds-photo-6 { --x: 82%; }
+}
+
+/* Short phones: the copy fills more of the screen, so the bottom pair would
+   reach the buttons while drifting. Keep the top pair only. */
+@media (max-width: 639px) and (max-height: 700px) {
+    html.proto .ds-photo-2,
+    html.proto .ds-photo-6 {
+        display: none;
+    }
+}
+
 /* ------------------------------------------------------------
    Hero entrance: the headline lines flip up in 3D, staggered,
    then the copy, the buttons and the gallery follow
