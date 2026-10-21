@@ -265,8 +265,23 @@ html.proto .rad-sim-media {
         align-items: start;
     }
 
-    html.proto .rad-sim-renders {
+    html.proto .rad-sim-renders,
+    html.proto .rad-sim-action {
         grid-column: 1 / -1;
+    }
+}
+
+/* Standalone button to the comparison page; full width on phones */
+html.proto .rad-compare-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    html.proto .rad-compare-btn {
+        width: 100%;
     }
 }
 
