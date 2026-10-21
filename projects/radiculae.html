@@ -168,7 +168,7 @@
             
             <div class="rad-sim-media">
                 <figure class="rad-sim-figure rad-sim-video">
-                    <video src="../images/radiculae/growth_web_1080p.mp4" poster="../images/radiculae/01_whole_plant.png" muted playsinline controls preload="metadata" aria-label="Root growth animation of a lettuce plant on a cellulose plug" aria-describedby="rad-vid-cap rad-sim-note"></video>
+                    <video src="../images/radiculae/growth_web_1080p.mp4" poster="../images/radiculae/01_whole_plant.png" muted playsinline preload="metadata" aria-label="Root growth animation of a lettuce plant on a cellulose plug" aria-describedby="rad-vid-cap rad-sim-note"></video>
                     <figcaption id="rad-vid-cap">
                         <span>Fig. 01</span>
                         <span>Simulated root growth, lettuce on a cellulose plug</span>
@@ -201,6 +201,15 @@
                         </figcaption>
                     </figure>
                 </div>
+            </div>
+        </section>
+
+        <section class="rad-compare-band">
+            <div class="container rad-compare-band-inner reveal reveal-up">
+                <div class="rad-compare-band-text">
+                    <h2>Growth in 3 different media: rockwool, peat and paper</h2>
+                </div>
+                <a href="radiculae-comparison.html" class="btn-primary rad-compare-band-btn">Compare growing media <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
             </div>
         </section>
 
@@ -241,6 +250,7 @@
 
     <script src="../script.js"></script>
     <script src="../prototype.js"></script>
+    <script src="../radiculae-proto.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const growthVideo = document.querySelector('.rad-sim-video video');

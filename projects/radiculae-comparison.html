@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" class="proto">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Emanuele D'Allestro">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Radiculae growth comparison: the same 15-day simulated lettuce root growth in balanced paper, peat and rockwool.">
+    <title>Radiculae Comparison | Emanuele D'Allestro</title>
+
+    <!-- Google Fonts: Bricolage Grotesque (display) + Figtree (text), prototype look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:wght@400..900&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../style.css">
+    <!-- Homepage prototype look and motion, then the Radiculae layer -->
+    <link rel="stylesheet" href="../prototype.css">
+    <link rel="stylesheet" href="../radiculae-proto.css">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="../images/radiculae/radiculae_logo.jpg">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Radiculae Comparison | Emanuele D'Allestro">
+    <meta property="og:description" content="Radiculae growth comparison: the same 15-day simulated lettuce root growth in balanced paper, peat and rockwool.">
+    <meta property="og:url" content="https://emanuelenene.github.io/projects/radiculae-comparison.html">
+    <meta property="og:locale" content="en_US">
+
+</head>
+
+<body>
+    <!-- Navigation: island with the name, Topics and Email Me -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="logo">Emanuele D.</a>
+            <ul class="nav-links">
+                <li>
+                    <button type="button" class="topics-toggle" aria-expanded="false" aria-controls="topics-panel">
+                        Topics <i class="ph ph-caret-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="topics-panel" id="topics-panel" role="region" aria-label="Topics">
+                        <p class="topics-head">Topics</p>
+                        <ul class="topics-list">
+                            <li><a href="/projects/projects.html" aria-current="page"><strong>Projects</strong><span>Research and startup work</span></a></li>
+                            <li><a href="/conferences/conferences.html"><strong>Conferences</strong><span>Talks, posters and logs</span></a></li>
+                            <li><a href="/phd/phd-responsible.html"><strong>PhD</strong><span>Milestones and responsibilities</span></a></li>
+                            <li><a href="/recipes/recipes.html"><strong>Recipes</strong><span>Cooking notes</span></a></li>
+                            <li><a href="/#values"><strong>Values</strong><span>Philosophies I follow</span></a></li>
+                            <li><a href="/#events"><strong>Events</strong><span>Events and competitions</span></a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li><a href="mailto:emadal@kth.se" class="btn-primary">Email Me</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="rad-compare-page">
+        <section class="container reveal reveal-up">
+            <a href="radiculae.html" class="rad-back"><i class="ph ph-arrow-left"></i> Back to Radiculae</a>
+            <div class="rad-compare-head">
+                <span class="rad-kicker">Research & Modeling</span>
+                <h1>Growing media, side by side</h1>
+                <p class="rad-sim-desc">The same lettuce (<em>Lactuca sativa</em>) root simulation over 15 days, under ebb-and-flow irrigation, in three growing media.</p>
+            </div>
+
+            <div class="rad-compare-grid" role="group" aria-label="Simulated 15-day root growth in three growing media">
+                <figure class="rad-compare-item">
+                    <video src="../images/radiculae/growth_cmp_paper_balanced.mp4" muted playsinline loop preload="metadata" aria-label="Balanced paper: simulated 15-day root growth" aria-describedby="rad-cmp-paper-cap"></video>
+                    <figcaption id="rad-cmp-paper-cap">
+                        <span>Balanced paper</span>
+                    </figcaption>
+                </figure>
+                <figure class="rad-compare-item">
+                    <video src="../images/radiculae/growth_cmp_peat.mp4" muted playsinline loop preload="metadata" aria-label="Peat: simulated 15-day root growth" aria-describedby="rad-cmp-peat-cap"></video>
+                    <figcaption id="rad-cmp-peat-cap">
+                        <span>Peat</span>
+                    </figcaption>
+                </figure>
+                <figure class="rad-compare-item">
+                    <video src="../images/radiculae/growth_cmp_rockwool.mp4" muted playsinline loop preload="metadata" aria-label="Rockwool: simulated 15-day root growth" aria-describedby="rad-cmp-rockwool-cap"></video>
+                    <figcaption id="rad-cmp-rockwool-cap">
+                        <span>Rockwool</span>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">Emanuele</div>
+                <p>&copy; 2026. All rights reserved.</p>
+            </div>
+
+            <div class="footer-contact">
+                <div class="info-item">
+                    <i class="ph ph-envelope-simple"></i>
+                    <span>emadal@kth.se</span>
+                </div>
+                <div class="info-item">
+                    <i class="ph ph-map-pin"></i>
+                    <span>Stockholm, Sweden</span>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="https://github.com/EmanueleNene" target="_blank"><i class="ph ph-github-logo"></i></a>
+                <a href="https://www.linkedin.com/in/emanuele-d-allestro-68a9601a7/" target="_blank"><i
+                        class="ph ph-linkedin-logo"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script src="../prototype.js"></script>
+    <script src="../radiculae-proto.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // The three media start together each time the grid comes into view; no autoplay for reduced motion.
+            const grid = document.querySelector('.rad-compare-grid');
+            if (grid && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                const videos = [...grid.querySelectorAll('video')];
+                new IntersectionObserver(([entry]) => {
+                    videos.forEach((video) => {
+                        if (entry.isIntersecting) {
+                            video.currentTime = 0;
+                            video.play().catch(() => {});
+                        } else {
+                            video.pause();
+                        }
+                    });
+                }, { threshold: 0.5 }).observe(grid);
+            }
+        });
+    </script>
+</body>
+
+</html>
