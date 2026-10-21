@@ -11,7 +11,7 @@ This is a personal portfolio website for Emanuele D'Allestro, a PhD Researcher a
 - `script.js`: Interactivity, including scroll reveal animations and navigation handling.
 - `prototype.css` / `prototype.js`: "Bright Ledger" look (Deepstash-inspired palette, type and motion), opt-in via `<html class="proto">` on `index.html` and `projects/*.html`. It re-maps `style.css` tokens under `html.proto`. Projects-only rules are in `projects-proto.css` / `projects-proto.js`; the Radiculae page layer is `radiculae-proto.css` (tokens only, no page palette). Reduced motion and no-JS fallbacks are in `prototype.css`. The values flip cards are a scroll-snap track (`.flip-grid`); `prototype.js` adds its drag, dots and buttons.
 - `featured-proto.css` / `featured-proto.js`: the homepage Featured Projects bento grid (`#projects`), loaded only by `index.html`. It animates transform and opacity only and has its own reduced-motion block.
-- `images/`: Contains static images for projects and personal branding.
+- `images/`: Static images grouped by section: `radiculae/` (all Radiculae media), `projects/`, `recipes/`, `events/`, `conferences/`, and `web/` (optimized webp for the homepage).
 - `recipes/`: Sub-pages for various recipes (e.g., `recipes.html`, individual recipe pages).
 - `recipes-proto.css` / `recipes-proto.js`: Bright Ledger layer for `recipes/*.html`, opt-in via `<html class="proto">` and loaded after `prototype.css`.
 - `conferences/`: Sub-pages for conference notes and logs (e.g., `conferences.html`, individual conference pages). Bright Ledger look, single mode, via `<html class="proto">` and `conferences-proto.css` / `conferences-proto.js`.

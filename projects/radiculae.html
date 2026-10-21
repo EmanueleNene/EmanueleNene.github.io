@@ -22,7 +22,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/jpeg" href="../images/radiculae_logo.jpg">
+    <link rel="icon" type="image/jpeg" href="../images/radiculae/radiculae_logo.jpg">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
@@ -80,7 +80,7 @@
                 </div>
                     <a href="../index.html" class="rad-back"><i class="ph ph-arrow-left"></i> Back to portfolio</a>
                     <div class="rad-hero-logo">
-                        <img src="../images/radiculae_logo.jpg" alt="Radiculae Logo">
+                        <img src="../images/radiculae/radiculae_logo.jpg" alt="Radiculae Logo">
                     </div>
                     <p class="rad-overline">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -166,38 +166,42 @@
                 <p class="rad-sim-desc">To validate cellulose-based substrates under real-world irrigation conditions, we simulated root system development for lettuce (<em>Lactuca sativa</em>) under cyclical ebb-and-flow dynamics.</p>
             </div>
             
-            <div class="rad-simulation-action">
-                <button id="toggle-sim-btn" class="rad-btn-outline" aria-expanded="false" aria-controls="sim-results-panel">
-                    <span class="btn-text">View Lettuce Simulation Results</span>
-                    <i class="ph ph-plus icon-toggle"></i>
-                </button>
-            </div>
-
-            <div id="sim-results-panel" class="rad-sim-results" aria-hidden="true">
-                <div class="rad-sim-results-inner">
+            <div class="rad-sim-media">
+                <figure class="rad-sim-figure rad-sim-video">
+                    <video src="../images/radiculae/growth_web_1080p.mp4" poster="../images/radiculae/01_whole_plant.png" muted playsinline controls preload="metadata" aria-label="Root growth animation of a lettuce plant on a cellulose plug" aria-describedby="rad-vid-cap rad-sim-note"></video>
+                    <figcaption id="rad-vid-cap">
+                        <span>Fig. 01</span>
+                        <span>Simulated root growth, lettuce on a cellulose plug</span>
+                    </figcaption>
+                </figure>
+                <div class="rad-sim-notes">
+                    <h3>Simulation Key & Methodology</h3>
+                    <p id="rad-sim-note">Root growth pathways are modeled for <em>Lactuca sativa</em> over a <strong>14-day growth cycle</strong>. The simulation factors in <strong>structural tortuosity</strong>, moisture retention characteristics, and drying conditions under periodic <strong>ebb-and-flow irrigation</strong>. The results show that <strong>cellulose-based substrates</strong> offer a highly versatile structure that can promote <strong>balanced root branching</strong> and minimize <strong>localized anoxia</strong> compared to traditional rockwool and peat-based media while being sustainable and easily accessible.</p>
+                </div>
+                <div class="rad-sim-renders" role="group" aria-label="Simulated renders of the plant">
                     <figure class="rad-sim-figure">
-                        <img src="../images/SIMULATIONS_results/rsa_pathD_comparison_grid.png" alt="Root System Architecture simulation comparison grid for Lactuca sativa across peat, rockwool, and cellulose substrates under ebb-and-flow conditions">
+                        <img src="../images/radiculae/01_whole_plant.png" loading="lazy" alt="Render of a lettuce plant on a cellulose plug with a dense white root network around it">
                         <figcaption>
                             <span>Fig. 02</span>
-                            <span>Root System Architecture (RSA) comparison across peat, rockwool, and cellulose substrates.</span>
+                            <span>Simulated render: whole plant</span>
                         </figcaption>
                     </figure>
-                    <div class="rad-sim-notes">
-                        <h4>Simulation Key & Methodology</h4>
-                        <p>This comparative grid models root growth pathways for <em>Lactuca sativa</em> over a 14-day growth cycle. The simulation factors in structural tortuosity, moisture retention characteristics, and drying conditions under periodic ebb-and-flow irrigation. The results show that cellulose-based substrates offer a highly versatile structure that can promote balanced root branching and minimize localized anoxia compared to traditional rockwool and peat-based media while being sustainable and easily accessible.</p>
-                    </div>
+                    <figure class="rad-sim-figure">
+                        <img src="../images/radiculae/02_plug_roots_closeup.png" loading="lazy" alt="Close-up render of the plug with roots wrapping its surface and running down its length">
+                        <figcaption>
+                            <span>Fig. 03</span>
+                            <span>Simulated render: roots on the plug</span>
+                        </figcaption>
+                    </figure>
+                    <figure class="rad-sim-figure">
+                        <img src="../images/radiculae/03_lettuce_closeup.png" loading="lazy" alt="Close-up render of the lettuce shoot rising from the top of the plug">
+                        <figcaption>
+                            <span>Fig. 04</span>
+                            <span>Simulated render: lettuce shoot</span>
+                        </figcaption>
+                    </figure>
                 </div>
             </div>
-        </section>
-
-        <section class="rad-specimen container reveal reveal-up">
-            <figure>
-                <img src="../images/radiculae.jpg" alt="Cellulose fiber network under magnification">
-                <figcaption>
-                    <span>Fig. 01</span>
-                    <span>Cellulose fiber network, magnified</span>
-                </figcaption>
-            </figure>
         </section>
 
         <section class="rad-cta">
@@ -239,21 +243,34 @@
     <script src="../prototype.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('toggle-sim-btn');
-            const resultsPanel = document.getElementById('sim-results-panel');
-
-            if (toggleBtn && resultsPanel) {
-                toggleBtn.addEventListener('click', () => {
-                    const isOpen = resultsPanel.classList.toggle('open');
-                    toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                    resultsPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-                    
-                    // Dispatch a window scroll event to trigger the IntersectionObserver checks
-                    // and scroll reveals for elements below that might have shifted into viewport
-                    if (typeof window.dispatchEvent === 'function') {
-                        window.dispatchEvent(new Event('scroll'));
-                    }
+            const growthVideo = document.querySelector('.rad-sim-video video');
+            if (growthVideo) {
+                // The first ~1.5 s of the file are black: start past them on first view and on every loop.
+                const START = 1.5;
+                const seekPastBlack = () => { growthVideo.currentTime = START; };
+                if (growthVideo.readyState >= 1) seekPastBlack();
+                else growthVideo.addEventListener('loadedmetadata', seekPastBlack, { once: true });
+                growthVideo.addEventListener('ended', () => {
+                    seekPastBlack();
+                    growthVideo.play().catch(() => {});
                 });
+
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    // shortcut: a manual pause is undone when the video scrolls back into view; track the user's pause if that annoys.
+                    new IntersectionObserver(([entry]) => {
+                        if (entry.isIntersecting) growthVideo.play().catch(() => {});
+                        else growthVideo.pause();
+                    }, { threshold: 0.5 }).observe(growthVideo);
+                }
+            }
+
+            // The phone strip scrolls sideways, so it needs a tab stop for keyboard users; the desktop row does not.
+            const strip = document.querySelector('.rad-sim-renders');
+            if (strip) {
+                new ResizeObserver(() => {
+                    if (strip.scrollWidth > strip.clientWidth) strip.setAttribute('tabindex', '0');
+                    else strip.removeAttribute('tabindex');
+                }).observe(strip);
             }
         });
     </script>
