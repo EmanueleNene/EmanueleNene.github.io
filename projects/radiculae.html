@@ -168,7 +168,7 @@
             
             <div class="rad-sim-media">
                 <figure class="rad-sim-figure rad-sim-video">
-                    <video src="../images/radiculae/growth_web_1080p.mp4" poster="../images/radiculae/01_whole_plant.png" muted playsinline controls preload="metadata" aria-label="Root growth animation of a lettuce plant on a cellulose plug" aria-describedby="rad-vid-cap rad-sim-note"></video>
+                    <video src="../images/radiculae/growth_web_1080p.mp4" poster="../images/radiculae/01_whole_plant.png" muted playsinline preload="metadata" aria-label="Root growth animation of a lettuce plant on a cellulose plug" aria-describedby="rad-vid-cap rad-sim-note"></video>
                     <figcaption id="rad-vid-cap">
                         <span>Fig. 01</span>
                         <span>Simulated root growth, lettuce on a cellulose plug</span>
@@ -244,6 +244,7 @@
 
     <script src="../script.js"></script>
     <script src="../prototype.js"></script>
+    <script src="../radiculae-proto.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const growthVideo = document.querySelector('.rad-sim-video video');

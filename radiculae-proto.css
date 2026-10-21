@@ -271,18 +271,22 @@ html.proto .rad-sim-media {
     }
 }
 
-/* Standalone button to the comparison page; full width on phones */
+/* Standalone button to the comparison page: right-aligned, about 70% of the primary button size */
+html.proto .rad-sim-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+html.proto .btn-primary.rad-compare-btn:not([href^="mailto"]) {
+    --lip: 3.5px;
+    gap: 0.35rem;
+    padding: 0.7rem 1.4rem;
+    font-size: 0.75rem;
+}
+
 html.proto .rad-compare-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-@media (max-width: 640px) {
-    html.proto .rad-compare-btn {
-        width: 100%;
-    }
 }
 
 html.proto .rad-sim-figure {
