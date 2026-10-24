@@ -23,7 +23,8 @@ html.proto .bento {
     grid-auto-rows: minmax(300px, auto);
     grid-template-areas:
         "hero hero structural structural"
-        "hero hero crystal ferro";
+        "hero hero crystal ferro"
+        "olive olive olive olive";
 }
 
 /* --i is the stagger slot: the tiles fade up one after another. */
@@ -243,7 +244,8 @@ html.proto .bento-tile:focus-visible .bento-cta i {
         grid-template-areas:
             "hero hero"
             "structural structural"
-            "crystal ferro";
+            "crystal ferro"
+            "olive olive";
     }
 
     html.proto .bento-hero .bento-tile {
@@ -259,7 +261,8 @@ html.proto .bento-tile:focus-visible .bento-cta i {
             "hero"
             "structural"
             "crystal"
-            "ferro";
+            "ferro"
+            "olive";
         grid-auto-rows: auto;
         gap: 1rem;
     }
@@ -331,3 +334,5 @@ html.proto .bento-tile:focus-visible .bento-cta i {
         transform: none;
     }
 }
+
+html.proto .bento-olive { grid-area: olive; --i: 4; }

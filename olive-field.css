@@ -1,0 +1,29 @@
+/* Olive restoration case study; shared typography and colors come from prototype.css. */
+.olive-project { padding-top: 8rem; }
+.olive-hero { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; padding-bottom: 5rem; }
+.olive-intro h1 { font-size: clamp(2.6rem, 5vw, 4.8rem); line-height: 1.06; margin: 1rem 0 1.5rem; }
+.olive-eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 700; margin: 1.5rem 0 1rem; }
+.olive-lead { font-size: 1.25rem; line-height: 1.6; }
+.olive-intro p, .olive-closing p { margin-bottom: 1.5rem; }
+.olive-project figure { margin: 0; min-width: 0; }
+.olive-project img { display: block; width: 100%; height: auto; border-radius: 1.25rem; }
+.olive-cover img { max-height: 680px; object-fit: cover; }
+.olive-project figcaption { font-size: .85rem; line-height: 1.6; padding: .8rem .25rem; }
+.olive-section-intro { max-width: 760px; margin: 1rem 0 2.5rem; line-height: 1.8; }
+.olive-photo-grid, .olive-diagram-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
+.olive-photo-grid img { aspect-ratio: 3 / 4; object-fit: cover; }
+.olive-photo-grid a:focus-visible { outline: 3px solid currentColor; outline-offset: 5px; border-radius: 1.25rem; }
+.olive-project .olive-study { max-width: 960px; margin-inline: auto; }
+.olive-study img { background: #f4f0e7; }
+.olive-diagram-grid img { aspect-ratio: 1; object-fit: contain; background: #f4f0e7; }
+.olive-closing { max-width: 800px; }
+@media (max-width: 800px) {
+    .olive-project { padding-top: 7rem; }
+    .olive-hero { grid-template-columns: 1fr; }
+    .olive-cover img { max-height: 560px; }
+    .olive-photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .olive-diagram-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    .olive-photo-grid { grid-template-columns: 1fr; }
+}
