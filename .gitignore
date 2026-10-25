@@ -1,0 +1,14 @@
+# Local Blender workspace; website exports live in images/olive-field/.
+/WEBSITE_OLIVE/
+
+# Blender scenes and backup files are not website assets.
+*.blend
+*.blend[0-9]*
+
+# Local caches, logs, and operating-system metadata.
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
