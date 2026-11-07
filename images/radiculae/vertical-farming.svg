@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600">
+  <title>Vertical farming: crops grown in stacked indoor layers</title>
+  <desc>Three shelves of leafy greens with arrows identifying the lights above each shelf, plants, growing plugs beneath the plants, and the water source connected to the shelves.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#f6c15a"/>
+    </marker>
+    <g id="plant">
+      <path d="M-13-4h26l-4 19H-9Z" fill="#f6c15a" stroke="#f7c25c" stroke-width="2"/>
+      <path d="M0 0v-29" fill="none" stroke="#70b850" stroke-width="5" stroke-linecap="round"/>
+      <path d="M0-8C-32-8-42-29-34-44-12-43-1-30 0-8Z" fill="#83c95a"/>
+      <path d="M0-8C32-8 42-29 34-44 12-43 1-30 0-8Z" fill="#58a63e"/>
+      <path d="M0-15C-18-31-16-51 0-60 16-51 18-31 0-15Z" fill="#ade477"/>
+    </g>
+    <g id="tier">
+      <rect x="245" y="0" width="438" height="10" rx="5" fill="#f2b233"/>
+      <path d="M265 21h398" stroke="#f6c15a" stroke-width="12" stroke-linecap="round" opacity=".5"/>
+      <rect x="244" y="105" width="440" height="24" rx="6" fill="#1e293b" stroke="#aab4c4" stroke-width="3"/>
+      <path d="M260 122h408" stroke="#7fc3d9" stroke-width="4" stroke-linecap="round"/>
+      <use href="#plant" x="300" y="105"/>
+      <use href="#plant" x="382" y="105"/>
+      <use href="#plant" x="464" y="105"/>
+      <use href="#plant" x="546" y="105"/>
+      <use href="#plant" x="628" y="105"/>
+    </g>
+  </defs>
+  <rect width="960" height="600" fill="#0f172a"/>
+  <rect x="154" y="44" width="652" height="506" rx="24" fill="#172238"/>
+  <path d="M206 532h548" stroke="#2c3a52" stroke-width="3"/>
+  <path d="M230 83v444M698 83v444" stroke="#aab4c4" stroke-width="12" stroke-linecap="round"/>
+  <use href="#tier" y="90"/>
+  <use href="#tier" y="235"/>
+  <use href="#tier" y="380"/>
+  <path d="M718 492h28V206H687M746 351h-59M746 496h-59" fill="none" stroke="#7fc3d9" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="720" y="490" width="66" height="42" rx="6" fill="#1f3140" stroke="#aab4c4" stroke-width="3"/>
+  <path d="M724 510h58v16a2 2 0 0 1-2 2h-54a2 2 0 0 1-2-2Z" fill="#7fc3d9"/>
+  <path d="m740 267 6-9 6 9m-12 145 6-9 6 9" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="none" stroke="#f6c15a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)">
+    <path d="M130 94h70l65 1"/>
+    <path d="M140 267h48l88 29"/>
+    <path d="M130 471h65l88 24"/>
+    <path d="M807 560h-54v-22"/>
+  </g>
+  <g fill="#f8fafc" font-family="Arial, sans-serif" font-size="32" font-weight="600">
+    <text x="24" y="105">Lights</text>
+    <text x="24" y="278">Plants</text>
+    <text x="24" y="482">Plugs</text>
+    <text x="936" y="585" text-anchor="end">Water source</text>
+  </g>
+</svg>
