@@ -182,6 +182,11 @@ html.proto .rad-farming {
     padding-top: clamp(3.5rem, 8vw, 6rem);
 }
 
+html.proto .rad-farming-images {
+    display: grid;
+    gap: 1rem;
+}
+
 html.proto .rad-farming img {
     display: block;
     width: 100%;
@@ -193,6 +198,10 @@ html.proto .rad-farming img {
 html.proto .rad-farming h2 {
     margin: 0 0 0.75rem;
     font-family: var(--ds-display);
+}
+
+html.proto .rad-farming h2.rad-building-title {
+    margin-top: 2rem;
 }
 
 html.proto .rad-farming p {
