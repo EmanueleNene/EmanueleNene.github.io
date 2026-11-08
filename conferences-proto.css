@@ -341,6 +341,60 @@ html.proto .conference-blog-content li::before {
     background-color: var(--ds-accent);
 }
 
+/* MAX IV: compact portraits alternate beside their related text. */
+html.proto .maxiv-page .experiment-row {
+    display: grid;
+    grid-template-columns: minmax(0, 215px) minmax(0, 1fr);
+    grid-template-areas: "photo copy";
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+html.proto .maxiv-page .experiment-row-reverse {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 215px);
+    grid-template-areas: "copy photo";
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+    border-top: 1px solid var(--ds-line);
+}
+
+html.proto .maxiv-page .experiment-photo {
+    grid-area: photo;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 1rem;
+}
+
+html.proto .maxiv-page .experiment-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+html.proto .maxiv-page .experiment-copy {
+    grid-area: copy;
+    min-width: 0;
+}
+
+html.proto .maxiv-page .experiment-copy > :last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+    html.proto .maxiv-page .experiment-row {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "photo" "copy";
+        gap: 1.25rem;
+    }
+
+    html.proto .maxiv-page .experiment-photo {
+        width: min(100%, 180px);
+    }
+
+    html.proto .maxiv-page .experiment-row-reverse .experiment-photo {
+        justify-self: end;
+    }
+}
+
 /* Pull quote as a bold panel */
 html.proto .conference-blog-content blockquote {
     margin: 2rem 0;
