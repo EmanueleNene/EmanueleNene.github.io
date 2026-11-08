@@ -177,7 +177,7 @@ html.proto .rad-marquee-track .dot {
 html.proto .rad-farming {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    align-items: center;
+    align-items: start;
     gap: clamp(1.5rem, 4vw, 3rem);
     padding-top: clamp(3.5rem, 8vw, 6rem);
 }
