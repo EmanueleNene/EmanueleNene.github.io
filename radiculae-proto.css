@@ -176,6 +176,7 @@ html.proto .rad-marquee-track .dot {
 /* A visual definition before the material and mission details */
 html.proto .rad-farming {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: clamp(1.5rem, 4vw, 3rem);
     padding-top: clamp(3.5rem, 8vw, 6rem);
 }
