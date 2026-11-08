@@ -176,15 +176,15 @@ html.proto .rad-marquee-track .dot {
 /* A visual definition before the material and mission details */
 html.proto .rad-farming {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    align-items: start;
     gap: clamp(1.5rem, 4vw, 3rem);
     padding-top: clamp(3.5rem, 8vw, 6rem);
 }
 
-html.proto .rad-farming-images {
+html.proto .rad-farming-block {
     display: grid;
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(1.5rem, 4vw, 3rem);
 }
 
 html.proto .rad-farming img {
@@ -200,10 +200,6 @@ html.proto .rad-farming h2 {
     font-family: var(--ds-display);
 }
 
-html.proto .rad-farming h2.rad-building-title {
-    margin-top: 2rem;
-}
-
 html.proto .rad-farming p {
     margin: 0;
     color: var(--text-secondary);
@@ -211,7 +207,7 @@ html.proto .rad-farming p {
 }
 
 @media (max-width: 640px) {
-    html.proto .rad-farming {
+    html.proto .rad-farming-block {
         grid-template-columns: minmax(0, 1fr);
     }
 }
